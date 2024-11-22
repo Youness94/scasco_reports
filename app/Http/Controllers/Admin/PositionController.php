@@ -46,7 +46,7 @@ class PositionController extends Controller
             ]);
 
             DB::commit();
-            return redirect('/positions')->with('success', 'BeneCompte created successfully');
+            return redirect('/positions')->with('success', 'Position created successfully');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Quotes creation failed: ' . $e->getMessage());
