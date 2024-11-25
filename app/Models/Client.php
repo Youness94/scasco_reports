@@ -24,6 +24,10 @@ class Client extends Model
         'city_id',
     ];
 
+    public function potentialCases()
+    {
+        return $this->hasMany(PotencialCase::class, 'client_id');
+    }
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');

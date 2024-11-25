@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
 class PotencialCaseController extends Controller
 {
     public function get_all_potential_cases(){
-        $all_potential_cases = PotencialCase::with('creator', 'updater','services','clients')->get();
+        $all_potential_cases = PotencialCase::with('creator', 'updater','services','client')->get();
         return view('potential_cases.potential_cases_list', compact('all_potential_cases'));
     }
 

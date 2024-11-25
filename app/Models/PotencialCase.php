@@ -28,9 +28,9 @@ class PotencialCase extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    public function clients()
+    public function client()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsTo(Client::class, 'client_id');
     }
 
     public function services()
