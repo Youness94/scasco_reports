@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\PositionController;
+use App\Http\Controllers\Admin\PotencialCaseController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Client\ClientUserController;
@@ -114,6 +115,19 @@ Route::group(['middleware' => ['web', 'auth']], function () {
         Route::get('modifier-client/{id}', 'edit_client')->name('edit.client');
         Route::post('update/client/{id}',  'update_client')->name('update.client');
         Route::get('delete/client/{id}', 'delete_client')->name('delete.client');
+        Route::get('détail-de-client/{id}', 'display_client')->name('display.client');
+    });
+
+    Route::controller(PotencialCaseController::class)->group(function () {
+
+        Route::get('affaires', 'get_all_potential_cases')->name('all.potential_cases');
+        Route::get('ajouter-affaire',  'add_potential_case')->name('add.potential_case');
+        Route::post('store/affaire',  'store_potential_case')->name('store.potential_case');
+        Route::get('modifier-affaire/{id}', 'edit_potential_case')->name('edit.potential_case');
+        Route::post('update/affaire/{id}',  'update_potential_case')->name('update.potential_case');
+        Route::get('delete/affaire/{id}', 'delete_potential_case')->name('delete.potential_case');
+        Route::get('détail-de-affaire/{id}', 'display_potential_case')->name('display.potential_case');
+        Route::get('get-branches-by-service','getBranchesByService')->name('getBranchesByService');
     });
 
     

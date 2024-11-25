@@ -14,7 +14,7 @@ class ClientController extends Controller
     public function get_all_clients()
     {
 
-        $clients = Client::with('creator', 'updater', 'client_infos')->get();
+        $clients = Client::with('creator', 'updater', 'client_infos', 'city')->get();
 
         return view('clients.clients_list', compact('clients'));
     }
@@ -22,7 +22,7 @@ class ClientController extends Controller
     public function add_client()
     {
 
-        $clients = Client::with('creator', 'updater', 'city')->get();
+        $clients = Client::with('creator', 'updater', 'client_infos', 'city')->get();
         $cities = City::all();
         return view('clients.add_client', compact('clients', 'cities'));
     }
@@ -73,14 +73,14 @@ class ClientController extends Controller
     public function edit_client($id)
     {
 
-        $client = Client::with('creator', 'updater', 'city')->findOrFail($id);
+        $client = Client::with('creator', 'updater', 'client_infos', 'city')->findOrFail($id);
         $cities = City::all();
         return view('clients.edit_client', compact('client', 'cities'));
     }
 
     public function update_client(Request $request, $id)
     {
-        $client = Client::with('creator', 'updater', 'city')->findOrFail($id);
+        $client = Client::with('creator', 'updater', 'client_infos', 'city')->findOrFail($id);
         $validatedData = $request->validate([
             'client_first_name' => 'sometimes',
             'client_last_name' => 'sometimes',
@@ -125,8 +125,16 @@ class ClientController extends Controller
     }
 
     public function delete_client($id){
-        $client = Client::with('creator', 'updater')->findOrFail($id);
+        $client = Client::with('creator', 'updater','client_infos', 'city')->findOrFail($id);
         $client->delete();
         return redirect('/clients')->with('success', 'Client deleted successfully');
+    }
+
+    public function display_client($id)
+    {
+
+        $client = Client::with('creator', 'updater', 'client_infos', 'city')->findOrFail($id);
+
+        return view('clients.client_details', compact('client'));
     }
 }

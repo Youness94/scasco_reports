@@ -11,7 +11,6 @@ class PotencialCase extends Model
     protected $fillable = [
         'case_number',
         'case_status',
-        'service_id',
         'client_id',
         'created_by',
         'updated_by',
@@ -27,5 +26,15 @@ class PotencialCase extends Model
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function clients()
+    {
+        return $this->hasMany(User::class);
+    }
+
+    public function services()
+    {
+        return $this->belongsToMany(Service::class)->withPivot('branch_ids');
     }
 }

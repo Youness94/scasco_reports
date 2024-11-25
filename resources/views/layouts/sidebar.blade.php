@@ -64,7 +64,32 @@
                     </div>
                 </li>
                 @endif
+                @if (Auth::check() && (Auth::user()->can('voir les positions') || Auth::user()->can('créer position')))
+                <li class="menu-title"><span>Affaires</span></li>
+                @endif
+                @if (Auth::check() && (Auth::user()->can('voir les positions') || Auth::user()->can('créer position') ))
+                <li class="nav-item">
+                    <a class="nav-link menu-link" aria-expanded="{{ request()->routeIs('all.potential_cases') || request()->routeIs('add.potential_case')  ? 'true' : 'false' }}" href="#potencialCases" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="potencialCases">
+                        <i class="ri-layout-3-line"></i> <span>Affaires</span>
+                    </a>
+                    <div class="collapse menu-dropdown {{ request()->routeIs('all.potential_cases') || request()->routeIs('add.potential_case') ? 'show' : '' }}" id="potencialCases">
+                        <ul class="nav nav-sm flex-column">
+                            @can('créer position')
+                            <li class="nav-item">
+                                <a href="{{route('add.potential_case')}}" class="nav-link {{ Route::is('add.potential_case') ? 'active' : '' }}">Ajouter position</a>
+                            </li>
+                            @endcan
+                            @can('voir les positions')
+                            <li class="nav-item">
+                                <a href="{{route('all.potential_cases')}}" class="nav-link {{ Route::is('all.potential_cases') ? 'active' : '' }}">Les positions</a>
+                            </li>
+                            @endcan
+                          
 
+                        </ul>
+                    </div>
+                </li>
+                @endif
                 @if (Auth::check() && (Auth::user()->can('voir les positions') || Auth::user()->can('créer position')))
                 <li class="menu-title"><span>Positions</span></li>
                 @endif

@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-@lang('Les clients')
+@lang('Les affaires')
 @endsection
 @section('css')
 <!--datatable css-->
@@ -12,7 +12,7 @@
 @section('content')
 @component('components.breadcrumb')
 @slot('li_1') <a href="{{ route('accueil') }}">Tableau de Bord</a> @endslot
-@slot('title') Les Clients @endslot
+@slot('title') Les Affaires @endslot
 @endcomponent
 
 <div class="page-wrapper">
@@ -56,10 +56,10 @@
                         <div class="card-header d-flex flex-column">
                             <div class="row align-items-center">
                                 <div class="col-md-10">
-                                    <h5 class="card-title mb-0">Les Clients</h5>
+                                    <h5 class="card-title mb-0">Les Affaires</h5>
                                 </div>
-                                <div class="col-md-2 d-flex justify-content-end"> 
-                                    <a href="{{ route('add.client') }}" class="btn btn-success add-btn"><i class="ri-add-line align-bottom me-1"></i> Ajouter</a> <!-- Remove padding from button -->
+                                <div class="col-md-2 d-flex justify-content-end">
+                                    <a href="{{ route('add.potential_case') }}" class="btn btn-success add-btn"><i class="ri-add-line align-bottom me-1"></i> Ajouter</a> <!-- Remove padding from button -->
                                 </div>
                             </div>
                         </div>
@@ -69,22 +69,36 @@
                             <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>Nom</th>
-                                        <th>Prénom</th>
-                                        <th>E-mail</th>
-                                        <th>Téléphone</th>
-                                        <th>Ville</th>
+                                        <th>Numéro d'Affaire</th>
+                                        <th>Client</th>
+                                        <th>Statu</th>
+                                        <th>Services</th>
+                                        <th>Branches</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($clients as $client)
+                                    @foreach ($all_potential_cases as $all_potential_case)
                                     <tr>
-                                        <td>{{ $client->client_first_name ?? N/V }}</td>
-                                        <td>{{ $client->client_last_name ?? N/V}}</td>
-                                        <td>{{ $client->client_email?? N/V }}</td>
-                                        <td>{{ $client->client_phone ?? N/V}}</td>
-                                        <td>{{ $client->city->name ?? N/V}}</td>
+                                        <td>{{ $all_potential_case->case_number ?? N/V }}</td>
+                                        <td>{{ $all_potential_case->clients->client_first_name ?? N/V}}</td>
+                                        <td>{{ $all_potential_case->case_status ?? N/V }}</td>
+                                        <!-- Display Services -->
+                                        <td>
+                                            @foreach($all_potential_case->services as $service)
+                                            {{ $service->name ?? 'N/V' }}@if (!$loop->last), @endif
+                                            @endforeach
+                                        </td>
+
+                                        <!-- Display Branches -->
+                                        <td>
+                                            @foreach(json_decode($all_potential_case->pivot->branch_ids) as $branchId)
+                                            @php
+                                            $branch = App\Models\Branch::find($branchId);
+                                            @endphp
+                                            {{ $branch->name ?? 'N/V' }}@if (!$loop->last), @endif
+                                            @endforeach
+                                        </td>
                                         <td>
                                             <div class="dropdown d-inline-block">
                                                 <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -92,8 +106,8 @@
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
                                                     <li><a href="{{route('edit.client',$client->id)}}" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Modifier</a></li>
-                                                    <li><a href="{{route('display.client',$client->id)}}" class="dropdown-item edit-item-btn"><i class="ri-eye-line align-bottom me-2 text-muted"></i> Affaicher</a></li>
-                                                    <li><a href="{{route('delete.client',$client->id)}}" class="dropdown-item edit-item-btn"><i class="ri-delete-bin-2-fill align-bottom me-2 text-muted"></i> Supprimer</a></li>
+                                                    <li><a href="{{route('display.potential_case',$potential_case->id)}}" class="dropdown-item edit-item-btn"><i class="ri-eye-line align-bottom me-2 text-muted"></i> Affaicher</a></li>
+                                                    <li><a href="{{route('delete.potential_case',$potential_case->id)}}" class="dropdown-item edit-item-btn"><i class="ri-delete-bin-2-fill align-bottom me-2 text-muted"></i> Supprimer</a></li>
                                                 </ul>
                                             </div>
                                         </td>
