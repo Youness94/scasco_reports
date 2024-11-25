@@ -37,31 +37,7 @@
                     <span>Tableau de Bord</span>
                 </a>
 
-                @if (Auth::check() && (Auth::user()->can('voir les utilisateurs') || Auth::user()->can('créer utilisateur')) )
-                <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarAuth" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs('all.client.users') || request()->routeIs('add.client.user')  ? 'true' : 'false' }}"  aria-controls="sidebarAuth">
-                        <i class="ri-admin-fill"></i> <span>Utilisateurs</span>
-                    </a>
-                    <div class="collapse menu-dropdown {{ request()->routeIs('all.client.users') || request()->routeIs('add.client.user')  ? 'show' : '' }}" id="sidebarAuth">
-                        <ul class="nav nav-sm flex-column">
-                            @can('voir les utilisateurs')
-                            <li class="nav-item">
-                                <a href="{{ route('all.client.users') }}" class="nav-link {{ Route::is('all.client.users') ? 'active' : '' }}">Liste des utilisateurs
-                                </a>
-
-                            </li>
-                            @endcan
-                            @can('créer utilisateur')
-                            <li class="nav-item">
-                                <a href="{{ route('add.client.user') }}" class="nav-link {{ Route::is('all.client.user') ? 'active' : '' }}">Ajouter un utilisateur
-                                </a>
-                            </li>
-                            @endcan
-
-                        </ul>
-                    </div>
-                </li>
-                @endif
+              
 
                 @if (Auth::check() && (Auth::user()->can('voir les admins') || Auth::user()->can('créer admin')) && Auth::user()->user_type === 'Admin')
                 <li class="nav-item">
@@ -89,46 +65,27 @@
                 </li>
                 @endif
 
-                @if (Auth::check() && (Auth::user()->can('voir les devis') || Auth::user()->can('créer devis')))
+                @if (Auth::check() && (Auth::user()->can('voir les positions') || Auth::user()->can('créer position')))
                 <li class="menu-title"><span>Devis</span></li>
                 @endif
-                @if (Auth::check() && (Auth::user()->can('voir les devis') || Auth::user()->can('créer devis') || Auth::user()->can('mettre à jour le devis') ))
+                @if (Auth::check() && (Auth::user()->can('voir les positions') || Auth::user()->can('créer position') ))
                 <li class="nav-item">
-                    <a class="nav-link menu-link" aria-expanded="{{ request()->routeIs('all.quotes') || request()->routeIs('add.quote') || request()->routeIs('pending.quote') || request()->routeIs('processing.quote') || request()->routeIs('completed.quote') || request()->routeIs('cancelled.quote') ? 'true' : 'false' }}" href="#Devis" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="Devis">
-                        <i class="ri-layout-3-line"></i> <span>Devis</span>
+                    <a class="nav-link menu-link" aria-expanded="{{ request()->routeIs('all.positions') || request()->routeIs('add.position')  ? 'true' : 'false' }}" href="#Positions" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="Positions">
+                        <i class="ri-layout-3-line"></i> <span>Positions</span>
                     </a>
-                    <div class="collapse menu-dropdown {{ request()->routeIs('all.quotes') || request()->routeIs('add.quote') || request()->routeIs('pending.quote') || request()->routeIs('processing.quote') || request()->routeIs('completed.quote') || request()->routeIs('cancelled.quote')? 'show' : '' }}" id="Devis">
+                    <div class="collapse menu-dropdown {{ request()->routeIs('all.position') || request()->routeIs('add.position') ? 'show' : '' }}" id="Positions">
                         <ul class="nav nav-sm flex-column">
-                            @can('créer devis')
+                            @can('créer position')
                             <li class="nav-item">
-                                <a href="{{route('add.quote')}}" class="nav-link {{ Route::is('add.quote') ? 'active' : '' }}">Ajouter devis</a>
+                                <a href="{{route('add.position')}}" class="nav-link {{ Route::is('add.position') ? 'active' : '' }}">Ajouter position</a>
                             </li>
                             @endcan
-                            @can('voir les devis')
+                            @can('voir les positions')
                             <li class="nav-item">
-                                <a href="{{route('all.quotes')}}" class="nav-link {{ Route::is('all.quotes') ? 'active' : '' }}">Les devis</a>
+                                <a href="{{route('all.positions')}}" class="nav-link {{ Route::is('all.positions') ? 'active' : '' }}">Les positions</a>
                             </li>
                             @endcan
-                            @can('mettre à jour le devis')
-                            <li class="nav-item">
-                                <a href="{{route('pending.quote')}}" class="nav-link {{ Route::is('pending.quote') ? 'active' : '' }}">Les devis en attente</a>
-                            </li>
-                            @endcan
-                            @can('mettre à jour le devis')
-                            <li class="nav-item">
-                                <a href="{{route('processing.quote')}}" class="nav-link {{ Route::is('processing.quote') ? 'active' : '' }}">Les devis en cours de traitement</a>
-                            </li>
-                            @endcan
-                            @can('mettre à jour le devis')
-                            <li class="nav-item">
-                                <a href="{{route('completed.quote')}}" class="nav-link {{ Route::is('completed.quote') ? 'active' : '' }}">Les devis complétés</a>
-                            </li>
-                            @endcan
-                            @can('mettre à jour le devis')
-                            <li class="nav-item">
-                                <a href="{{route('cancelled.quote')}}" class="nav-link {{ Route::is('cancelled.quote') ? 'active' : '' }}">Les devis annulés</a>
-                            </li>
-                            @endcan
+                          
 
                         </ul>
                     </div>

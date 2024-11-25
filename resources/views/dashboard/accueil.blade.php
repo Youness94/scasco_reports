@@ -35,8 +35,8 @@
                                     </div>
                                     <!--end col-->
                                     <div class="col-auto">
-                                        <a href="{{ route('add.quote') }}" class="btn btn-soft-primary"><i class="ri-add-circle-line align-middle me-1"></i>
-                                            Ajouter Devis</a>
+                                        <a href="{{ route('add.position') }}" class="btn btn-soft-primary"><i class="ri-add-circle-line align-middle me-1"></i>
+                                            Ajouter position</a>
                                     </div>
                                     <!--end col-->
 
@@ -66,9 +66,9 @@
                             </div>
                             <div class="d-flex align-items-end justify-content-between mt-4">
                                 <div>
-                                    <h4 class="fs-22 fw-semibold ff-secondary mb-4">{{$quotes_status_pending}}
+                                    <h4 class="fs-22 fw-semibold ff-secondary mb-4">
                                     </h4>
-                                    <a href="{{ route('pending.quote') }}" class="text-decoration-underline">Les devis en attente</a>
+                                    <a href="" class="text-decoration-underline">Les devis en attente</a>
                                 </div>
                                 <div class="avatar-sm flex-shrink-0">
                                     <span class="avatar-title bg-warning rounded fs-3">
@@ -93,8 +93,8 @@
                             </div>
                             <div class="d-flex align-items-end justify-content-between mt-4">
                                 <div>
-                                    <h4 class="fs-22 fw-semibold ff-secondary mb-4">{{$quotes_status_processing}}</h4>
-                                    <a href="{{ route('processing.quote') }}" class="text-decoration-underline">Les devis en cours de traitement</a>
+                                    <h4 class="fs-22 fw-semibold ff-secondary mb-4"></h4>
+                                    <a href="" class="text-decoration-underline">Les devis en cours de traitement</a>
                                 </div>
                                 <div class="avatar-sm flex-shrink-0">
                                     <span class="avatar-title bg-info rounded fs-3">
@@ -119,9 +119,9 @@
                             </div>
                             <div class="d-flex align-items-end justify-content-between mt-4">
                                 <div>
-                                    <h4 class="fs-22 fw-semibold ff-secondary mb-4">{{$quotes_status_completed}}
+                                    <h4 class="fs-22 fw-semibold ff-secondary mb-4">
                                     </h4>
-                                    <a href="{{ route('completed.quote') }}" class="text-decoration-underline">Les devis terminés</a>
+                                    <a href="" class="text-decoration-underline">Les devis terminés</a>
                                 </div>
                                 <div class="avatar-sm flex-shrink-0">
                                     <span class="avatar-title bg-success rounded fs-3">
@@ -146,9 +146,9 @@
                             </div>
                             <div class="d-flex align-items-end justify-content-between mt-4">
                                 <div>
-                                    <h4 class="fs-22 fw-semibold ff-secondary mb-4">{{$quotes_status_cancelled}}
+                                    <h4 class="fs-22 fw-semibold ff-secondary mb-4">
                                     </h4>
-                                    <a href="{{ route('cancelled.quote') }}" class="text-decoration-underline">Les devis annulés</a>
+                                    <a href="" class="text-decoration-underline">Les devis annulés</a>
                                 </div>
                                 <div class="avatar-sm flex-shrink-0">
                                     <span class="avatar-title bg-danger rounded fs-3">
@@ -170,7 +170,7 @@
                         </div><!-- end card header -->
 
                         <div class="card-body">
-                            <div id="quotes_chart_bar"  class="apex-charts" dir="ltr"></div>
+                            <div id="quotes_chart_bar" class="apex-charts" dir="ltr"></div>
                         </div><!-- end card-body -->
                     </div><!-- end card -->
                 </div>
@@ -195,361 +195,81 @@
                     </div> <!-- .card-->
                 </div> <!-- .col-->
                 <!-- end col -->
-                <div class="col-xl-8">
-                    <div class="card">
-                        <div class="card-header align-items-center d-flex">
-                            <h4 class="card-title mb-0 flex-grow-1">Devis récents</h4>
 
-                        </div><!-- end card header -->
-
-                        <div class="card-body">
-                            <div class="table-responsive table-card">
-                                <table class="table table-hover table-centered align-middle table-nowrap mb-0">
-                                    <tbody>
-                                        @foreach ($recent_quotes as $recent_quote)
-                                        @foreach ($recent_quote->quotes as $quote)
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-
-                                                    <div>
-                                                        <h5 class="fs-14 my-1"><a href="apps-ecommerce-product-details" class="text-reset">
-                                                        {{ $recent_quote->quote_number ?? 'N/A' }}</a></h5>
-                                                        <span class="text-muted">Devis</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{ $recent_quote->date_creation }}</h5>
-                                                <span class="text-muted">Date de création</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{ $quote->prime_ht ?? 'N/A' }}</h5>
-                                                <span class="text-muted">Prime HT</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{ $quote->prime_ht_tax ?? 'N/A' }}</h5>
-                                                <span class="text-muted">Taxe</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{ ($quote->prime_ht ?? 0) + ($quote->prime_ht_tax ?? 0) }}</h5>
-                                                <span class="text-muted">Prime</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{ ($quote->prime_totale_annuelle ?? 0)  }}</h5>
-                                                <span class="text-muted">Prime Totale annuelle</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{  ($quote->prorata ?? 0) }}</h5>
-                                                <span class="text-muted">Prorata</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">
-                                                    <span class="badge bg-success-subtle text-success text-uppercase">
-                                                        @if ($recent_quote->latestStatus)
-                                                        @switch($recent_quote->latestStatus->quote_status)
-                                                        @case('pending')
-                                                        <a class="text-warning">En attente</a>
-                                                        @break
-                                                        @case('completed')
-                                                        <a class="text-success">Complété</a>
-                                                        @break
-                                                        @case('processing')
-                                                        <a class="text-primary">En cours de traitement</a>
-                                                        @break
-                                                        @case('cancelled')
-                                                        <a class="text-danger">Annulé</a>
-                                                        @break
-                                                        @default
-                                                        <a class="text-muted">Pas de statut</a>
-                                                        @endswitch
-                                                        @endif
-                                                    </span>
-                                                </h5>
-                                                <span class="text-muted">Status</span>
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div class="align-items-center mt-4 pt-2 justify-content-between row text-center text-sm-start">
-                                <div class="col-sm">
-                                    <div class="text-muted">
-                                    Afficher les détails
-                                    </div>
-                                </div>
-                                <div class="col-sm-auto  mt-3 mt-sm-0">
-                                    <a href="{{ route('all.quotes') }}" class="text-decoration-underline">Tous les devis</a>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
 
 
             </div> <!-- end row-->
 
             <div class="row">
-                <div class="col-xl-12">
-                    <div class="card card-height-100">
-                    <div class="card-header align-items-center d-flex">
-                            <h4 class="card-title mb-0 flex-grow-1">Devis terminés</h4>
+            
 
-                        </div><!-- end card header -->
-                        <div class="card-body">
-                            <div class="table-responsive table-card">
-                                <table class="table table-hover table-centered align-middle table-nowrap mb-0">
-                                    <tbody>
-                                        @foreach ($completed_quotes as $completed_quote)
-                                        @foreach ($completed_quote->quotes as $quote)
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
+            </div> <!-- end .h-100-->
 
-                                                    <div>
-                                                        <h5 class="fs-14 my-1"><a href="apps-ecommerce-product-details" class="text-reset">
-                                                        {{ $completed_quote->quote_number ?? 'N/A' }}</a></h5>
-                                                        <span class="text-muted">Devis</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{ $completed_quote->date_creation }}</h5>
-                                                <span class="text-muted">Date de création</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{ $quote->prime_ht ?? 'N/A' }}</h5>
-                                                <span class="text-muted">Prime HT</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{ $quote->prime_ht_tax ?? 'N/A' }}</h5>
-                                                <span class="text-muted">Taxe</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{ ($quote->prime_ht ?? 0) + ($quote->prime_ht_tax ?? 0) }}</h5>
-                                                <span class="text-muted">Prime</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{ ($quote->prime_totale_annuelle ?? 0)  }}</h5>
-                                                <span class="text-muted">Prime Totale annuelle</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{  ($quote->prorata ?? 0) }}</h5>
-                                                <span class="text-muted">Prorata</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">
-                                                    <span class="badge bg-success-subtle text-success text-uppercase">
-                                                        @if ($completed_quote->latestStatus)
-                                                        @switch($completed_quote->latestStatus->quote_status)
-                                                        @case('pending')
-                                                        <a class="text-warning">En attente</a>
-                                                        @break
-                                                        @case('completed')
-                                                        <a class="text-success">Complété</a>
-                                                        @break
-                                                        @case('processing')
-                                                        <a class="text-primary">En cours de traitement</a>
-                                                        @break
-                                                        @case('cancelled')
-                                                        <a class="text-danger">Annulé</a>
-                                                        @break
-                                                        @default
-                                                        <a class="text-muted">Pas de statut</a>
-                                                        @endswitch
-                                                        @endif
-                                                    </span>
-                                                </h5>
-                                                <span class="text-muted">Status</span>
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
+        </div> <!-- end col -->
 
-                            <div class="align-items-center mt-4 pt-2 justify-content-between row text-center text-sm-start">
-                                <div class="col-sm">
-                                    <div class="text-muted">
-                                    Afficher les détails
-                                    </div>
-                                </div>
-                                <div class="col-sm-auto  mt-3 mt-sm-0">
-                                    <a href="{{ route('completed.quote') }}" class="text-decoration-underline">Tous les devis</a>
-                                </div>
-                            </div>
 
-                        </div>
-                    </div> <!-- .card-->
-                </div> <!-- .col-->
+    </div>
+    @endsection
+    @section('script')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
-                <div class="col-xl-12">
-                    <div class="card">
-                    <div class="card-header align-items-center d-flex">
-                            <h4 class="card-title mb-0 flex-grow-1">Devis annulés</h4>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
 
-                        </div><!-- end card header -->
-                        <div class="card-body">
-                            <div class="table-responsive table-card">
-                                <table class="table table-hover table-centered align-middle table-nowrap mb-0">
-                                    <tbody>
-                                        @foreach ($cancelled_quotes as $cancelled_quote)
-                                        @foreach ($cancelled_quote->quotes as $quote)
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
+    <!-- apexcharts -->
+    <script src="{{ URL::asset('build/libs/apexcharts/apexcharts.min.js') }}"></script>
+    <script src="{{ URL::asset('build/libs/jsvectormap/js/jsvectormap.min.js') }}"></script>
+    <script src="{{ URL::asset('build/libs/jsvectormap/maps/world-merc.js') }}"></script>
+    <script src="{{ URL::asset('build/libs/swiper/swiper-bundle.min.js')}}"></script>
+    <!-- <script src="{{ URL::asset('build/js/pages/chartjs.init.js') }}"></script> -->
+    <!-- dashboard init -->
+    <script src="{{ URL::asset('build/js/pages/dashboard-ecommerce.init.js') }}"></script>
+    <script src="{{ URL::asset('build/js/app.js') }}"></script>
 
-                                                    <div>
-                                                        <h5 class="fs-14 my-1"><a href="apps-ecommerce-product-details" class="text-reset">
-                                                        {{ $cancelled_quote->quote_number ?? 'N/A' }}</a></h5>
-                                                        <span class="text-muted">Devis</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{ $cancelled_quote->date_creation }}</h5>
-                                                <span class="text-muted">Date de création</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{ $quote->prime_ht ?? 'N/A' }}</h5>
-                                                <span class="text-muted">Prime HT</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{ $quote->prime_ht_tax ?? 'N/A' }}</h5>
-                                                <span class="text-muted">Taxe</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{ ($quote->prime_ht ?? 0) + ($quote->prime_ht_tax ?? 0) }}</h5>
-                                                <span class="text-muted">Prime</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{ ($quote->prime_totale_annuelle ?? 0)  }}</h5>
-                                                <span class="text-muted">Prime Totale annuelle</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">{{  ($quote->prorata ?? 0) }}</h5>
-                                                <span class="text-muted">Prorata</span>
-                                            </td>
-                                            <td>
-                                                <h5 class="fs-14 my-1 fw-normal">
-                                                    <span class="badge bg-success-subtle text-success text-uppercase">
-                                                        @if ($cancelled_quote->latestStatus)
-                                                        @switch($cancelled_quote->latestStatus->quote_status)
-                                                        @case('pending')
-                                                        <a class="text-warning">En attente</a>
-                                                        @break
-                                                        @case('completed')
-                                                        <a class="text-success">Complété</a>
-                                                        @break
-                                                        @case('processing')
-                                                        <a class="text-primary">En cours de traitement</a>
-                                                        @break
-                                                        @case('cancelled')
-                                                        <a class="text-danger">Annulé</a>
-                                                        @break
-                                                        @default
-                                                        <a class="text-muted">Pas de statut</a>
-                                                        @endswitch
-                                                        @endif
-                                                    </span>
-                                                </h5>
-                                                <span class="text-muted">Status</span>
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-                            <div class="align-items-center mt-4 pt-2 justify-content-between row text-center text-sm-start">
-                                <div class="col-sm">
-                                    <div class="text-muted">
-                                    Afficher les détails
-                                    </div>
-                                </div>
-                                <div class="col-sm-auto  mt-3 mt-sm-0">
-                                    <a href="{{ route('cancelled.quote') }}" class="text-decoration-underline">Tous les devis</a>
-                                </div>
-                            </div>
+    <script src="{{ URL::asset('build/js/pages/apexcharts-pie.init.js') }}"></script>
+    <script src="{{ URL::asset('build/js/pages/apexcharts-bar.init.js') }}"></script>
 
-                        </div>
-                    </div> <!-- .card-->
-                </div> <!-- .col-->
-            </div> <!-- end row-->
+    <script>
+        // Get reference to the span element where the date will be displayed
+        var currentDateTimeSpan = document.getElementById("currentDate");
 
-        </div> <!-- end .h-100-->
+        // Function to update the current date and time
+        function updateCurrentDateTime() {
+            // Get today's date and time
+            var today = new Date();
 
-    </div> <!-- end col -->
+            // Format date and time as 'Day, Month Date, Year - HH:MM:SS AM/PM'
+            var formattedDateTime = today.toLocaleString('fr-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                second: 'numeric',
+                hour12: true
+            });
 
-  
-</div>
-@endsection
-@section('script')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+            // Update the content of the span element with the formatted date and time
+            currentDateTimeSpan.textContent = formattedDateTime;
+        }
 
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+        // Call the function initially to set the current date and time
+        updateCurrentDateTime();
 
-<!-- apexcharts -->
-<script src="{{ URL::asset('build/libs/apexcharts/apexcharts.min.js') }}"></script>
-<script src="{{ URL::asset('build/libs/jsvectormap/js/jsvectormap.min.js') }}"></script>
-<script src="{{ URL::asset('build/libs/jsvectormap/maps/world-merc.js') }}"></script>
-<script src="{{ URL::asset('build/libs/swiper/swiper-bundle.min.js')}}"></script>
-<!-- <script src="{{ URL::asset('build/js/pages/chartjs.init.js') }}"></script> -->
-<!-- dashboard init -->
-<script src="{{ URL::asset('build/js/pages/dashboard-ecommerce.init.js') }}"></script>
-<script src="{{ URL::asset('build/js/app.js') }}"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-<script src="{{ URL::asset('build/js/pages/apexcharts-pie.init.js') }}"></script>
-<script src="{{ URL::asset('build/js/pages/apexcharts-bar.init.js') }}"></script>
-
-<script>
-    // Get reference to the span element where the date will be displayed
-    var currentDateTimeSpan = document.getElementById("currentDate");
-
-    // Function to update the current date and time
-    function updateCurrentDateTime() {
-        // Get today's date and time
-        var today = new Date();
-
-        // Format date and time as 'Day, Month Date, Year - HH:MM:SS AM/PM'
-        var formattedDateTime = today.toLocaleString('fr-US', {
-            weekday: 'long',
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric',
-            second: 'numeric',
-            hour12: true
-        });
-
-        // Update the content of the span element with the formatted date and time
-        currentDateTimeSpan.textContent = formattedDateTime;
-    }
-
-    // Call the function initially to set the current date and time
-    updateCurrentDateTime();
-
-    // Set up an interval to update the current date and time every second
-    setInterval(updateCurrentDateTime, 1000); // Update every second (1000 milliseconds)
-</script>
-<!-- <script>
+        // Set up an interval to update the current date and time every second
+        setInterval(updateCurrentDateTime, 1000); // Update every second (1000 milliseconds)
+    </script>
+    <!-- <script>
     document.addEventListener("DOMContentLoaded", function() {
         fetch("/quotes-bar-chart-home")
             .then((response) => response.json())
@@ -629,4 +349,4 @@
     });
 </script> -->
 
-@endsection
+    @endsection

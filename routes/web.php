@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminPermissionController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\HomeController;
+use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Client\ClientUserController;
 use App\Http\Controllers\MatuAutoDevisController;
@@ -72,40 +73,17 @@ Route::group(['middleware' => ['web', 'auth']], function () {
         Route::post('change/password', 'changePassword')->name('admin/change/password');
     });
 
-    Route::controller(ClientUserController::class)->group(function () {
-        Route::get('utilisateurs', 'client_users')->name('all.client.users');
-        Route::get('ajouter-utilisateur', 'add_client_user')->name('add.client.user');
-        Route::post('store-utilisateur', 'store_client_user')->name('store.client.user');
-        Route::get('modifier-utilisateur/{id}', 'edit_client_user')->name('edit.client.user');
-        Route::post('utilisateur/update/{id}', 'update_client_user')->name('client.user.update');
-        Route::post('utilisateur/delete', 'delete_client_user')->name('client.user.delete');
+    Route::controller(PositionController::class)->group(function () {
+
+        Route::get('positions', 'get_all_positions')->name('all.positions');
+        Route::get('ajouter-position',  'add_position')->name('add.position');
+        Route::post('store/position',  'store_position')->name('store.position');
+        Route::get('modifier-position/{id}', 'edit_position')->name('edit.position');
+        Route::post('update/position/{id}',  'update_position')->name('update.position');
+        Route::get('delete/position/{id}', 'delete_position')->name('delete.position');
     });
 
-
-    Route::controller(QuoteController::class)->group(function () {
-        Route::get('les-devis', 'get_all_quotes')->name('all.quotes');
-        Route::get('ajouter-devi', 'add_quote')->name('add.quote');
-        Route::post('store-devi', 'store_quote')->name('store.quote');
-
-        Route::get('modifier-devi/{id}', 'edit_quote')->name('edit.quote');
-        Route::post('update-devi/{id}', 'update_quote')->name('update.quote');
-        Route::get('delete-devi/{id}', 'delete_quote')->name('delete.quote');
-
-        Route::get('details-quote-client', 'quote_details')->name('details.quote');
-        Route::get('admin-details-quote/{id}', 'quote_details_id')->name('details.quote.id');
-        Route::get('details-quote/{id}', 'quote_details_id_client')->name('details.quote.client');
-
-        // 'pending', 'completed', 'processing', 'cancelled'
-        Route::get('devis-pending', 'quotes_status_pending')->name('pending.quote');
-        Route::get('devis-processing', 'quotes_status_processing')->name('processing.quote');
-        Route::get('devis-completed', 'quotes_status_completed')->name('completed.quote');
-        Route::get('devis-cancelled', 'quotes_status_cancelled')->name('cancelled.quote');
-
-        Route::put('/quote-infos/bulk-status', [QuoteController::class, 'update_quote_status'])->name('quote.infos.bulk.status.update');
-        Route::put('/quote-info/status/{id}', [QuoteController::class, 'update_one_quote_status'])->name('quote.info.status.update');
-        // Route::post('/quote-infos/bulk-status', [QuoteController::class, 'bulkUpdateQuoteInfoAndQuotes'])->name('quote.infos.bulk.status.update');
-    });
-
+    
 
     Route::controller(AdminRoleController::class)->group(function () {
 

@@ -27,15 +27,16 @@ class PositionController extends Controller
         return view('positions.add_position', compact('positions'));
     }
 
+
     public function store_position(Request $request)
     {
         $validatedData = $request->validate([
             'name' => 'required',
-        
-          
+
+
         ], [
-            'name.required' => 'Veuillez entrer votre prénom.',
-           
+            'name.required' => 'Veuillez entrer le nom du poste.',
+
         ]);
         DB::beginTransaction();
         try {
@@ -56,4 +57,51 @@ class PositionController extends Controller
             ];
         }
     }
+
+    public function edit_position($id)
+    {
+
+        $position = Position::with('creator', 'updater')->findOrFail($id);
+
+        return view('positions.edit_position', compact('position'));
+    }
+
+    public function update_position(Request $request, $id)
+    {
+        $position = Position::with('creator', 'updater')->findOrFail($id);
+        $validatedData = $request->validate([
+            'name' => 'required',
+
+
+        ], [
+            'name.required' => 'Veuillez entrer le nom du poste.',
+
+        ]);
+
+        DB::beginTransaction();
+        try {
+
+            $user = Auth::user();
+            $position->name = $request->input('name');
+            $position->updated_by = $user->id;
+            $position->save();
+
+            DB::commit();
+            return redirect('/positions')->with('success', 'Position updated successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Quotes creation failed: ' . $e->getMessage());
+            return [
+                'status' => 'Error',
+                'message' => $e->getMessage() ?: 'DB Error',
+            ];
+        }
+    }
+
+    public function delete_position($id){
+        $position = Position::with('creator', 'updater')->findOrFail($id);
+        $position->delete();
+        return redirect('/positions')->with('success', 'Position deleted successfully');
+    }
 }
+  

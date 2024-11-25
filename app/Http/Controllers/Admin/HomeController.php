@@ -40,49 +40,9 @@ class HomeController extends Controller
     /** home dashboard */
     public function index()
     {
-        $quotes = QuoteInfo::with('quotes_status')->count();
+       
 
-        $quotes_status_pending = QuoteInfo::whereHas('latestStatus', function ($query) {
-            $query->where('quote_status', 'pending');
-        })->count();
-
-        $quotes_status_processing = QuoteInfo::whereHas('latestStatus', function ($query) {
-            $query->where('quote_status', 'processing');
-        })->count();
-
-        $quotes_status_completed = QuoteInfo::whereHas('latestStatus', function ($query) {
-            $query->where('quote_status', 'completed');
-        })->count();
-
-        $quotes_status_cancelled = QuoteInfo::whereHas('latestStatus', function ($query) {
-            $query->where('quote_status', 'cancelled');
-        })->count();
-
-        $recent_quotes = QuoteInfo::with('creator', 'updater', 'quotes', 'city', 'payment_method', 'quotes_status')->latest()->take(4)->get();
-        $completed_quotes = QuoteInfo::with('creator', 'updater', 'quotes', 'city', 'payment_method', 'quotes_status')
-        ->whereHas('latestStatus', function ($query) {
-            $query->where('quote_status', 'completed');
-        })
-        ->latest()->take(4)->get();
-        $cancelled_quotes = QuoteInfo::with('creator', 'updater', 'quotes', 'city', 'payment_method', 'quotes_status')
-        ->whereHas('latestStatus', function ($query) {
-            $query->where('quote_status', 'cancelled');
-        })
-        ->latest()->take(4)->get();
-        // Log::info([
-        //     // 'recent_quotes' => $recent_quotes,
-        // ]);
-
-
-        return view('dashboard.accueil', compact(
-            'quotes_status_pending',
-            'quotes_status_processing',
-            'quotes_status_completed',
-            'quotes_status_cancelled',
-            'recent_quotes',
-            'completed_quotes',
-            'cancelled_quotes',
-        ));
+        return view('dashboard.accueil');
     }
 
 

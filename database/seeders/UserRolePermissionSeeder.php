@@ -37,12 +37,11 @@ class UserRolePermissionSeeder extends Seeder
         Permission::create(['name' => 'mettre à jour le admin']);
         Permission::create(['name' => 'supprimer admin']);
 
-        Permission::create(['name' => 'voir les devis']);
-        Permission::create(['name' => 'créer devis']);
-        Permission::create(['name' => 'mettre à jour le devis']);
-        Permission::create(['name' => 'supprimer devis']);
-        Permission::create(['name' => 'détails devis']);
-        Permission::create(['name' => 'admin devis']);
+        Permission::create(['name' => 'voir les positions']);
+        Permission::create(['name' => 'créer position']);
+        Permission::create(['name' => 'mettre à jour le position']);
+        Permission::create(['name' => 'supprimer position']);
+        Permission::create(['name' => 'détails position']);
 
 
         
@@ -52,6 +51,8 @@ class UserRolePermissionSeeder extends Seeder
         // Create Roles
         $superAdminRole = Role::create(['name' => 'Super Admin']); //as super-admin
         $adminRole = Role::create(['name' => 'Admin']);
+        $commercialRole = Role::create(['name' => 'Commercial']);
+        $responsableRole = Role::create(['name' => 'Responsable']);
      
 
         // Lets give all permission to super-admin role.
@@ -61,11 +62,9 @@ class UserRolePermissionSeeder extends Seeder
 
         // Let's give few permissions to admin role.
         $adminRole->givePermissionTo([
-            'voir les devis', 'créer devis', 'mettre à jour le devis','supprimer devis', 'admin devis',
+            'voir les positions', 'créer position', 'mettre à jour le position','supprimer position',
     ]);
-        // $adminRole->givePermissionTo(['créer role', 'voir les role', 'mettre à jour le role']);
-        // $adminRole->givePermissionTo(['créer permission', 'voir les permission']);
-        // $adminRole->givePermissionTo(['créer user', 'voir les user', 'mettre à jour le user']);
+       
 
         
 }

@@ -37,31 +37,7 @@
                     <span>Tableau de Bord</span>
                 </a>
 
-                <?php if(Auth::check() && (Auth::user()->can('voir les utilisateurs') || Auth::user()->can('créer utilisateur')) ): ?>
-                <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarAuth" data-bs-toggle="collapse" role="button" aria-expanded="<?php echo e(request()->routeIs('all.client.users') || request()->routeIs('add.client.user')  ? 'true' : 'false'); ?>"  aria-controls="sidebarAuth">
-                        <i class="ri-admin-fill"></i> <span>Utilisateurs</span>
-                    </a>
-                    <div class="collapse menu-dropdown <?php echo e(request()->routeIs('all.client.users') || request()->routeIs('add.client.user')  ? 'show' : ''); ?>" id="sidebarAuth">
-                        <ul class="nav nav-sm flex-column">
-                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('voir les utilisateurs')): ?>
-                            <li class="nav-item">
-                                <a href="<?php echo e(route('all.client.users')); ?>" class="nav-link <?php echo e(Route::is('all.client.users') ? 'active' : ''); ?>">Liste des utilisateurs
-                                </a>
-
-                            </li>
-                            <?php endif; ?>
-                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('créer utilisateur')): ?>
-                            <li class="nav-item">
-                                <a href="<?php echo e(route('add.client.user')); ?>" class="nav-link <?php echo e(Route::is('all.client.user') ? 'active' : ''); ?>">Ajouter un utilisateur
-                                </a>
-                            </li>
-                            <?php endif; ?>
-
-                        </ul>
-                    </div>
-                </li>
-                <?php endif; ?>
+              
 
                 <?php if(Auth::check() && (Auth::user()->can('voir les admins') || Auth::user()->can('créer admin')) && Auth::user()->user_type === 'Admin'): ?>
                 <li class="nav-item">
@@ -89,46 +65,27 @@
                 </li>
                 <?php endif; ?>
 
-                <?php if(Auth::check() && (Auth::user()->can('voir les devis') || Auth::user()->can('créer devis'))): ?>
+                <?php if(Auth::check() && (Auth::user()->can('voir les positions') || Auth::user()->can('créer position'))): ?>
                 <li class="menu-title"><span>Devis</span></li>
                 <?php endif; ?>
-                <?php if(Auth::check() && (Auth::user()->can('voir les devis') || Auth::user()->can('créer devis') || Auth::user()->can('mettre à jour le devis') )): ?>
+                <?php if(Auth::check() && (Auth::user()->can('voir les positions') || Auth::user()->can('créer position') )): ?>
                 <li class="nav-item">
-                    <a class="nav-link menu-link" aria-expanded="<?php echo e(request()->routeIs('all.quotes') || request()->routeIs('add.quote') || request()->routeIs('pending.quote') || request()->routeIs('processing.quote') || request()->routeIs('completed.quote') || request()->routeIs('cancelled.quote') ? 'true' : 'false'); ?>" href="#Devis" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="Devis">
-                        <i class="ri-layout-3-line"></i> <span>Devis</span>
+                    <a class="nav-link menu-link" aria-expanded="<?php echo e(request()->routeIs('all.positions') || request()->routeIs('add.position')  ? 'true' : 'false'); ?>" href="#Positions" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="Positions">
+                        <i class="ri-layout-3-line"></i> <span>Positions</span>
                     </a>
-                    <div class="collapse menu-dropdown <?php echo e(request()->routeIs('all.quotes') || request()->routeIs('add.quote') || request()->routeIs('pending.quote') || request()->routeIs('processing.quote') || request()->routeIs('completed.quote') || request()->routeIs('cancelled.quote')? 'show' : ''); ?>" id="Devis">
+                    <div class="collapse menu-dropdown <?php echo e(request()->routeIs('all.position') || request()->routeIs('add.position') ? 'show' : ''); ?>" id="Positions">
                         <ul class="nav nav-sm flex-column">
-                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('créer devis')): ?>
+                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('créer position')): ?>
                             <li class="nav-item">
-                                <a href="<?php echo e(route('add.quote')); ?>" class="nav-link <?php echo e(Route::is('add.quote') ? 'active' : ''); ?>">Ajouter devis</a>
+                                <a href="<?php echo e(route('add.position')); ?>" class="nav-link <?php echo e(Route::is('add.position') ? 'active' : ''); ?>">Ajouter position</a>
                             </li>
                             <?php endif; ?>
-                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('voir les devis')): ?>
+                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('voir les positions')): ?>
                             <li class="nav-item">
-                                <a href="<?php echo e(route('all.quotes')); ?>" class="nav-link <?php echo e(Route::is('all.quotes') ? 'active' : ''); ?>">Les devis</a>
+                                <a href="<?php echo e(route('all.positions')); ?>" class="nav-link <?php echo e(Route::is('all.positions') ? 'active' : ''); ?>">Les positions</a>
                             </li>
                             <?php endif; ?>
-                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('mettre à jour le devis')): ?>
-                            <li class="nav-item">
-                                <a href="<?php echo e(route('pending.quote')); ?>" class="nav-link <?php echo e(Route::is('pending.quote') ? 'active' : ''); ?>">Les devis en attente</a>
-                            </li>
-                            <?php endif; ?>
-                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('mettre à jour le devis')): ?>
-                            <li class="nav-item">
-                                <a href="<?php echo e(route('processing.quote')); ?>" class="nav-link <?php echo e(Route::is('processing.quote') ? 'active' : ''); ?>">Les devis en cours de traitement</a>
-                            </li>
-                            <?php endif; ?>
-                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('mettre à jour le devis')): ?>
-                            <li class="nav-item">
-                                <a href="<?php echo e(route('completed.quote')); ?>" class="nav-link <?php echo e(Route::is('completed.quote') ? 'active' : ''); ?>">Les devis complétés</a>
-                            </li>
-                            <?php endif; ?>
-                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('mettre à jour le devis')): ?>
-                            <li class="nav-item">
-                                <a href="<?php echo e(route('cancelled.quote')); ?>" class="nav-link <?php echo e(Route::is('cancelled.quote') ? 'active' : ''); ?>">Les devis annulés</a>
-                            </li>
-                            <?php endif; ?>
+                          
 
                         </ul>
                     </div>

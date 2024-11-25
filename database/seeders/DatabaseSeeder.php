@@ -19,7 +19,6 @@ class DatabaseSeeder extends Seeder
             // PermissionTableSeeder::class,
             CreateAdminUserSeeder::class,
             CitySeeder::class,
-            PaymentMethodSeeder::class,
             
         ]);
     }
