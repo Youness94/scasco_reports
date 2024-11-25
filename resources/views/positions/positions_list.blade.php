@@ -56,7 +56,7 @@
                         <div class="card-header d-flex flex-column">
                             <div class="row align-items-center">
                                 <div class="col-md-10">
-                                    <h5 class="card-title mb-0">Les Devis</h5>
+                                    <h5 class="card-title mb-0">Les Positions</h5>
                                 </div>
                                 <div class="col-md-2 d-flex justify-content-end"> 
                                     <a href="{{ route('add.position') }}" class="btn btn-success add-btn"><i class="ri-add-line align-bottom me-1"></i> Ajouter</a> <!-- Remove padding from button -->

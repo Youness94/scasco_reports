@@ -1,19 +1,18 @@
-@extends('layouts.master')
-@section('title')
-@lang('Les admins')
-@endsection
-@section('css')
+<?php $__env->startSection('title'); ?>
+<?php echo app('translator')->get('Les admins'); ?>
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('css'); ?>
 <!--datatable css-->
 <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
 <!--datatable responsive css-->
 <link href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap.min.css" rel="stylesheet" type="text/css" />
 <link href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css" rel="stylesheet" type="text/css" />
-@endsection
-@section('content')
-@component('components.breadcrumb')
-@slot('li_1') <a href="{{ route('accueil') }}">Tableau de Bord</a> @endslot
-@slot('title') List des Admins @endslot
-@endcomponent
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('content'); ?>
+<?php $__env->startComponent('components.breadcrumb'); ?>
+<?php $__env->slot('li_1'); ?> <a href="<?php echo e(route('accueil')); ?>">Tableau de Bord</a> <?php $__env->endSlot(); ?>
+<?php $__env->slot('title'); ?> List des Admins <?php $__env->endSlot(); ?>
+<?php echo $__env->renderComponent(); ?>
 
 <div class="page-wrapper">
     <div class="content container-fluid">
@@ -25,25 +24,28 @@
                 </div>
                 <div class="col-xl-4 col-sm-6 col-12 d-flex flex-column justify-content-center">
                     <ul class="breadcrumb ml-auto">
-                        <li class="breadcrumb-item"><a href="{{ route('accueil') }}">Tableau de Bord</a></li>
+                        <li class="breadcrumb-item"><a href="<?php echo e(route('accueil')); ?>">Tableau de Bord</a></li>
                         <li class="breadcrumb-item active">List Users</li>
                     </ul>
                 </div>
             </div> -->
         </div>
-        {{-- message --}}
-        {!! Toastr::message() !!}
-        @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-        @endif
+        
+        <?php echo Toastr::message(); ?>
 
-        @if(session('error'))
-        <div class="alert alert-danger">
-            {{ session('error') }}
+        <?php if(session('success')): ?>
+        <div class="alert alert-success">
+            <?php echo e(session('success')); ?>
+
         </div>
-        @endif
+        <?php endif; ?>
+
+        <?php if(session('error')): ?>
+        <div class="alert alert-danger">
+            <?php echo e(session('error')); ?>
+
+        </div>
+        <?php endif; ?>
 
 
         <div class="row">
@@ -55,13 +57,13 @@
                                 <h5 class="card-title mb-0">Liste des Admins</h5>
                             </div>
                             <div class="col-md-2 d-flex justify-content-end">
-                                <a href="{{ route('add.admin') }}" class="btn btn-success add-btn"><i class="ri-add-line align-bottom me-1"></i> Ajouter</a> <!-- Remove padding from button -->
+                                <a href="<?php echo e(route('add.admin')); ?>" class="btn btn-success add-btn"><i class="ri-add-line align-bottom me-1"></i> Ajouter</a> <!-- Remove padding from button -->
                             </div>
                         </div>
                     </div>
                     
                     <div class="card-body">
-                        @if (!empty($users) && count($users) > 0)
+                        <?php if(!empty($users) && count($users) > 0): ?>
                         <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
                             <thead>
                                 <tr>
@@ -73,19 +75,19 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($users as $key=>$list )
+                                <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key=>$list): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr>
-                                    <td class="customer_name">{{ $list->first_name }}</td>
-                                    <td class="email">{{ $list->email }}</td>
-                                    <td class="phone">{{ isset($userRoles[$list->id]) ? $userRoles[$list->id] : 'N/A' }}</td>
+                                    <td class="customer_name"><?php echo e($list->first_name); ?></td>
+                                    <td class="email"><?php echo e($list->email); ?></td>
+                                    <td class="phone"><?php echo e(isset($userRoles[$list->id]) ? $userRoles[$list->id] : 'N/A'); ?></td>
 
                                     <td class="status"><span class="badge bg-success-subtle text-success text-uppercase">
                                             <div class="edit-delete-btn">
-                                                @if ($list->status === 'Active')
-                                                <a class="text-success">{{ $list->status }}</a>
-                                                @else ($list->status === 'Inactive')
-                                                <a class="text-warning">{{ $list->status }}</a>
-                                                @endif
+                                                <?php if($list->status === 'Active'): ?>
+                                                <a class="text-success"><?php echo e($list->status); ?></a>
+                                                <?php else: ?>
+                                                <a class="text-warning"><?php echo e($list->status); ?></a>
+                                                <?php endif; ?>
                                             </div>
                                         </span>
                                     <td>
@@ -95,20 +97,20 @@
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end">
                                                 <!-- <li><a href="#" class="dropdown-item"><i class="ri-eye-fill align-bottom me-2 text-muted"></i> View</a></li> -->
-                                                <li><a href="{{route('edit.admin',$list->id)}}" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Modifier</a></li>
+                                                <li><a href="<?php echo e(route('edit.admin',$list->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Modifier</a></li>
 
                                             </ul>
                                         </div>
                                     </td>
 
                                 </tr>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </tbody>
                         </table>
                     </div>¨
-                    @else
+                    <?php else: ?>
                     <p>Aucun client disponible.</p>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -119,8 +121,8 @@
 
 
 
-@endsection
-@section('script')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('script'); ?>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
@@ -134,8 +136,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
 
-<script src="{{ URL::asset('build/js/pages/datatables.init.js') }}"></script>
+<script src="<?php echo e(URL::asset('build/js/pages/datatables.init.js')); ?>"></script>
 
-<script src="{{ URL::asset('build/js/app.js') }}"></script>
+<script src="<?php echo e(URL::asset('build/js/app.js')); ?>"></script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\YOUNESS-DEVL\Desktop\scasco_reports\resources\views/usermanagement/list_users.blade.php ENDPATH**/ ?>

@@ -10,7 +10,8 @@ class Client extends Model
     use HasFactory;
 
     protected $fillable = [
-        'client_name',
+        'client_first_name',
+        'client_last_name',
         'client_address',
         'client_phone',
         'client_email',
@@ -32,5 +33,13 @@ class Client extends Model
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
+    public function client_infos()
+    {
+        return $this->hasMany(ClientInfo::class);
     }
 }

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('case_number');
             $table->enum('case_status', ['pending', 'completed', 'processing', 'cancelled'])->default('pending');
             $table->unsignedBigInteger('service_id');
+            $table->unsignedBigInteger('branche_id');
             $table->unsignedBigInteger('client_id');
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('updated_by')->nullable();
@@ -24,6 +25,7 @@ return new class extends Migration
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null'); 
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
             $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
+            $table->foreign('branche_id')->references('id')->on('branches')->onDelete('cascade');
         });
     }
 

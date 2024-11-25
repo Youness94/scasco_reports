@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\Admin\AdminPermissionController;
 use App\Http\Controllers\Admin\AdminRoleController;
+use App\Http\Controllers\Admin\BrancheController;
+use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\PositionController;
+use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Client\ClientUserController;
 use App\Http\Controllers\MatuAutoDevisController;
@@ -81,6 +84,36 @@ Route::group(['middleware' => ['web', 'auth']], function () {
         Route::get('modifier-position/{id}', 'edit_position')->name('edit.position');
         Route::post('update/position/{id}',  'update_position')->name('update.position');
         Route::get('delete/position/{id}', 'delete_position')->name('delete.position');
+    });
+
+    Route::controller(ServiceController::class)->group(function () {
+
+        Route::get('services', 'get_all_services')->name('all.services');
+        Route::get('ajouter-service',  'add_service')->name('add.service');
+        Route::post('store/service',  'store_service')->name('store.service');
+        Route::get('modifier-service/{id}', 'edit_service')->name('edit.service');
+        Route::post('update/service/{id}',  'update_service')->name('update.service');
+        Route::get('delete/service/{id}', 'delete_service')->name('delete.service');
+    });
+
+    Route::controller(BrancheController::class)->group(function () {
+
+        Route::get('branches', 'get_all_branches')->name('all.branches');
+        Route::get('ajouter-branche',  'add_branche')->name('add.branche');
+        Route::post('store/branche',  'store_branche')->name('store.branche');
+        Route::get('modifier-branche/{id}', 'edit_branche')->name('edit.branche');
+        Route::post('update/branche/{id}',  'update_branche')->name('update.branche');
+        Route::get('delete/branche/{id}', 'delete_branche')->name('delete.branche');
+    });
+
+    Route::controller(ClientController::class)->group(function () {
+
+        Route::get('clients', 'get_all_clients')->name('all.clients');
+        Route::get('ajouter-client',  'add_client')->name('add.client');
+        Route::post('store/client',  'store_client')->name('store.client');
+        Route::get('modifier-client/{id}', 'edit_client')->name('edit.client');
+        Route::post('update/client/{id}',  'update_client')->name('update.client');
+        Route::get('delete/client/{id}', 'delete_client')->name('delete.client');
     });
 
     

@@ -70,11 +70,11 @@ class PositionController extends Controller
     {
         $position = Position::with('creator', 'updater')->findOrFail($id);
         $validatedData = $request->validate([
-            'name' => 'required',
+            'name' => 'sometimes',
 
 
         ], [
-            'name.required' => 'Veuillez entrer le nom du poste.',
+            'name.sometimes' => 'Veuillez entrer le nom du poste.',
 
         ]);
 

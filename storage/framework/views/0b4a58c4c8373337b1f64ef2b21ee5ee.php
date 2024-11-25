@@ -1,6 +1,6 @@
 
 <?php $__env->startSection('title'); ?>
-<?php echo app('translator')->get('Les positions'); ?>
+<?php echo app('translator')->get('Les branches'); ?>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('css'); ?>
 <!--datatable css-->
@@ -12,7 +12,7 @@
 <?php $__env->startSection('content'); ?>
 <?php $__env->startComponent('components.breadcrumb'); ?>
 <?php $__env->slot('li_1'); ?> <a href="<?php echo e(route('accueil')); ?>">Tableau de Bord</a> <?php $__env->endSlot(); ?>
-<?php $__env->slot('title'); ?> Les Positions <?php $__env->endSlot(); ?>
+<?php $__env->slot('title'); ?> Les Branches <?php $__env->endSlot(); ?>
 <?php echo $__env->renderComponent(); ?>
 
 <div class="page-wrapper">
@@ -59,10 +59,10 @@
                         <div class="card-header d-flex flex-column">
                             <div class="row align-items-center">
                                 <div class="col-md-10">
-                                    <h5 class="card-title mb-0">Les Positions</h5>
+                                    <h5 class="card-title mb-0">Les Branches</h5>
                                 </div>
                                 <div class="col-md-2 d-flex justify-content-end"> 
-                                    <a href="<?php echo e(route('add.position')); ?>" class="btn btn-success add-btn"><i class="ri-add-line align-bottom me-1"></i> Ajouter</a> <!-- Remove padding from button -->
+                                    <a href="<?php echo e(route('add.branche')); ?>" class="btn btn-success add-btn"><i class="ri-add-line align-bottom me-1"></i> Ajouter</a> <!-- Remove padding from button -->
                                 </div>
                             </div>
                         </div>
@@ -72,24 +72,24 @@
                             <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>Positions</th>
-
+                                        <th>Branche</th>
+                                        <th>Service</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php $__currentLoopData = $positions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $position): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php $__currentLoopData = $branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branche): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr>
-                                        <td><?php echo e($position->name); ?></td>
-
+                                        <td><?php echo e($branche->name); ?></td>
+                                        <td><?php echo e($branche->service->name); ?></td>
                                         <td>
                                             <div class="dropdown d-inline-block">
                                                 <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                     <i class="ri-more-fill align-middle"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
-                                                    <li><a href="<?php echo e(route('edit.position',$position->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Modifier</a></li>
-                                                    <li><a href="<?php echo e(route('delete.position',$position->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-delete-bin-2-fill align-bottom me-2 text-muted"></i> Supprimer</a></li>
+                                                    <li><a href="<?php echo e(route('edit.branche',$branche->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Modifier</a></li>
+                                                    <li><a href="<?php echo e(route('delete.branche',$branche->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-delete-bin-2-fill align-bottom me-2 text-muted"></i> Supprimer</a></li>
                                                 </ul>
                                             </div>
                                         </td>
@@ -128,4 +128,4 @@
     <script src="<?php echo e(URL::asset('build/js/app.js')); ?>"></script>
 
     <?php $__env->stopSection(); ?>
-<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\YOUNESS-DEVL\Desktop\scasco_reports\resources\views/positions/positions_list.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\YOUNESS-DEVL\Desktop\scasco_reports\resources\views/clients/clients_list.blade.php ENDPATH**/ ?>

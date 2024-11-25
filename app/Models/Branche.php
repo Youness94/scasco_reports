@@ -27,4 +27,8 @@ class Branche extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+
+    public function service(){
+        return $this->belongsTo(Service::class);
+    }
 }
