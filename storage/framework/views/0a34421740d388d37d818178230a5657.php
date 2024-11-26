@@ -76,12 +76,12 @@
                         <ul class="nav nav-sm flex-column">
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('créer position')): ?>
                             <li class="nav-item">
-                                <a href="<?php echo e(route('add.potential_case')); ?>" class="nav-link <?php echo e(Route::is('add.potential_case') ? 'active' : ''); ?>">Ajouter position</a>
+                                <a href="<?php echo e(route('add.potential_case')); ?>" class="nav-link <?php echo e(Route::is('add.potential_case') ? 'active' : ''); ?>">Ajouter Affaire</a>
                             </li>
                             <?php endif; ?>
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('voir les positions')): ?>
                             <li class="nav-item">
-                                <a href="<?php echo e(route('all.potential_cases')); ?>" class="nav-link <?php echo e(Route::is('all.potential_cases') ? 'active' : ''); ?>">Les positions</a>
+                                <a href="<?php echo e(route('all.potential_cases')); ?>" class="nav-link <?php echo e(Route::is('all.potential_cases') ? 'active' : ''); ?>">Les Affaires</a>
                             </li>
                             <?php endif; ?>
                           

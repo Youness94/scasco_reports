@@ -39,55 +39,6 @@
                                                 <div class="row">
 
 
-                                                      <!-- First Name -->
-                                                      <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="client_first_name">Prénom du Client</label>
-                                                            <input type="text" class="form-control <?php $__errorArgs = ['client_first_name'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>" name="client_first_name" value="<?php echo e(old('client_first_name')); ?>">
-                                                            <?php $__errorArgs = ['client_first_name'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                                                            <span class="invalid-feedback" role="alert">
-                                                                  <span class="text-danger"> <?php echo e($message); ?> </span>
-                                                            </span>
-                                                            <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-                                                      </div>
-
-                                                      <!-- Last Name -->
-                                                      <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="client_last_name">Nom du Client</label>
-                                                            <input type="text" class="form-control <?php $__errorArgs = ['client_last_name'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>" name="client_last_name" value="<?php echo e(old('client_last_name')); ?>">
-                                                            <?php $__errorArgs = ['client_last_name'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                                                            <span class="invalid-feedback" role="alert">
-                                                                  <span class="text-danger"> <?php echo e($message); ?> </span>
-                                                            </span>
-                                                            <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-                                                      </div>
 
                                                       <!-- Client -->
                                                       <div class="col-md-4 mb-3">
@@ -124,35 +75,15 @@ unset($__errorArgs, $__bag); ?>
 
                                                       <!-- Service -->
                                                       <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="client_id">Services</label>
-                                                            <select name="services[]" id="services" class="form-control" multiple required>
-                                                                  <option value="">Sélectionnez les Services</option>
+                                                            <label class="form-label" for="services">Select Services</label>
+                                                            <select id="services" name="services[]" class="form-control" multiple>
                                                                   <?php $__currentLoopData = $services; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                  <option value="<?php echo e($service->id); ?>" <?php echo e(in_array($service->id, old('services', [])) ? 'selected' : ''); ?>><?php echo e($service->name); ?></option>
+                                                                  <option value="<?php echo e($service->id); ?>"><?php echo e($service->name); ?></option>
                                                                   <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                             </select>
-                                                            <?php $__errorArgs = ['client_id'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                                                            <span class="invalid-feedback" role="alert">
-                                                                  <span class="text-danger"><?php echo e($message); ?></span>
-                                                            </span>
-                                                            <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
                                                       </div>
-
-                                                      <!-- Branche -->
-                                                      <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="branches">Sélectionnez les Services</label>
-                                                            <select name="branches[]" id="branches" class="form-control" multiple>
-                                                                  <!-- Branches will be populated here via AJAX -->
-                                                            </select>
-                                                          
-                                                      </div>
+                                                       <!-- Branche -->
+                                                      <div id="branches-container" class="col-md-4 mb-3"></div>
                                                 </div>
                                           </div>
                                     </div>
@@ -203,36 +134,79 @@ unset($__errorArgs, $__bag); ?>
 <script src="<?php echo e(URL::asset('build/js/app.js')); ?>"></script>
 
 <script>
-    // Event listener for Service Selection
-    $('#services').change(function() {
-        var serviceIds = $(this).val(); // Get the selected service IDs
+    $(document).ready(function() {
+        // Initialize Select2 for services
+        $('#services').select2({
+            placeholder: "Select Services",
+            closeOnSelect: false,
+            templateResult: formatState,
+            templateSelection: formatState
+        });
 
-        if (serviceIds.length) {
+        function formatState (opt) {
+            if (!opt.id) {
+                return opt.text;
+            }
+            var optimage = $(opt.element).data('image');
+            if(!optimage){
+                return opt.text;
+            } else {
+                var $opt = $(
+                    '<span><input type="checkbox" /> ' + opt.text + '</span>'
+                );
+                return $opt;
+            }
+        };
+
+        // Handle service selection
+        $('#services').on('change', function() {
+            var serviceIds = $(this).val();
+
             $.ajax({
-                url: "<?php echo e(route('getBranchesByService')); ?>", // Update with the correct route
+                url: "<?php echo e(route('getBranchesByService')); ?>",
                 method: 'GET',
-                data: { service_ids: serviceIds },
+                data: {
+                    service_ids: serviceIds
+                },
                 success: function(response) {
-                    var branchSelect = $('#branches');
-                    branchSelect.empty(); // Clear the current branches
+                    $('#branches-container').empty();
 
                     if (response.length) {
-                        // Append the new branch options to the dropdown
-                        response.forEach(function(branch) {
-                            branchSelect.append('<option value="' + branch.id + '">' + branch.name + '</option>');
+                        response.forEach(function(service) {
+                            var html = `
+                                <div class="mb-3">
+                                    <label class="form-label">Branches for ${service.name}</label>
+                                    <select name="branches[${service.id}][]" class="form-control branches-select" multiple>
+                            `;
+                            service.branches.forEach(function(branch) {
+                                html += `<option value="${branch.id}">${branch.name}</option>`;
+                            });
+                            html += `
+                                    </select>
+                                </div>
+                            `;
+                            $('#branches-container').append(html);
+                        });
+
+                        // Initialize Select2 for dynamically added branch selects
+                        $('.branches-select').select2({
+                            placeholder: "Select Branches",
+                            closeOnSelect: false,
+                            templateResult: formatState,
+                            templateSelection: formatState
                         });
                     } else {
-                        branchSelect.append('<option value="">No branches available</option>');
+                        $('#branches-container').append('<p>No branches available for selected services.</p>');
                     }
                 },
                 error: function() {
                     alert('Error loading branches');
                 }
             });
-        } else {
-            $('#branches').empty(); // Clear branch dropdown if no service is selected
-        }
+        });
     });
 </script>
+
+
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\YOUNESS-DEVL\Desktop\scasco_reports\resources\views/potential_cases/add_potential_case.blade.php ENDPATH**/ ?>

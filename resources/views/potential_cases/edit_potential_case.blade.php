@@ -1,15 +1,16 @@
 @extends('layouts.master')
 @section('title')
-@lang('Modifier client')
+@lang('Modifier Affaire')
 @endsection
 @section('css')
 <link href="{{ URL::asset('build/libs/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
 @component('components.breadcrumb')
-@slot('li_1') <a href="{{ route('all.clients') }}">Les Positions</a> @endslot
-@slot('title') Modifier Client @endslot
+@slot('li_1') <a href="{{ route('all.potential_cases') }}">Les Affaires</a> @endslot
+@slot('title') Modifier Affaire @endslot
 @endcomponent
+
 {{-- Include any Toastr messages --}}
 {!! Toastr::message() !!}
 
@@ -26,136 +27,74 @@
             <!-- <div class="card">
                               <div class="card-body d-flex flex-column">-->
             <!-- <div class="live-preview flex-grow-1"> -->
-            <form method="POST" action="{{ route('update.client', ['id' => $client->id]) }}" class="forms-sample" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('update.potential_case', ['id' => $potentialCase->id]) }}" class="forms-sample" enctype="multipart/form-data">
+
                   @csrf
                   <div class="row">
                         <div class="col-md-12">
                               <div class="card">
-                                    <div class="card-header">Client</div>
-
+                                    <div class="card-header">Modifier l'Affaire</div>
                                     <div class="card-body d-flex flex-column">
                                           <div class="live-preview flex-grow-1">
                                                 <div class="row">
-                                                      <!-- Client Type -->
-
+                                                      <!-- Select Client -->
                                                       <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="client_type">Type de client</label>
-                                                            <select id="client_type" class="form-control @error('client_type') is-invalid @enderror" name="client_type">
-                                                                  <option value="Particulier" {{ old('client_type',$client->client_type) == 'Particulier' ? 'selected' : '' }}>Particulier</option>
-                                                                  <option value="Entreprise" {{ old('client_type',$client->client_type) == 'Entreprise' ? 'selected' : '' }}>Entreprise</option>
-                                                            </select>
-                                                            @error('Type de client')
-                                                            <span class="invalid-feedback" role="alert">
-                                                                  <span class="text-danger"> {{ $message }} </span>
-                                                            </span>
-                                                            @enderror
-                                                      </div>
-
-                                                      <!-- First Name -->
-                                                      <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="client_first_name">Prénom du Client</label>
-                                                            <input type="text" class="form-control @error('client_first_name') is-invalid @enderror" name="client_first_name" value="{{ $client->client_first_name }}">
-                                                            @error('client_first_name')
-                                                            <span class="invalid-feedback" role="alert">
-                                                                  <span class="text-danger"> {{ $message }} </span>
-                                                            </span>
-                                                            @enderror
-                                                      </div>
-
-                                                      <!-- Last Name -->
-                                                      <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="client_last_name">Nom du Client</label>
-                                                            <input type="text" class="form-control @error('client_last_name') is-invalid @enderror" name="client_last_name" value="{{ $client->client_last_name }}">
-                                                            @error('client_last_name')
-                                                            <span class="invalid-feedback" role="alert">
-                                                                  <span class="text-danger"> {{ $message }} </span>
-                                                            </span>
-                                                            @enderror
-                                                      </div>
-
-                                                      <!-- City -->
-                                                      <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="city_id">Ville</label>
-                                                            <select id="city_id" class="form-control @error('city_id') is-invalid @enderror" name="city_id">
-                                                                  <option selected disabled value="">Choisissez une ville</option>
-                                                                  @foreach ($cities as $city)
-                                                                  <option value="{{ $city->id }}" {{ old('city_id',$client->city_id) == $city->id ? 'selected' : '' }}>
-                                                                        {{ $city->name }}
+                                                            <label class="form-label" for="client_id">Ville</label>
+                                                            <select id="client_id" class="form-control @error('client_id') is-invalid @enderror" name="client_id">
+                                                                  @foreach ($clients as $client)
+                                                                  <option value="{{ $client->id }}" {{ old('client_id', $potentialCase->client_id) == $client->id ? 'selected' : '' }}>
+                                                                        {{ $client->client_first_name }} {{ $client->client_last_name }}
                                                                   </option>
                                                                   @endforeach
                                                             </select>
-                                                            @error('city_id')
+                                                            @error('client_id')
                                                             <span class="invalid-feedback" role="alert">
                                                                   <span class="text-danger">{{ $message }}</span>
                                                             </span>
                                                             @enderror
                                                       </div>
 
-                                                      <!-- Client Address -->
+                                                      <!-- Select Services -->
                                                       <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="client_address">Adresse du Client</label>
-                                                            <input type="text" class="form-control @error('client_address') is-invalid @enderror" name="client_address" value="{{ $client->client_address }}">
-                                                            @error('client_address')
+                                                            <label class="form-label" for="services">Sélectionner les Services</label>
+                                                            <select id="services" name="services[]" class="form-control @error('services') is-invalid @enderror" multiple>
+                                                                  @foreach ($services as $service)
+                                                                  <option value="{{ $service->id }}"
+                                                                        {{ in_array($service->id, old('services', $potentialCase->services->pluck('id')->toArray())) ? 'selected' : '' }}>
+                                                                        {{ $service->name }}
+                                                                  </option>
+                                                                  @endforeach
+                                                            </select>
+                                                            @error('services')
                                                             <span class="invalid-feedback" role="alert">
-                                                                  <span class="text-danger"> {{ $message }} </span>
+                                                                  <span class="text-danger">{{ $message }}</span>
                                                             </span>
                                                             @enderror
                                                       </div>
 
-                                                      <!-- Client Phone -->
-                                                      <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="client_phone">Téléphone du Client</label>
-                                                            <input type="text" class="form-control @error('client_phone') is-invalid @enderror" name="client_phone" value="{{ $client->client_phone }}">
-                                                            @error('client_phone')
-                                                            <span class="invalid-feedback" role="alert">
-                                                                  <span class="text-danger"> {{ $message }} </span>
-                                                            </span>
-                                                            @enderror
+                                                      <!-- Branches -->
+                                                      <div id="branches-container" class="col-md-4 mb-3">
+                                                            @foreach ($services as $service)
+                                                            @if($potentialCase->services->contains('id', $service->id))
+                                                            <div class="service-branches" data-service-id="{{ $service->id }}">
+                                                                  <label class="form-label">Branches pour {{ $service->name }}</label>
+                                                                  <select name="branches[{{ $service->id }}][]" class="form-control branches-select" multiple>
+                                                                        @foreach ($service->branches as $branch)
+                                                                        <option value="{{ $branch->id }}"
+                                                                              @if($potentialCase->services->where('id', $service->id)->first())
+                                                                              {{ in_array($branch->id, json_decode($potentialCase->services->where('id', $service->id)->first()->pivot->branch_ids, true) ?? []) ? 'selected' : '' }}
+                                                                              @endif>
+                                                                              {{ $branch->name }}
+                                                                        </option>
+                                                                        @endforeach
+                                                                  </select>
+                                                            </div>
+                                                            @endif
+                                                            @endforeach
                                                       </div>
 
-                                                      <!-- Client Email -->
-                                                      <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="client_email">E-mail du Client</label>
-                                                            <input type="email" class="form-control @error('client_email') is-invalid @enderror" name="client_email" value="{{ $client->client_email }}">
-                                                            @error('client_email')
-                                                            <span class="invalid-feedback" role="alert">
-                                                                  <span class="text-danger"> {{ $message }} </span>
-                                                            </span>
-                                                            @enderror
-                                                      </div>
 
-                                                      <!-- Raison Sociale -->
-                                                      <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="raison_sociale">Raison Sociale du Client</label>
-                                                            <input type="text" class="form-control @error('raison_sociale') is-invalid @enderror" name="raison_sociale" value="{{ $client->raison_sociale }}">
-                                                            @error('raison_sociale')
-                                                            <span class="invalid-feedback" role="alert">
-                                                                  <span class="text-danger"> {{ $message }} </span>
-                                                            </span>
-                                                            @enderror
-                                                      </div>
 
-                                                      <!-- RC -->
-                                                      <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="RC">RC du Client</label>
-                                                            <input type="text" class="form-control @error('RC') is-invalid @enderror" name="RC" value="{{ $client->RC }}">
-                                                            @error('RC')
-                                                            <span class="invalid-feedback" role="alert">
-                                                                  <span class="text-danger"> {{ $message }} </span>
-                                                            </span>
-                                                            @enderror
-                                                      </div>
-
-                                                      <!-- ICE -->
-                                                      <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="ICE">ICE du Client</label>
-                                                            <input type="text" class="form-control @error('ICE') is-invalid @enderror" name="ICE" value="{{ $client->ICE }}">
-                                                            @error('ICE')
-                                                            <span class="invalid-feedback" role="alert">
-                                                                  <span class="text-danger"> {{ $message }} </span>
-                                                            </span>
-                                                            @enderror
-                                                      </div>
                                                 </div>
                                           </div>
                                     </div>
@@ -193,6 +132,141 @@
 
 @endsection
 @section('script')
+<!--jquery cdn-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+<!--select2 cdn-->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script src="{{ URL::asset('build/js/pages/select2.init.js') }}"></script>
+
 <script src="{{ URL::asset('build/js/pages/profile-setting.init.js') }}"></script>
 <script src="{{ URL::asset('build/js/app.js') }}"></script>
+<script>
+      $(document).ready(function() {
+            var branchesContainer = $('#branches-container');
+
+
+            $('#services').on('change', function() {
+                  var selectedServiceIds = $(this).val();
+
+                  // remove deselected
+                  branchesContainer.find('.service-branches').each(function() {
+                        var serviceId = $(this).data('service-id').toString();
+                        if (!selectedServiceIds.includes(serviceId)) {
+                              removeBranchesFromService(serviceId);
+                              $(this).remove();
+                        }
+                  });
+
+                  // new selected services 
+                  selectedServiceIds.forEach(function(serviceId) {
+                        if (branchesContainer.find(`.service-branches[data-service-id=${serviceId}]`).length === 0) {
+                              addBranchesForService(serviceId);
+                        }
+                  });
+            });
+
+            // add branches for a selected service
+            function addBranchesForService(serviceId) {
+                  $.ajax({
+                        url: '{{ route('
+                        editBranchesByService ') }}',
+                        method: 'GET',
+                        data: {
+                              service_id: serviceId
+                        },
+                        success: function(response) {
+                              var branches = response.branches;
+                              var serviceBranchesHtml = `
+                    <div class="service-branches" data-service-id="${serviceId}">
+                        <label class="form-label">Branches pour ${response.service_name}</label>
+                        <select name="branches[${serviceId}][]" class="form-control" multiple>
+                            ${branches.map(branch => `<option value="${branch.id}">${branch.name}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+                              branchesContainer.append(serviceBranchesHtml);
+                        }
+                  });
+            }
+
+            // remove branches for a deselected service
+            function removeBranchesFromService(serviceId) {
+                  $.ajax({
+                        url: '{{ route('
+                        removeBranchesFromService ') }}',
+                        method: 'POST',
+                        data: {
+                              service_id: serviceId,
+                              _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                              if (response.success) {
+                                    console.log(`Branches for service ID ${serviceId} removed successfully.`);
+                              }
+                        }
+                  });
+            }
+
+            // update branches for a selected service
+            branchesContainer.on('change', 'select', function() {
+                  var serviceId = $(this).closest('.service-branches').data('service-id');
+                  var selectedBranchIds = $(this).val();
+
+                  $.ajax({
+                        url: '{{ route('
+                        updateBranchesForService ') }}',
+                        method: 'POST',
+                        data: {
+                              service_id: serviceId,
+                              branch_ids: selectedBranchIds,
+                              _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                              if (response.success) {
+                                    console.log(`Branches for service ID ${serviceId} updated successfully.`);
+                              }
+                        }
+                  });
+            });
+      });
+</script>
+<script>
+      $(document).ready(function() {
+            // ==========
+            $('#services').select2({
+                  placeholder: "Sélectionner les Services",
+                  width: '100%',
+                  templateSelection: formatState,
+                  templateResult: formatState,
+                  closeOnSelect: false
+            });
+
+            // =================
+            $('.branches-select').select2({
+                  placeholder: "Sélectionner les Branches",
+                  width: '100%',
+                  templateSelection: formatState,
+                  templateResult: formatState,
+                  closeOnSelect: false
+            });
+
+            function formatState(opt) {
+                  if (!opt.id) {
+                        return opt.text;
+                  }
+
+                  var optimage = $(opt.element).data('image');
+                  if (!optimage) {
+                        return opt.text;
+                  } else {
+                        var $opt = $(
+                              '<span><input type="checkbox" /> ' + opt.text + '</span>'
+                        );
+                        return $opt;
+                  }
+            }
+      });
+</script>
 @endsection

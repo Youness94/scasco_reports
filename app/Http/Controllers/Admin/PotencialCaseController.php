@@ -11,83 +11,131 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Services\PotentialCaseService;
 
 class PotencialCaseController extends Controller
 {
-    public function get_all_potential_cases(){
-        $all_potential_cases = PotencialCase::with('creator', 'updater','services','client')->get();
+    protected $potentialCaseService;
+
+    public function __construct(PotentialCaseService $potentialCaseService)
+    {
+        $this->potentialCaseService = $potentialCaseService;
+    }
+
+    public function get_all_potential_cases()
+    {
+        $all_potential_cases = $this->potentialCaseService->getAllPotentialCases();
         return view('potential_cases.potential_cases_list', compact('all_potential_cases'));
     }
 
-    public function add_potential_case(){
-        $services = Service::with('branches')->get();
-        $clients = Client::all();
+    public function add_potential_case()
+    {
+        $data = $this->potentialCaseService->getAllClientsAndServices();
+        return view('potential_cases.add_potential_case', $data);
+    }
 
-        return view('potential_cases.add_potential_case', compact('clients', 'services'));
-    }
-    public function getBranchesByService(Request $request) {
-        $serviceIds = $request->input('service_ids');
-        
-        // Get branches for the selected services
-        $branches = Branche::whereIn('service_id', $serviceIds)->get();
-    
-        // Return branches as a JSON response
-        return response()->json($branches);
-    }
     public function store_potential_case(Request $request)
     {
-        // Validate the incoming request (you may adjust validation rules as needed)
         $request->validate([
             'client_id' => 'required|exists:clients,id',
-            'services' => 'required|array',  
-            'services.*' => 'exists:services,id', 
-            'branches' => 'nullable|array',  
-            'branches.*' => 'exists:branches,id', 
+            'services' => 'required|array',
+            'services.*' => 'exists:services,id',
+            'branches' => 'nullable|array',
+            'branches.*' => 'exists:branches,id',
         ]);
-        DB::beginTransaction();
-        try {
 
-            $user = Auth::user();
-            $lastPotentialCaseNumber = DB::table('potential_case_sequences')->first();
-            if ($lastPotentialCaseNumber === null) {
-                  $newPotentialCaseNumber = 1;
-                  DB::table('potential_case_sequences')->insert(['last_potential_case_number' => $newPotentialCaseNumber]);
-            } else {
-                  $newPotentialCaseNumber = $lastPotentialCaseNumber->last_potential_case_number + 1;
-                  DB::table('potential_case_sequences')->update(['last_potential_case_number' => $newPotentialCaseNumber]);
-            }
-            $generated_number = 'DEV-' . str_pad($newPotentialCaseNumber, 6, '0', STR_PAD_LEFT);
-            
-            // Create a new PotentialCase 
-            $potentialCase = PotencialCase::create([
-                'case_number' =>   $generated_number,
-                'case_status' => 'pending', 
-                'client_id' => $request->input('client_id'),
-                'created_by' =>    $user->id, 
-            ]);
+        $result = $this->potentialCaseService->storePotentialCase($request);
 
-            //  selected services
-            foreach ($request->services as $serviceId) {
-                $service = Service::findOrFail($serviceId);
+        if ($result['status'] == 'success') {
+            return redirect('/affaires')->with('success', $result['message']);
+        } else {
+            return redirect()->back()->with('error', $result['message']);
+        }
+    }
 
-                // Get the branch IDs related to the service (if any branches are selected)
-                $selectedBranches = $request->branches ?: []; // If no branches selected, use an empty array
 
-                // Store the relationship in the pivot table, with branch_ids as a JSON array
-                $potentialCase->services()->attach($serviceId, [
-                    'branch_ids' => json_encode($selectedBranches) // Store selected branch IDs as JSON
-                ]);
-            }
+    public function edit_potential_case($id)
+    {
+        Log::info('Entering edit_potential_case method with ID: ' . $id);
 
-            DB::commit();
-            return redirect('/affaires')->with('success', 'Business updated successfully');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Quotes creation failed: ' . $e->getMessage());
-            return [
-                'status' => 'Error',
-                'message' => $e->getMessage() ?: 'DB Error',
-            ];
+        $potentialCase = $this->potentialCaseService->editPotentialCase($id);
+        Log::info('Data for editing potential case:', ['potentialCase' => $potentialCase]);
+
+        return view('potential_cases.edit_potential_case', [
+            'potentialCase' => $potentialCase['potentialCase'],  
+            'services' => $potentialCase['services'],  
+            'clients' => $potentialCase['clients']   
+        ]);
+    }
+
+    public function update_potential_case(Request $request, $id)
+    {
+        Log::info('Entering update_potential_case method with ID: ' . $id);
+
+        $validated = $request->validate([
+            'client_id' => 'sometimes|exists:clients,id',
+            'services' => 'sometimes|array',
+            'services.*' => 'exists:services,id',
+            'branches' => 'nullable|array',
+            'branches.*' => 'exists:branches,id',
+        ]);
+        Log::info('Request validated successfully:', $validated);
+
+        $result = $this->potentialCaseService->updatePotentialCase($request, $id);
+
+        if ($result['status'] == 'success') {
+            Log::info('Potential case updated successfully');
+            return redirect('/affaires')->with('success', $result['message']);
+        } else {
+            Log::error('Failed to update potential case: ' . $result['message']);
+            return redirect()->back()->with('error', $result['message']);
+        }
+    }
+    public function getBranchesByService(Request $request)
+    {
+        $serviceIds = $request->input('service_ids');
+        $services = $this->potentialCaseService->getBranchesByService($serviceIds);
+
+        return response()->json($services);
+    }
+
+
+    public function editBranchesByService(Request $request)
+    {
+        $serviceId = $request->service_id;
+        $result = $this->potentialCaseService->getBranchesByService($serviceId);
+
+        return response()->json([
+            'service_name' => $result['service_name'],
+            'branches' => $result['branches']
+        ]);
+    }
+
+    public function updateBranchesForService(Request $request)
+    {
+        $serviceId = $request->service_id;
+        $branchIds = $request->branch_ids;
+
+        $this->potentialCaseService->updateBranchesForService($serviceId, $branchIds);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function removeBranchesFromService(Request $request)
+    {
+        $serviceId = $request->service_id;
+
+        $this->potentialCaseService->removeBranchesFromService($serviceId);
+
+        return response()->json(['success' => true]);
+    }
+    public function delete_potential_case($id)
+    {
+        $result = $this->potentialCaseService->deletePotencialCase($id);
+        if ($result['status'] == 'success') {
+            return redirect('/affaires')->with('success', $result['message']);
+        } else {
+            return redirect()->back()->with('error', $result['message']);
         }
     }
 }

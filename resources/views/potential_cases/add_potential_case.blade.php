@@ -38,27 +38,6 @@
                                                 <div class="row">
 
 
-                                                      <!-- First Name -->
-                                                      <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="client_first_name">Prénom du Client</label>
-                                                            <input type="text" class="form-control @error('client_first_name') is-invalid @enderror" name="client_first_name" value="{{ old('client_first_name') }}">
-                                                            @error('client_first_name')
-                                                            <span class="invalid-feedback" role="alert">
-                                                                  <span class="text-danger"> {{ $message }} </span>
-                                                            </span>
-                                                            @enderror
-                                                      </div>
-
-                                                      <!-- Last Name -->
-                                                      <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="client_last_name">Nom du Client</label>
-                                                            <input type="text" class="form-control @error('client_last_name') is-invalid @enderror" name="client_last_name" value="{{ old('client_last_name') }}">
-                                                            @error('client_last_name')
-                                                            <span class="invalid-feedback" role="alert">
-                                                                  <span class="text-danger"> {{ $message }} </span>
-                                                            </span>
-                                                            @enderror
-                                                      </div>
 
                                                       <!-- Client -->
                                                       <div class="col-md-4 mb-3">
@@ -80,28 +59,15 @@
 
                                                       <!-- Service -->
                                                       <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="client_id">Services</label>
-                                                            <select name="services[]" id="services" class="form-control" multiple required>
-                                                                  <option value="">Sélectionnez les Services</option>
+                                                            <label class="form-label" for="services">Select Services</label>
+                                                            <select id="services" name="services[]" class="form-control" multiple>
                                                                   @foreach($services as $service)
-                                                                  <option value="{{ $service->id }}" {{ in_array($service->id, old('services', [])) ? 'selected' : '' }}>{{ $service->name }}</option>
+                                                                  <option value="{{ $service->id }}">{{ $service->name }}</option>
                                                                   @endforeach
                                                             </select>
-                                                            @error('client_id')
-                                                            <span class="invalid-feedback" role="alert">
-                                                                  <span class="text-danger">{{ $message }}</span>
-                                                            </span>
-                                                            @enderror
                                                       </div>
-
-                                                      <!-- Branche -->
-                                                      <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="branches">Sélectionnez les Services</label>
-                                                            <select name="branches[]" id="branches" class="form-control" multiple>
-                                                                  <!-- Branches will be populated here via AJAX -->
-                                                            </select>
-                                                          
-                                                      </div>
+                                                       <!-- Branche -->
+                                                      <div id="branches-container" class="col-md-4 mb-3"></div>
                                                 </div>
                                           </div>
                                     </div>
@@ -152,35 +118,78 @@
 <script src="{{ URL::asset('build/js/app.js') }}"></script>
 
 <script>
-    // Event listener for Service Selection
-    $('#services').change(function() {
-        var serviceIds = $(this).val(); // Get the selected service IDs
+    $(document).ready(function() {
+     
+        $('#services').select2({
+            placeholder: "Select Services",
+            closeOnSelect: false,
+            templateResult: formatState,
+            templateSelection: formatState
+        });
 
-        if (serviceIds.length) {
+        function formatState (opt) {
+            if (!opt.id) {
+                return opt.text;
+            }
+            var optimage = $(opt.element).data('image');
+            if(!optimage){
+                return opt.text;
+            } else {
+                var $opt = $(
+                    '<span><input type="checkbox" /> ' + opt.text + '</span>'
+                );
+                return $opt;
+            }
+        };
+
+        // service selection
+        $('#services').on('change', function() {
+            var serviceIds = $(this).val();
+
             $.ajax({
-                url: "{{ route('getBranchesByService') }}", // Update with the correct route
+                url: "{{ route('getBranchesByService') }}",
                 method: 'GET',
-                data: { service_ids: serviceIds },
+                data: {
+                    service_ids: serviceIds
+                },
                 success: function(response) {
-                    var branchSelect = $('#branches');
-                    branchSelect.empty(); // Clear the current branches
+                    $('#branches-container').empty();
 
                     if (response.length) {
-                        // Append the new branch options to the dropdown
-                        response.forEach(function(branch) {
-                            branchSelect.append('<option value="' + branch.id + '">' + branch.name + '</option>');
+                        response.forEach(function(service) {
+                            var html = `
+                                <div class="mb-3">
+                                    <label class="form-label">Branches pour ${service.name}</label>
+                                    <select name="branches[${service.id}][]" class="form-control branches-select" multiple>
+                            `;
+                            service.branches.forEach(function(branch) {
+                                html += `<option value="${branch.id}">${branch.name}</option>`;
+                            });
+                            html += `
+                                    </select>
+                                </div>
+                            `;
+                            $('#branches-container').append(html);
+                        });
+
+                        // 
+                        $('.branches-select').select2({
+                            placeholder: "Select Branches",
+                            closeOnSelect: false,
+                            templateResult: formatState,
+                            templateSelection: formatState
                         });
                     } else {
-                        branchSelect.append('<option value="">No branches available</option>');
+                        $('#branches-container').append('<p>No branches available for selected services.</p>');
                     }
                 },
                 error: function() {
                     alert('Error loading branches');
                 }
             });
-        } else {
-            $('#branches').empty(); // Clear branch dropdown if no service is selected
-        }
+        });
     });
 </script>
+
+
 @endsection

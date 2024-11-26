@@ -60,7 +60,7 @@ Route::group(['middleware' => ['web', 'auth']], function () {
     Route::get('accueil', [HomeController::class, 'index'])->name('accueil');
     Route::get('/quotes-bar-chart-home', [HomeController::class, 'BarChatQuotes'])->name('chart.bar.home');
     Route::get('/quotes-pie-chart-home', [HomeController::class, 'PieChatQuotes'])->name('chart.pie.home');
-    
+
     Route::get('utilisateur-profile', [HomeController::class, 'userProfile'])->name('admin.user.profile');
 
     Route::controller(UserManagementController::class)->group(function () {
@@ -127,10 +127,15 @@ Route::group(['middleware' => ['web', 'auth']], function () {
         Route::post('update/affaire/{id}',  'update_potential_case')->name('update.potential_case');
         Route::get('delete/affaire/{id}', 'delete_potential_case')->name('delete.potential_case');
         Route::get('détail-de-affaire/{id}', 'display_potential_case')->name('display.potential_case');
-        Route::get('get-branches-by-service','getBranchesByService')->name('getBranchesByService');
+
+        Route::get('get-branches-by-service', 'getBranchesByService')->name('getBranchesByService');
+
+        Route::post('/update-branches-for-service', 'updateBranchesForService')->name('updateBranchesForService');
+        Route::post('/remove-branches-from-service', 'removeBranchesFromService')->name('removeBranchesFromService');
+        Route::get('/edit-branches-by-service', 'editBranchesByService')->name('editBranchesByService');
     });
 
-    
+
 
     Route::controller(AdminRoleController::class)->group(function () {
 

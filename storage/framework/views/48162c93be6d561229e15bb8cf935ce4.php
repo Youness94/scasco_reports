@@ -1,1 +1,0 @@
-<?php /**PATH C:\Users\YOUNESS-DEVL\Desktop\scasco-ANCFCC-devis\resources\views/layouts/customizer.blade.php ENDPATH**/ ?>

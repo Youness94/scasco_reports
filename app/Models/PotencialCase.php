@@ -37,4 +37,18 @@ class PotencialCase extends Model
     {
         return $this->belongsToMany(Service::class)->withPivot('branch_ids');
     }
+    public function getBranchNamesAttribute()
+    {
+        $branchNames = [];
+        foreach ($this->services as $service) {
+            $branchIds = json_decode($service->pivot->branch_ids ?? '[]', true);
+            foreach ($branchIds as $branchId) {
+                $branch = Branche::find($branchId);
+                if ($branch) {
+                    $branchNames[] = $branch->name;
+                }
+            }
+        }
+        return implode(', ', $branchNames);
+    }
 }

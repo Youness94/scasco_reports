@@ -76,12 +76,12 @@
                         <ul class="nav nav-sm flex-column">
                             @can('créer position')
                             <li class="nav-item">
-                                <a href="{{route('add.potential_case')}}" class="nav-link {{ Route::is('add.potential_case') ? 'active' : '' }}">Ajouter position</a>
+                                <a href="{{route('add.potential_case')}}" class="nav-link {{ Route::is('add.potential_case') ? 'active' : '' }}">Ajouter Affaire</a>
                             </li>
                             @endcan
                             @can('voir les positions')
                             <li class="nav-item">
-                                <a href="{{route('all.potential_cases')}}" class="nav-link {{ Route::is('all.potential_cases') ? 'active' : '' }}">Les positions</a>
+                                <a href="{{route('all.potential_cases')}}" class="nav-link {{ Route::is('all.potential_cases') ? 'active' : '' }}">Les Affaires</a>
                             </li>
                             @endcan
                           

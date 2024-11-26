@@ -95,11 +95,18 @@
 
                                         <!-- Display Branches -->
                                         <td>
-                                            <?php $__currentLoopData = json_decode($all_potential_case->pivot->branch_ids); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branchId): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php $__currentLoopData = $all_potential_case->services; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <?php
-                                            $branch = App\Models\Branch::find($branchId);
+                                            $branchIds = json_decode($service->pivot->branch_ids ?? '[]', true);
                                             ?>
-                                            <?php echo e($branch->name ?? 'N/V'); ?><?php if(!$loop->last): ?>, <?php endif; ?>
+                                            <?php $__currentLoopData = $branchIds; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branchId): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php
+                                            $branch = \App\Models\Branche::find($branchId);
+                                            ?>
+                                            <?php echo e($branch->name ?? 'N/V'); ?>
+
+                                            <?php if(!$loop->last): ?>, <?php endif; ?>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </td>
                                         <td>
@@ -108,9 +115,9 @@
                                                     <i class="ri-more-fill align-middle"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
-                                                    <li><a href="<?php echo e(route('edit.client',$client->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Modifier</a></li>
-                                                    <li><a href="<?php echo e(route('display.potential_case',$potential_case->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-eye-line align-bottom me-2 text-muted"></i> Affaicher</a></li>
-                                                    <li><a href="<?php echo e(route('delete.potential_case',$potential_case->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-delete-bin-2-fill align-bottom me-2 text-muted"></i> Supprimer</a></li>
+                                                    <li><a href="<?php echo e(route('edit.potential_case',$all_potential_case->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Modifier</a></li>
+                                                    <li><a href="<?php echo e(route('display.potential_case',$all_potential_case->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-eye-line align-bottom me-2 text-muted"></i> Affaicher</a></li>
+                                                    <li><a href="<?php echo e(route('delete.potential_case',$all_potential_case->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-delete-bin-2-fill align-bottom me-2 text-muted"></i> Supprimer</a></li>
                                                 </ul>
                                             </div>
                                         </td>
