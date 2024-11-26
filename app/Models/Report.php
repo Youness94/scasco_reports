@@ -28,4 +28,9 @@ class Report extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+
+    public function potential_case()
+    {
+        return $this->belongsTo(PotencialCase::class, 'potencial_case_id');
+    }
 }

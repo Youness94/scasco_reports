@@ -90,6 +90,29 @@
                     </div>
                 </li>
                 @endif
+                @if (Auth::check() && (Auth::user()->can('voir les positions') || Auth::user()->can('créer position') ))
+                <li class="nav-item">
+                    <a class="nav-link menu-link" aria-expanded="{{ request()->routeIs('all.reports') || request()->routeIs('add.report')  ? 'true' : 'false' }}" href="#Reports" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="Reports">
+                        <i class="ri-layout-3-line"></i> <span>Comptes Rendus</span>
+                    </a>
+                    <div class="collapse menu-dropdown {{ request()->routeIs('all.reports') || request()->routeIs('add.report') ? 'show' : '' }}" id="Reports">
+                        <ul class="nav nav-sm flex-column">
+                            @can('créer position')
+                            <li class="nav-item">
+                                <a href="{{route('add.report')}}" class="nav-link {{ Route::is('add.report') ? 'active' : '' }}">Ajouter Compte Rendu</a>
+                            </li>
+                            @endcan
+                            @can('voir les positions')
+                            <li class="nav-item">
+                                <a href="{{route('all.reports')}}" class="nav-link {{ Route::is('all.reports') ? 'active' : '' }}">Les Comptes Rendus</a>
+                            </li>
+                            @endcan
+                          
+
+                        </ul>
+                    </div>
+                </li>
+                @endif
                 @if (Auth::check() && (Auth::user()->can('voir les positions') || Auth::user()->can('créer position')))
                 <li class="menu-title"><span>Positions</span></li>
                 @endif

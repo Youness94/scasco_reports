@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
         
             $table->string('statut_precedent')->default('pending');
-            $table->string('statut_nouveau')->nullable()->default('pending');
+            $table->string('statut_nouveau')->nullable();
             $table->timestamp('change_date');
             $table->text('commentaire');
             $table->unsignedBigInteger('potencial_case_id')->nullable();

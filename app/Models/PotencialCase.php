@@ -16,7 +16,10 @@ class PotencialCase extends Model
         'updated_by',
       
     ];
-
+    public function reports()
+    {
+        return $this->hasMany(Report::class, 'potencial_case_id');
+    }
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
@@ -51,4 +54,6 @@ class PotencialCase extends Model
         }
         return implode(', ', $branchNames);
     }
+
+    
 }

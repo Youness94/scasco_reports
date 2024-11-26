@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\PotencialCaseController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Client\ClientUserController;
@@ -135,7 +136,16 @@ Route::group(['middleware' => ['web', 'auth']], function () {
         Route::get('/edit-branches-by-service', 'editBranchesByService')->name('editBranchesByService');
     });
 
+    Route::controller(ReportController::class)->group(function () {
 
+        Route::get('comptes-rendus', 'get_all_reports')->name('all.reports');
+        Route::get('ajouter-compte-rendu',  'add_report')->name('add.report');
+        Route::post('store/report',  'store_report')->name('store.report');
+        Route::get('modifier-compte-rendu/{id}', 'edit_report')->name('edit.report');
+        Route::post('update/report/{id}',  'update_report')->name('update.report');
+        Route::get('delete/report/{id}', 'delete_report')->name('delete.report');
+        Route::get('détail-de-compte-rendu/{id}', 'display_report')->name('display.report');
+    });
 
     Route::controller(AdminRoleController::class)->group(function () {
 

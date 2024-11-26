@@ -135,7 +135,7 @@ unset($__errorArgs, $__bag); ?>
 
 <script>
     $(document).ready(function() {
-        // Initialize Select2 for services
+     
         $('#services').select2({
             placeholder: "Select Services",
             closeOnSelect: false,
@@ -158,7 +158,7 @@ unset($__errorArgs, $__bag); ?>
             }
         };
 
-        // Handle service selection
+        // service selection
         $('#services').on('change', function() {
             var serviceIds = $(this).val();
 
@@ -175,7 +175,7 @@ unset($__errorArgs, $__bag); ?>
                         response.forEach(function(service) {
                             var html = `
                                 <div class="mb-3">
-                                    <label class="form-label">Branches for ${service.name}</label>
+                                    <label class="form-label">Branches pour ${service.name}</label>
                                     <select name="branches[${service.id}][]" class="form-control branches-select" multiple>
                             `;
                             service.branches.forEach(function(branch) {
@@ -188,7 +188,7 @@ unset($__errorArgs, $__bag); ?>
                             $('#branches-container').append(html);
                         });
 
-                        // Initialize Select2 for dynamically added branch selects
+                        // 
                         $('.branches-select').select2({
                             placeholder: "Select Branches",
                             closeOnSelect: false,
