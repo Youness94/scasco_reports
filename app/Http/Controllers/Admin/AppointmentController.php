@@ -130,7 +130,7 @@ class AppointmentController extends Controller
             $appointment->status = $request->input('status') ??  $appointment->status  ;
             $appointment->updated_by = $user->id;
             $appointment->save();
-
+            $this->potencialCaseHisotryService->createHistoryRecord('updated', 'Appointment updated', $potentialCase, $appointment->id, null, $user->id);
             DB::commit();
             return redirect('/rendez-vous')->with('success', 'Appointment updated successfully');
         } catch (\Exception $e) {

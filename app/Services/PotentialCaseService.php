@@ -124,7 +124,7 @@ class PotentialCaseService
                     'branch_ids' => json_encode($branchIds),
                 ]);
             }
-
+            $this->potencialCaseHisotryService->createHistoryRecord('updated', 'Potential case updated', $potentialCase, null, null, $user->id);
             DB::commit();
 
             return ['status' => 'success', 'message' => 'Potential case updated successfully'];

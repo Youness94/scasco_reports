@@ -108,7 +108,7 @@ class ReportController extends Controller
             $report->appointment_id = $request->input('appointment_id');
             $report->updated_by = $user->id;
             $report->save();
-
+            $this->potencialCaseHisotryService->createHistoryRecord('updated', 'Report updated', $report->potential_case, null, $report->id, $user->id);
             DB::commit();
             return redirect('/comptes-rendus')->with('success', 'Report updated successfully');
         } catch (\Exception $e) {

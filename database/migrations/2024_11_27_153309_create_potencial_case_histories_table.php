@@ -13,16 +13,15 @@ return new class extends Migration
     {
         Schema::create('potencial_case_histories', function (Blueprint $table) {
             $table->id();
-            $table->text('comment')->nullable(); // A comment or description of the history entry
-            $table->enum('action_type', ['created', 'updated', 'appointment_added', 'report_added', 'status_changed', 'note_added', 'other']); // The type of action (could be extended as per requirement)
-            $table->timestamp('action_date'); // Date and time of the action or history entry
-            $table->unsignedBigInteger('potencial_case_id')->nullable(); // Link to the potential case
-            $table->unsignedBigInteger('appointment_id')->nullable(); // Link to an appointment, if applicable
-            $table->unsignedBigInteger('report_id')->nullable(); // Link to a report, if applicable
-            $table->unsignedBigInteger('created_by'); // User who performed the action
+            $table->text('comment')->nullable();
+            $table->enum('action_type', ['created', 'updated', 'appointment_added', 'report_added', 'status_changed', 'note_added', 'other']); 
+            $table->timestamp('action_date'); 
+            $table->unsignedBigInteger('potencial_case_id')->nullable(); 
+            $table->unsignedBigInteger('appointment_id')->nullable();
+            $table->unsignedBigInteger('report_id')->nullable();
+            $table->unsignedBigInteger('created_by'); 
             $table->timestamps();
         
-            // Foreign keys to link the history to the respective tables
             $table->foreign('potencial_case_id')->references('id')->on('potencial_cases')->onDelete('cascade');
             $table->foreign('appointment_id')->references('id')->on('appointments')->onDelete('cascade');
             $table->foreign('report_id')->references('id')->on('reports')->onDelete('cascade');
