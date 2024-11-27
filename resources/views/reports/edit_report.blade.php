@@ -54,6 +54,25 @@
                                                             </span>
                                                             @enderror
                                                       </div>
+                                                      <!-- Appointment -->
+                                                      <div class="col-md-4 mb-3">
+                                                            <label class="form-label" for="appointment_id">Rendez-vous</label>
+                                                            <select id="appointment_id" class="js-example-basic-single form-control @error('appointment_id') is-invalid @enderror" name="appointment_id">
+                                                                  <option selected disabled value="">Choisissez un rendez-vous</option>
+                                                                  <!-- Options will be populated by AJAX -->
+                                                                  @foreach ($appointments as $appointment)
+                                                                  <option value="{{ $appointment->id }}"
+                                                                        {{ old('appointment_id', $report->appointment_id) == $appointment->id ? 'selected' : '' }}>
+                                                                        {{ $appointment->date_appointment }} - {{ $appointment->place }}
+                                                                  </option>
+                                                                  @endforeach
+                                                            </select>
+                                                            @error('appointment_id')
+                                                            <span class="invalid-feedback" role="alert">
+                                                                  <span class="text-danger">{{ $message }}</span>
+                                                            </span>
+                                                            @enderror
+                                                      </div>
                                                       <!-- Description -->
                                                       <div class="col-md-8 mb-3">
 
@@ -106,4 +125,54 @@
 @section('script')
 <script src="{{ URL::asset('build/js/pages/profile-setting.init.js') }}"></script>
 <script src="{{ URL::asset('build/js/app.js') }}"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+<script type="text/javascript">
+      // When the user changes the potential case, load the corresponding appointments
+      $('#potencial_case_id').change(function() {
+            var potencialCaseId = $(this).val();
+
+            if (potencialCaseId) {
+                  $.ajax({
+                        url: '/get-appointments-by-case/' + potencialCaseId, // URL to fetch appointments
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(data) {
+                              // Clear the current options in the appointment dropdown
+                              $('#appointment_id').empty();
+                              // Add a default "Choose an appointment" option
+                              $('#appointment_id').append('<option selected disabled value="">Choisissez un rendez-vous</option>');
+
+                              // Populate the appointment dropdown with the available options
+                              $.each(data, function(key, appointment) {
+                                    $('#appointment_id').append('<option value="' + appointment.id + '">' + appointment.date_appointment + ' - ' + appointment.place + '</option>');
+                              });
+
+                              // Preselect the previously selected appointment, if it exists
+                              var oldAppointmentId = '{{ old("appointment_id", $report->appointment_id) }}';
+                              if (oldAppointmentId) {
+                                    $('#appointment_id').val(oldAppointmentId); // Set the selected appointment
+                              }
+                        },
+                        error: function(xhr, status, error) {
+                              console.error("Error fetching appointments: " + error);
+                        }
+                  });
+            } else {
+                  // If no potential case is selected, reset the appointment dropdown
+                  $('#appointment_id').empty().append('<option selected disabled value="">Choisissez un rendez-vous</option>');
+            }
+      });
+
+      // Initialize the appointment dropdown with the preselected appointment (if any)
+      $(document).ready(function() {
+            var potencialCaseId = $('#potencial_case_id').val(); // Get the selected potential case ID
+            if (potencialCaseId) {
+                  // Trigger change event to populate appointments on page load
+                  $('#potencial_case_id').trigger('change');
+            } else {
+                  // Ensure the default option is selected when no potential case is selected
+                  $('#appointment_id').val('');
+            }
+      });
+</script>
 @endsection

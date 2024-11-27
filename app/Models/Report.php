@@ -13,10 +13,15 @@ class Report extends Model
         'date_report',
         'contenu',
         'potencial_case_id',
+        'appointment_id',
         'created_by',
         'updated_by',
       
     ];
+    public function caseHistories()
+    {
+        return $this->hasMany(PotencialCaseHisotry::class, 'report_id');
+    }
 
     public function creator()
     {
@@ -32,5 +37,10 @@ class Report extends Model
     public function potential_case()
     {
         return $this->belongsTo(PotencialCase::class, 'potencial_case_id');
+    }
+
+    public function appointment()
+    {
+        return $this->belongsTo(Appointment::class);
     }
 }

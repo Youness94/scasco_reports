@@ -113,6 +113,30 @@
                     </div>
                 </li>
                 <?php endif; ?>
+
+                <?php if(Auth::check() && (Auth::user()->can('voir les positions') || Auth::user()->can('créer position') )): ?>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" aria-expanded="<?php echo e(request()->routeIs('all.appointments') || request()->routeIs('add.appointment')  ? 'true' : 'false'); ?>" href="#Appointment" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="Appointment">
+                        <i class="ri-layout-3-line"></i> <span>Rendez-Vous</span>
+                    </a>
+                    <div class="collapse menu-dropdown <?php echo e(request()->routeIs('all.appointments') || request()->routeIs('add.appointment') ? 'show' : ''); ?>" id="Appointment">
+                        <ul class="nav nav-sm flex-column">
+                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('créer position')): ?>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('add.appointment')); ?>" class="nav-link <?php echo e(Route::is('add.appointment') ? 'active' : ''); ?>">Ajouter Rendez-Vous</a>
+                            </li>
+                            <?php endif; ?>
+                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('voir les positions')): ?>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('all.appointments')); ?>" class="nav-link <?php echo e(Route::is('all.appointments') ? 'active' : ''); ?>">Les Rendez-Vous</a>
+                            </li>
+                            <?php endif; ?>
+                          
+
+                        </ul>
+                    </div>
+                </li>
+                <?php endif; ?>
                 <?php if(Auth::check() && (Auth::user()->can('voir les positions') || Auth::user()->can('créer position'))): ?>
                 <li class="menu-title"><span>Positions</span></li>
                 <?php endif; ?>

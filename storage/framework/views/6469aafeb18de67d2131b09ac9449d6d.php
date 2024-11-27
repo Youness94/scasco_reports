@@ -1,6 +1,6 @@
 
 <?php $__env->startSection('title'); ?>
-<?php echo app('translator')->get('Les Comptes rendus'); ?>
+<?php echo app('translator')->get('Les rendez-Vous'); ?>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('css'); ?>
 <!--datatable css-->
@@ -12,7 +12,7 @@
 <?php $__env->startSection('content'); ?>
 <?php $__env->startComponent('components.breadcrumb'); ?>
 <?php $__env->slot('li_1'); ?> <a href="<?php echo e(route('accueil')); ?>">Tableau de Bord</a> <?php $__env->endSlot(); ?>
-<?php $__env->slot('title'); ?> Les Comptes rendus@endslot
+<?php $__env->slot('title'); ?> Les Rendez-Vous <?php $__env->endSlot(); ?>
 <?php echo $__env->renderComponent(); ?>
 
 <div class="page-wrapper">
@@ -59,10 +59,10 @@
                         <div class="card-header d-flex flex-column">
                             <div class="row align-items-center">
                                 <div class="col-md-10">
-                                    <h5 class="card-title mb-0">Les Comptes rendus</h5>
+                                    <h5 class="card-title mb-0">Les Rendez-Vous</h5>
                                 </div>
-                                <div class="col-md-2 d-flex justify-content-end"> 
-                                    <a href="<?php echo e(route('add.report')); ?>" class="btn btn-success add-btn"><i class="ri-add-line align-bottom me-1"></i> Ajouter</a> <!-- Remove padding from button -->
+                                <div class="col-md-2 d-flex justify-content-end">
+                                    <a href="<?php echo e(route('add.appointment')); ?>" class="btn btn-success add-btn"><i class="ri-add-line align-bottom me-1"></i> Ajouter</a> <!-- Remove padding from button -->
                                 </div>
                             </div>
                         </div>
@@ -72,29 +72,47 @@
                             <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>#ID</th>
-                                        <th>Date de création</th>
-                                        <th>Date de modéfication</th>
+                                        <th>Client</th>
+                                        <th>Téléphone</th>
                                         <th>Némuro d'affaire</th>
+                                        <th>Date</th>
+                                        <th>Lieu de rendez-vous</th>
+                                        <th>Statut</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php $__currentLoopData = $reports; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $report): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php $__currentLoopData = $appointments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $appointment): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr>
-                                        <td><?php echo e($report->id ?? "N/V"); ?></td>
-                                        <td><?php echo e(\Carbon\Carbon::parse($report->date_report)->format('F d, Y') ?? 'N/V'); ?></td>
-                                        <td><?php echo e(\Carbon\Carbon::parse($report->updated_at )->format('F d, Y') ?? 'N/V'); ?></td>
-                                        <td><?php echo e($report->potential_case->case_number ?? "N/V"); ?></td>
+                                        <td><?php echo e($appointment->potential_case->client->client_first_name); ?> <?php echo e($appointment->potential_case->client->client_first_name); ?></td>
+                                        <td><?php echo e($appointment->potential_case->client->client_phone ?? "--"); ?> </td>
+                                        <td><?php echo e($appointment->potential_case->case_number ?? "N/V"); ?></td>
+                                        <td><?php echo e(\Carbon\Carbon::parse($appointment->date_appointment)->format('F d, Y') ?? 'N/V'); ?></td>²
+                                        <td><?php echo e($appointment->place ?? "N/V"); ?></td>
+                                        <td>
+                                            <?php switch($appointment->status):
+                                            case ('pending'): ?>
+                                            <a class="text-warning">En attente</a>
+                                            <?php break; ?>
+                                            <?php case ('completed'): ?>
+                                            <a class="text-success">Complété</a>
+                                            <?php break; ?>
+                                            <?php case ('cancelled'): ?>
+                                            <a class="text-danger">Annulé</a>
+                                            <?php break; ?>
+                                            <?php default: ?>
+                                            <a class="text-muted">Pas de statut</a>
+                                            <?php endswitch; ?>
+                                        </td>
                                         <td>
                                             <div class="dropdown d-inline-block">
                                                 <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                     <i class="ri-more-fill align-middle"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
-                                                    <li><a href="<?php echo e(route('edit.report',$report->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Modifier</a></li>
-                                                    <li><a href="<?php echo e(route('display.report',$report->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-eye-line align-bottom me-2 text-muted"></i> Affaicher</a></li>
-                                                    <li><a href="<?php echo e(route('delete.report',$report->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-delete-bin-2-fill align-bottom me-2 text-muted"></i> Supprimer</a></li>
+                                                    <li><a href="<?php echo e(route('edit.appointment',$appointment->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Modifier</a></li>
+                                                    <li><a href="<?php echo e(route('display.appointment',$appointment->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-eye-line align-bottom me-2 text-muted"></i> Affaicher</a></li>
+                                                    <li><a href="<?php echo e(route('delete.appointment',$appointment->id)); ?>" class="dropdown-item edit-item-btn"><i class="ri-delete-bin-2-fill align-bottom me-2 text-muted"></i> Supprimer</a></li>
                                                 </ul>
                                             </div>
                                         </td>
@@ -133,4 +151,4 @@
     <script src="<?php echo e(URL::asset('build/js/app.js')); ?>"></script>
 
     <?php $__env->stopSection(); ?>
-<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\YOUNESS-DEVL\Desktop\scasco_reports\resources\views/reports/reports_list.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\YOUNESS-DEVL\Desktop\scasco_reports\resources\views/appointments/appointments_list.blade.php ENDPATH**/ ?>

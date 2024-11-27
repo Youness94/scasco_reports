@@ -170,8 +170,7 @@
             // add branches for a selected service
             function addBranchesForService(serviceId) {
                   $.ajax({
-                        url: '{{ route('
-                        editBranchesByService ') }}',
+                        url: '{{ route('editBranchesByService') }}',
                         method: 'GET',
                         data: {
                               service_id: serviceId
@@ -194,8 +193,7 @@
             // remove branches for a deselected service
             function removeBranchesFromService(serviceId) {
                   $.ajax({
-                        url: '{{ route('
-                        removeBranchesFromService ') }}',
+                        url: '{{ route('removeBranchesFromService') }}',
                         method: 'POST',
                         data: {
                               service_id: serviceId,
@@ -215,8 +213,7 @@
                   var selectedBranchIds = $(this).val();
 
                   $.ajax({
-                        url: '{{ route('
-                        updateBranchesForService ') }}',
+                        url: '{{ route('updateBranchesForService') }}',
                         method: 'POST',
                         data: {
                               service_id: serviceId,

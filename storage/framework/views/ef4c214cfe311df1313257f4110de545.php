@@ -70,6 +70,40 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                                                       </div>
+                                                      <!-- Appointment -->
+                                                      <div class="col-md-4 mb-3">
+                                                            <label class="form-label" for="appointment_id">Rendez-vous</label>
+                                                            <select id="appointment_id" class="js-example-basic-single form-control <?php $__errorArgs = ['appointment_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" name="appointment_id">
+                                                                  <option selected disabled value="">Choisissez un rendez-vous</option>
+                                                                  <!-- Options will be populated by AJAX -->
+                                                                  <?php $__currentLoopData = $appointments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $appointment): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                  <option value="<?php echo e($appointment->id); ?>"
+                                                                        <?php echo e(old('appointment_id', $report->appointment_id) == $appointment->id ? 'selected' : ''); ?>>
+                                                                        <?php echo e($appointment->date_appointment); ?> - <?php echo e($appointment->place); ?>
+
+                                                                  </option>
+                                                                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                            </select>
+                                                            <?php $__errorArgs = ['appointment_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                            <span class="invalid-feedback" role="alert">
+                                                                  <span class="text-danger"><?php echo e($message); ?></span>
+                                                            </span>
+                                                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                                                      </div>
                                                       <!-- Description -->
                                                       <div class="col-md-8 mb-3">
 
@@ -136,5 +170,55 @@ unset($__errorArgs, $__bag); ?>
 <?php $__env->startSection('script'); ?>
 <script src="<?php echo e(URL::asset('build/js/pages/profile-setting.init.js')); ?>"></script>
 <script src="<?php echo e(URL::asset('build/js/app.js')); ?>"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+<script type="text/javascript">
+      // When the user changes the potential case, load the corresponding appointments
+      $('#potencial_case_id').change(function() {
+            var potencialCaseId = $(this).val();
+
+            if (potencialCaseId) {
+                  $.ajax({
+                        url: '/get-appointments-by-case/' + potencialCaseId, // URL to fetch appointments
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(data) {
+                              // Clear the current options in the appointment dropdown
+                              $('#appointment_id').empty();
+                              // Add a default "Choose an appointment" option
+                              $('#appointment_id').append('<option selected disabled value="">Choisissez un rendez-vous</option>');
+
+                              // Populate the appointment dropdown with the available options
+                              $.each(data, function(key, appointment) {
+                                    $('#appointment_id').append('<option value="' + appointment.id + '">' + appointment.date_appointment + ' - ' + appointment.place + '</option>');
+                              });
+
+                              // Preselect the previously selected appointment, if it exists
+                              var oldAppointmentId = '<?php echo e(old("appointment_id", $report->appointment_id)); ?>';
+                              if (oldAppointmentId) {
+                                    $('#appointment_id').val(oldAppointmentId); // Set the selected appointment
+                              }
+                        },
+                        error: function(xhr, status, error) {
+                              console.error("Error fetching appointments: " + error);
+                        }
+                  });
+            } else {
+                  // If no potential case is selected, reset the appointment dropdown
+                  $('#appointment_id').empty().append('<option selected disabled value="">Choisissez un rendez-vous</option>');
+            }
+      });
+
+      // Initialize the appointment dropdown with the preselected appointment (if any)
+      $(document).ready(function() {
+            var potencialCaseId = $('#potencial_case_id').val(); // Get the selected potential case ID
+            if (potencialCaseId) {
+                  // Trigger change event to populate appointments on page load
+                  $('#potencial_case_id').trigger('change');
+            } else {
+                  // Ensure the default option is selected when no potential case is selected
+                  $('#appointment_id').val('');
+            }
+      });
+</script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\YOUNESS-DEVL\Desktop\scasco_reports\resources\views/reports/edit_report.blade.php ENDPATH**/ ?>

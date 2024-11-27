@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Log;
 
 class PotentialCaseService
 {
+    protected $potencialCaseHisotryService;
+    public function __construct(PotencialCaseHisotryService $potencialCaseHisotryService)
+    {
+        $this->potencialCaseHisotryService = $potencialCaseHisotryService;
+    }
     public function getAllPotentialCases()
     {
         return PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->get();
@@ -58,7 +63,14 @@ class PotentialCaseService
                     'branch_ids' => json_encode($branchIds),
                 ]);
             }
-
+            $this->potencialCaseHisotryService->createHistoryRecord(
+                'created',
+                'Potential case created',
+                $potentialCase,
+                null,
+                null,
+                $user->id
+            );
             DB::commit();
 
             return ['status' => 'success', 'message' => 'Potential case created successfully'];
@@ -109,7 +121,7 @@ class PotentialCaseService
 
                 // attach the service with its branches
                 $potentialCase->services()->attach($serviceId, [
-                    'branch_ids' => json_encode($branchIds), 
+                    'branch_ids' => json_encode($branchIds),
                 ]);
             }
 

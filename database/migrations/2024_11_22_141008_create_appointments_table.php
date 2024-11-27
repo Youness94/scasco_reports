@@ -11,20 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('potencial_case_histories', function (Blueprint $table) {
+        Schema::create('appointments', function (Blueprint $table) {
             $table->id();
-        
-            $table->string('statut_precedent')->default('pending');
-            $table->string('statut_nouveau')->nullable();
-            $table->timestamp('change_date');
-            $table->text('commentaire');
+          
+            $table->dateTime('date_appointment');
+            $table->string('place');
+            $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending');
             $table->unsignedBigInteger('potencial_case_id')->nullable();
-            $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('client_id')->nullable();
             $table->timestamps();
             $table->foreign('potencial_case_id')->references('id')->on('potencial_cases')->onDelete('cascade');
+            $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
         });
     }
 
@@ -33,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('potencial_case_histories');
+        Schema::dropIfExists('appointments');
     }
 };

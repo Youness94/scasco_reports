@@ -7,6 +7,7 @@
 <script src="<?php echo e(URL::to('assets/plugins/apexchart/chart-data.js')); ?>"></script>
 <script src="<?php echo e(URL::asset('build/js/pages/chartjs.init.js')); ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <?php echo $__env->yieldContent('script'); ?>
 <?php echo $__env->yieldContent('script-bottom'); ?>
 <?php /**PATH C:\Users\YOUNESS-DEVL\Desktop\scasco_reports\resources\views/layouts/vendor-scripts.blade.php ENDPATH**/ ?>

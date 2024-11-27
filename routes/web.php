@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminPermissionController;
 use App\Http\Controllers\Admin\AdminRoleController;
+use App\Http\Controllers\Admin\AppointmentController;
 use App\Http\Controllers\Admin\BrancheController;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\LoginController;
@@ -145,6 +146,22 @@ Route::group(['middleware' => ['web', 'auth']], function () {
         Route::post('update/report/{id}',  'update_report')->name('update.report');
         Route::get('delete/report/{id}', 'delete_report')->name('delete.report');
         Route::get('détail-de-compte-rendu/{id}', 'display_report')->name('display.report');
+
+        Route::get('/get-appointments-by-case/{potencial_case_id}', 'get_appointments_by_case')->name('get.appointments.by.case');
+
+    });
+
+    Route::controller(AppointmentController::class)->group(function () {
+
+        Route::get('rendez-vous', 'get_all_appointments')->name('all.appointments');
+        Route::get('ajouter-rendez-vous',  'add_appointment')->name('add.appointment');
+        Route::post('store/appointment',  'store_appointment')->name('store.appointment');
+        Route::get('modifier-rendez-vous/{id}', 'edit_appointment')->name('edit.appointment');
+        Route::post('update/appointment/{id}',  'update_appointment')->name('update.appointment');
+        Route::get('delete/appointment/{id}', 'delete_appointment')->name('delete.appointment');
+        Route::get('détail-de-rendez-vous/{id}', 'display_appointment')->name('display.appointment');
+ 
+        Route::get('/get-client-by-case/{potencial_case_id}', [AppointmentController::class, 'getClientByCase'])->name('get.client.by.case');
     });
 
     Route::controller(AdminRoleController::class)->group(function () {

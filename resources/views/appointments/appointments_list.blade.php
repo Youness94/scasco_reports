@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-@lang('Les Comptes rendus')
+@lang('Les rendez-Vous')
 @endsection
 @section('css')
 <!--datatable css-->
@@ -12,7 +12,7 @@
 @section('content')
 @component('components.breadcrumb')
 @slot('li_1') <a href="{{ route('accueil') }}">Tableau de Bord</a> @endslot
-@slot('title') Les Comptes rendus@endslot
+@slot('title') Les Rendez-Vous @endslot
 @endcomponent
 
 <div class="page-wrapper">
@@ -56,10 +56,10 @@
                         <div class="card-header d-flex flex-column">
                             <div class="row align-items-center">
                                 <div class="col-md-10">
-                                    <h5 class="card-title mb-0">Les Comptes rendus</h5>
+                                    <h5 class="card-title mb-0">Les Rendez-Vous</h5>
                                 </div>
-                                <div class="col-md-2 d-flex justify-content-end"> 
-                                    <a href="{{ route('add.report') }}" class="btn btn-success add-btn"><i class="ri-add-line align-bottom me-1"></i> Ajouter</a> <!-- Remove padding from button -->
+                                <div class="col-md-2 d-flex justify-content-end">
+                                    <a href="{{ route('add.appointment') }}" class="btn btn-success add-btn"><i class="ri-add-line align-bottom me-1"></i> Ajouter</a> <!-- Remove padding from button -->
                                 </div>
                             </div>
                         </div>
@@ -69,29 +69,47 @@
                             <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>#ID</th>
-                                        <th>Date de création</th>
-                                        <th>Date de modéfication</th>
+                                        <th>Client</th>
+                                        <th>Téléphone</th>
                                         <th>Némuro d'affaire</th>
+                                        <th>Date</th>
+                                        <th>Lieu de rendez-vous</th>
+                                        <th>Statut</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($reports as $report)
+                                    @foreach ($appointments as $appointment)
                                     <tr>
-                                        <td>{{ $report->id ?? "N/V" }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($report->date_report)->format('F d, Y') ?? 'N/V' }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($report->updated_at )->format('F d, Y') ?? 'N/V' }}</td>
-                                        <td>{{ $report->potential_case->case_number ?? "N/V"}}</td>
+                                        <td>{{ $appointment->potential_case->client->client_first_name}} {{ $appointment->potential_case->client->client_first_name}}</td>
+                                        <td>{{ $appointment->potential_case->client->client_phone ?? "--"}} </td>
+                                        <td>{{ $appointment->potential_case->case_number ?? "N/V" }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($appointment->date_appointment)->format('F d, Y') ?? 'N/V' }}</td>²
+                                        <td>{{ $appointment->place ?? "N/V"}}</td>
+                                        <td>
+                                            @switch($appointment->status)
+                                            @case('pending')
+                                            <a class="text-warning">En attente</a>
+                                            @break
+                                            @case('completed')
+                                            <a class="text-success">Complété</a>
+                                            @break
+                                            @case('cancelled')
+                                            <a class="text-danger">Annulé</a>
+                                            @break
+                                            @default
+                                            <a class="text-muted">Pas de statut</a>
+                                            @endswitch
+                                        </td>
                                         <td>
                                             <div class="dropdown d-inline-block">
                                                 <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                     <i class="ri-more-fill align-middle"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
-                                                    <li><a href="{{route('edit.report',$report->id)}}" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Modifier</a></li>
-                                                    <li><a href="{{route('display.report',$report->id)}}" class="dropdown-item edit-item-btn"><i class="ri-eye-line align-bottom me-2 text-muted"></i> Affaicher</a></li>
-                                                    <li><a href="{{route('delete.report',$report->id)}}" class="dropdown-item edit-item-btn"><i class="ri-delete-bin-2-fill align-bottom me-2 text-muted"></i> Supprimer</a></li>
+                                                    <li><a href="{{route('edit.appointment',$appointment->id)}}" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Modifier</a></li>
+                                                    <li><a href="{{route('display.appointment',$appointment->id)}}" class="dropdown-item edit-item-btn"><i class="ri-eye-line align-bottom me-2 text-muted"></i> Affaicher</a></li>
+                                                    <li><a href="{{route('delete.appointment',$appointment->id)}}" class="dropdown-item edit-item-btn"><i class="ri-delete-bin-2-fill align-bottom me-2 text-muted"></i> Supprimer</a></li>
                                                 </ul>
                                             </div>
                                         </td>

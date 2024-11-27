@@ -7,5 +7,6 @@
 <script src="{{ URL::to('assets/plugins/apexchart/chart-data.js') }}"></script>
 <script src="{{ URL::asset('build/js/pages/chartjs.init.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @yield('script')
 @yield('script-bottom')

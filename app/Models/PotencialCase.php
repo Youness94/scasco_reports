@@ -16,9 +16,19 @@ class PotencialCase extends Model
         'updated_by',
       
     ];
+    public function caseHistories()
+    {
+        return $this->hasMany(PotencialCaseHisotry::class);
+    }
+
     public function reports()
     {
         return $this->hasMany(Report::class, 'potencial_case_id');
+    }
+
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class, 'potencial_case_id');
     }
     public function creator()
     {

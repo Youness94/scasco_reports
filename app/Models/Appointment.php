@@ -19,6 +19,12 @@ class Appointment extends Model
         'client_id',
     ];
 
+    public function caseHistories()
+    {
+        return $this->hasMany(PotencialCaseHisotry::class, 'appointment_id');
+    }
+
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
@@ -28,5 +34,20 @@ class Appointment extends Model
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function potential_case()
+    {
+        return $this->belongsTo(PotencialCase::class, 'potencial_case_id');
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'client_id');
+    }
+
+    public function reports()
+    {
+        return $this->belongsTo(Report::class,);
     }
 }
