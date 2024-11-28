@@ -31,7 +31,7 @@ class PotencialCaseApiController extends Controller
 
         return response()->json($data);
     }
-    public function storePotentialCase(PotencialCaseRequest $request)
+    public function store_potential_case(PotencialCaseRequest $request)
     {
         $validatedData = $request->validated();
 
