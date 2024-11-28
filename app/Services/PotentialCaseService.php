@@ -28,7 +28,7 @@ class PotentialCaseService
 
         if ($user->user_type == 'Responsable') {
             return PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
-                ->whereIn('creator_id', function ($query) use ($user) {
+                ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
                         ->where('responsible_id', $user->id)
@@ -39,7 +39,7 @@ class PotentialCaseService
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
 
             return PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
-                ->where('creator_id', $user->id)
+                ->where('created_by', $user->id)
                 ->get();
         }
 
@@ -116,7 +116,7 @@ class PotentialCaseService
    
         if ($user->user_type == 'Responsable') {
             $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
-                ->whereIn('creator_id', function ($query) use ($user) {
+                ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
                         ->where('responsible_id', $user->id)
@@ -127,7 +127,7 @@ class PotentialCaseService
 
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
             $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
-                ->where('creator_id', $user->id)
+                ->where('created_by', $user->id)
                 ->findOrFail($id);
         }
     
@@ -226,7 +226,7 @@ class PotentialCaseService
    
         if ($user->user_type == 'Responsable') {
             $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
-                ->whereIn('creator_id', function ($query) use ($user) {
+                ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
                         ->where('responsible_id', $user->id)
@@ -237,7 +237,7 @@ class PotentialCaseService
   
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
             $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
-                ->where('creator_id', $user->id)
+                ->where('created_by', $user->id)
                 ->findOrFail($id);
         }
     

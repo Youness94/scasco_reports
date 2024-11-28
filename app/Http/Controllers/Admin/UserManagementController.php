@@ -100,7 +100,7 @@ class UserManagementController extends Controller
     {
         try {
 
-            $user = User::where('user_type', 'Admin')->findOrFail($id);
+            $user = User::findOrFail($id);
             $responsibles = User::where('user_type', 'Responsable')->latest()->get();
             $roles = Role::pluck('name', 'name')->all();
             $userRoles = $user->roles()->pluck('name', 'name')->all();

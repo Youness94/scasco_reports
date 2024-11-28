@@ -29,7 +29,7 @@ class AppointmentService
 
         if ($user->user_type == 'Responsable') {
             return Appointment::with('creator', 'updater', 'potential_case.client')
-                ->whereIn('creator_id', function ($query) use ($user) {
+                ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
                         ->where('responsible_id', $user->id)
@@ -40,7 +40,7 @@ class AppointmentService
 
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
             return Appointment::with('creator', 'updater', 'potential_case.client')
-                ->where('creator_id', $user->id)
+                ->where('created_by', $user->id)
                 ->get();
         }
 
@@ -77,7 +77,7 @@ class AppointmentService
 
         if ($user->user_type == 'Responsable') {
             $potential_case = PotencialCase::with('client')
-                ->whereIn('creator_id', function ($query) use ($user) {
+                ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
                         ->where('responsible_id', $user->id)
@@ -96,7 +96,7 @@ class AppointmentService
 
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
             $potential_case = PotencialCase::with('client')
-                ->where('creator_id', $user->id)
+                ->where('created_by', $user->id)
                 ->find($potencial_case_id);
 
             if ($potential_case) {
@@ -124,7 +124,7 @@ class AppointmentService
 
         if ($user->user_type == 'Responsable') {
             $appointments = Appointment::with('creator', 'updater')
-                ->whereIn('creator_id', function ($query) use ($user) {
+                ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
                         ->where('responsible_id', $user->id)
@@ -133,7 +133,7 @@ class AppointmentService
                 ->get();
 
             $potential_cases = PotencialCase::with('client')
-                ->whereIn('creator_id', function ($query) use ($user) {
+                ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
                         ->where('responsible_id', $user->id)
@@ -144,11 +144,11 @@ class AppointmentService
 
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
             $appointments = Appointment::with('creator', 'updater')
-                ->where('creator_id', $user->id)
+                ->where('created_by', $user->id)
                 ->get();
 
             $potential_cases = PotencialCase::with('client')
-                ->where('creator_id', $user->id)
+                ->where('created_by', $user->id)
                 ->get();
         }
 
@@ -203,7 +203,7 @@ class AppointmentService
 
         if ($user->user_type == 'Responsable') {
             $appointment = Appointment::with('creator', 'updater', 'potential_case.client')
-                ->whereIn('creator_id', function ($query) use ($user) {
+                ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
                         ->where('responsible_id', $user->id)
@@ -212,7 +212,7 @@ class AppointmentService
                 ->findOrFail($id);
 
             $potential_cases = PotencialCase::with('client')
-                ->whereIn('creator_id', function ($query) use ($user) {
+                ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
                         ->where('responsible_id', $user->id)
@@ -223,11 +223,11 @@ class AppointmentService
 
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
             $appointment = Appointment::with('creator', 'updater', 'potential_case.client')
-                ->where('creator_id', $user->id)
+                ->where('created_by', $user->id)
                 ->findOrFail($id);
 
             $potential_cases = PotencialCase::with('client')
-                ->where('creator_id', $user->id)
+                ->where('created_by', $user->id)
                 ->get();
         }
 
@@ -280,7 +280,7 @@ class AppointmentService
 
         if ($user->user_type == 'Responsable') {
             $appointment = Appointment::with('creator', 'updater')
-                ->whereIn('creator_id', function ($query) use ($user) {
+                ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
                         ->where('responsible_id', $user->id)
@@ -291,7 +291,7 @@ class AppointmentService
 
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
             $appointment = Appointment::with('creator', 'updater')
-                ->where('creator_id', $user->id)
+                ->where('created_by', $user->id)
                 ->findOrFail($id);
         }
 

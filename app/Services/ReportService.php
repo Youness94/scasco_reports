@@ -29,7 +29,7 @@ class ReportService
     
         if ($user->user_type == 'Responsable') {
             return Report::with('creator', 'updater', 'potential_case', 'appointment')
-                ->whereIn('creator_id', function ($query) use ($user) {
+                ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
                         ->where('responsible_id', $user->id)
@@ -40,7 +40,7 @@ class ReportService
     
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
             return Report::with('creator', 'updater', 'potential_case', 'appointment')
-                ->where('creator_id', $user->id)
+                ->where('created_by', $user->id)
                 ->get();
         }
     
@@ -57,7 +57,7 @@ class ReportService
     
         if ($user->user_type == 'Responsable') {
             return Appointment::where('potencial_case_id', $potencial_case_id)
-                ->whereIn('creator_id', function ($query) use ($user) {
+                ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
                         ->where('responsible_id', $user->id)
@@ -68,7 +68,7 @@ class ReportService
     
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
             return Appointment::where('potencial_case_id', $potencial_case_id)
-                ->where('creator_id', $user->id)
+                ->where('created_by', $user->id)
                 ->get();
         }
    
@@ -85,7 +85,7 @@ class ReportService
         }
     
         if ($user->user_type == 'Responsable') {
-            $potential_cases = PotencialCase::whereIn('creator_id', function ($query) use ($user) {
+            $potential_cases = PotencialCase::whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
                         ->where('responsible_id', $user->id)
@@ -96,14 +96,14 @@ class ReportService
         }
     
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
-            $potential_cases = PotencialCase::where('creator_id', $user->id)->get();
+            $potential_cases = PotencialCase::where('created_by', $user->id)->get();
         }
     
         $appointments = Appointment::when($user->user_type == 'Super Responsable', function ($query) {
             return $query;
         })
         ->when($user->user_type == 'Responsable', function ($query) use ($user) {
-            return $query->whereIn('creator_id', function ($query) use ($user) {
+            return $query->whereIn('created_by', function ($query) use ($user) {
                 $query->select('id')
                     ->from('users')
                     ->where('responsible_id', $user->id)
@@ -111,7 +111,7 @@ class ReportService
             });
         })
         ->when($user->user_type == 'Admin' || $user->user_type == 'Commercial', function ($query) use ($user) {
-            return $query->where('creator_id', $user->id);
+            return $query->where('created_by', $user->id);
         })
         ->get();
     
@@ -159,7 +159,7 @@ class ReportService
     
         if ($user->user_type == 'Responsable') {
             $report = Report::with('creator', 'updater', 'potential_case', 'appointment')
-                ->whereIn('creator_id', function ($query) use ($user) {
+                ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
                         ->where('responsible_id', $user->id)
@@ -170,7 +170,7 @@ class ReportService
     
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
             $report = Report::with('creator', 'updater', 'potential_case', 'appointment')
-                ->where('creator_id', $user->id)
+                ->where('created_by', $user->id)
                 ->findOrFail($id);
         }
     
@@ -220,7 +220,7 @@ class ReportService
     
         if ($user->user_type == 'Responsable') {
             $report = Report::with('creator', 'updater', 'potential_case')
-                ->whereIn('creator_id', function ($query) use ($user) {
+                ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
                         ->where('responsible_id', $user->id)
@@ -231,7 +231,7 @@ class ReportService
     
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
             $report = Report::with('creator', 'updater', 'potential_case')
-                ->where('creator_id', $user->id)
+                ->where('created_by', $user->id)
                 ->findOrFail($id);
         }
    

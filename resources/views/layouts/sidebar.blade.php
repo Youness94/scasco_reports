@@ -39,7 +39,7 @@
 
               
 
-                @if (Auth::check() && (Auth::user()->can('voir les admins') || Auth::user()->can('créer admin')) && Auth::user()->user_type === 'Admin')
+                @if (Auth::check() && (Auth::user()->can('voir les admins') || Auth::user()->can('créer admin')))
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarAdmin" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->routeIs('all.users') || request()->routeIs('add.user')  ? 'true' : 'false' }}" aria-controls="sidebarAdmin">
                         <i class="ri-admin-fill"></i> <span>Admins</span>
@@ -247,7 +247,7 @@
                 )&& Auth::user()->user_type === 'Admin')
                 <li class="menu-title"><span>Rôles & Permisions</span></li>
                 @endif
-                @if (Auth::check() && (Auth::user()->can('voir les roles') || Auth::user()->can('créer role')  ) && Auth::user()->user_type === 'Admin')
+                @if (Auth::check() && (Auth::user()->can('voir les roles') || Auth::user()->can('créer role')  ))
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#Roles" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="Roles">
                         <i class="ri-layout-3-line"></i> <span>Rôles</span>
