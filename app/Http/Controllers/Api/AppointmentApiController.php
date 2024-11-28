@@ -1,17 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Appointment;
-use App\Models\PotencialCase;
-use App\Services\PotencialCaseHisotryService;
-use Carbon\Carbon;
+
+
 use App\Services\AppointmentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class AppointmentController extends Controller
+class AppointmentApiController extends Controller
 {
     protected $appointmentService;
 
@@ -23,7 +20,7 @@ class AppointmentController extends Controller
     public function get_all_appointments()
     {
         $appointments = $this->appointmentService->getAllAppointments();
-        return view('appointments.appointments_list', compact('appointments'));
+        return response()->json($appointments);
     }
 
     public function getClientByCase($potencial_case_id)
@@ -40,7 +37,7 @@ class AppointmentController extends Controller
     public function add_appointment()
     {
         $data = $this->appointmentService->addAppointmentData();
-        return view('appointments.add_appointment', $data);
+        return response()->json($data);
     }
 
     public function store_appointment(Request $request)
@@ -55,34 +52,39 @@ class AppointmentController extends Controller
         $result = $this->appointmentService->storeAppointment($validatedData);
 
         if ($result['status'] == 'success') {
-            return redirect('/rendez-vous')->with('success', $result['message']);
+            return response()->json(['message' => $result['message']], 201);
         }
 
-        return redirect('/ajouter-rendez-voust')->with('error', $result['message']);
+        return response()->json(['error' => $result['message']], 400);
     }
 
     public function edit_appointment($id)
     {
         $data = $this->appointmentService->getEditAppointmentData($id);
-        return view('appointments.edit_appointment', $data);
+
+        if ($data) {
+            return response()->json($data);
+        }
+
+        return response()->json(['error' => 'Appointment not found'], 404);
     }
 
     public function update_appointment(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'date_appointment' => 'sometimes',
-            'place' => 'sometimes',
-            'status' => 'sometimes',
-            'potencial_case_id' => 'sometimes|exists:potencial_cases,id',
+            'date_appointment' => 'sometimes|required',
+            'place' => 'sometimes|required',
+            'status' => 'sometimes|nullable',
+            'potencial_case_id' => 'sometimes|required|exists:potencial_cases,id',
         ]);
 
         $result = $this->appointmentService->updateAppointment($validatedData, $id);
 
         if ($result['status'] == 'success') {
-            return redirect('/rendez-vous')->with('success', $result['message']);
+            return response()->json(['message' => $result['message']]);
         }
 
-        return response()->json(['status' => 'Error', 'message' => $result['message']]);
+        return response()->json(['error' => $result['message']], 400);
     }
 
     public function delete_appointment($id)
@@ -90,9 +92,9 @@ class AppointmentController extends Controller
         $result = $this->appointmentService->deleteAppointment($id);
 
         if ($result['status'] == 'success') {
-            return redirect('/rendez-vous')->with('success', $result['message']);
+            return response()->json(['message' => $result['message']]);
         }
 
-        return response()->json(['status' => 'Error', 'message' => $result['message']]);
+        return response()->json(['error' => $result['message']], 400);
     }
 }

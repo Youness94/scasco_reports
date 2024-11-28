@@ -161,7 +161,7 @@ Route::group(['middleware' => ['web', 'auth']], function () {
         Route::get('delete/appointment/{id}', 'delete_appointment')->name('delete.appointment');
         Route::get('détail-de-rendez-vous/{id}', 'display_appointment')->name('display.appointment');
  
-        Route::get('/get-client-by-case/{potencial_case_id}', [AppointmentController::class, 'getClientByCase'])->name('get.client.by.case');
+        Route::get('/get-client-by-case/{potencial_case_id}', 'getClientByCase')->name('get.client.by.case');
     });
 
     Route::controller(AdminRoleController::class)->group(function () {

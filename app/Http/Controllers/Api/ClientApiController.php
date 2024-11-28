@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\City;
 use App\Services\ClientService;
+use App\Models\City;
 use Illuminate\Http\Request;
 
-class ClientController extends Controller
+class ClientApiController extends Controller
 {
     protected $clientService;
 
@@ -19,13 +19,13 @@ class ClientController extends Controller
     public function get_all_clients()
     {
         $clients = $this->clientService->getAllClients();
-        return view('clients.clients_list', compact('clients'));
+        return response()->json($clients);
     }
 
     public function add_client()
     {
         $data = $this->clientService->addClient();
-        return view('clients.add_client', $data);
+        return response()->json($data);
     }
 
     public function store_client(Request $request)
@@ -46,17 +46,33 @@ class ClientController extends Controller
 
         try {
             $this->clientService->storeClient($validatedData);
-            return redirect('/clients')->with('success', 'Client created successfully');
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Client created successfully',
+            ], 201);
         } catch (\Exception $e) {
-            return redirect('/ajouter-client')->with('success', 'Client not created');
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Client not created: ' . $e->getMessage(),
+            ], 400);
         }
     }
 
     public function edit_client($id)
     {
         $client = $this->clientService->getClient($id);
-        $cities = City::all();
-        return view('clients.edit_client', compact('client', 'cities'));
+        if ($client) {
+            $cities = City::all();
+            return response()->json([
+                'client' => $client,
+                'cities' => $cities,
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Client not found',
+        ], 404);
     }
 
     public function update_client(Request $request, $id)
@@ -77,12 +93,15 @@ class ClientController extends Controller
 
         try {
             $this->clientService->updateClient($id, $validatedData);
-            return redirect('/clients')->with('success', 'Client updated successfully');
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Client updated successfully',
+            ]);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'Error',
+                'status' => 'error',
                 'message' => $e->getMessage() ?: 'DB Error',
-            ]);
+            ], 400);
         }
     }
 
@@ -90,18 +109,28 @@ class ClientController extends Controller
     {
         try {
             $this->clientService->deleteClient($id);
-            return redirect('/clients')->with('success', 'Client deleted successfully');
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Client deleted successfully',
+            ]);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'Error',
+                'status' => 'error',
                 'message' => $e->getMessage() ?: 'DB Error',
-            ]);
+            ], 400);
         }
     }
 
     public function display_client($id)
     {
         $client = $this->clientService->getClient($id);
-        return view('clients.client_details', compact('client'));
+        if ($client) {
+            return response()->json($client);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Client not found',
+        ], 404);
     }
 }

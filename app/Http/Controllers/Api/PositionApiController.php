@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\PositionService;
 use Illuminate\Http\Request;
 
-class PositionController extends Controller
+class PositionApiController extends Controller
 {
     protected $positionService;
 
@@ -18,13 +18,13 @@ class PositionController extends Controller
     public function get_all_positions()
     {
         $positions = $this->positionService->getAllPositions();
-        return view('positions.positions_list', compact('positions'));
+        return response()->json($positions);
     }
 
     public function add_position()
     {
         $positions = $this->positionService->getAllPositions();
-        return view('positions.add_position', compact('positions'));
+        return response()->json($positions);
     }
 
     public function store_position(Request $request)
@@ -37,16 +37,30 @@ class PositionController extends Controller
 
         try {
             $this->positionService->createPosition($validatedData);
-            return redirect('/positions')->with('success', 'Position created successfully');
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Position created successfully',
+            ], 201);
         } catch (\Exception $e) {
-            return redirect('/ajouter-position')->with('error', 'Position not created');
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Position not created: ' . $e->getMessage(),
+            ], 400);
         }
     }
 
     public function edit_position($id)
     {
         $position = $this->positionService->getPosition($id);
-        return view('positions.edit_position', compact('position'));
+
+        if ($position) {
+            return response()->json($position);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Position not found',
+        ], 404);
     }
 
     public function update_position(Request $request, $id)
@@ -59,9 +73,15 @@ class PositionController extends Controller
 
         try {
             $this->positionService->updatePosition($id, $validatedData);
-            return redirect('/positions')->with('success', 'Position updated successfully');
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Position updated successfully',
+            ]);
         } catch (\Exception $e) {
-            return redirect('/edit-position/' . $id)->with('error', 'Position not updated');
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage() ?: 'DB Error',
+            ], 400);
         }
     }
 
@@ -69,9 +89,15 @@ class PositionController extends Controller
     {
         try {
             $this->positionService->deletePosition($id);
-            return redirect('/positions')->with('success', 'Position deleted successfully');
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Position deleted successfully',
+            ]);
         } catch (\Exception $e) {
-            return redirect('/positions')->with('error', 'Position not deleted');
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage() ?: 'DB Error',
+            ], 400);
         }
     }
 }

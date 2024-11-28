@@ -1,19 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Branche;
-use App\Models\Client;
-use App\Models\PotencialCase;
-use App\Models\Service;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Services\PotentialCaseService;
+use App\Models\PotentialCase;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
-class PotencialCaseController extends Controller
+class PotencialCaseApiController extends Controller
 {
     protected $potentialCaseService;
 
@@ -22,23 +18,20 @@ class PotencialCaseController extends Controller
         $this->potentialCaseService = $potentialCaseService;
     }
 
-
-
     public function get_all_potential_cases()
     {
         $all_potential_cases = $this->potentialCaseService->getAllPotentialCases();
-        return view('potential_cases.potential_cases_list', compact('all_potential_cases'));
+        return response()->json($all_potential_cases);
     }
-
     public function add_potential_case()
     {
         $data = $this->potentialCaseService->getAllClientsAndServices();
-        return view('potential_cases.add_potential_case', $data);
+    
+        return response()->json($data);
     }
-
-    public function store_potential_case(Request $request)
+    public function storePotentialCase(Request $request)
     {
-        $request->validate([
+        $validatedData = $request->validate([
             'client_id' => 'required|exists:clients,id',
             'services' => 'required|array',
             'services.*' => 'exists:services,id',
@@ -49,30 +42,42 @@ class PotencialCaseController extends Controller
         $result = $this->potentialCaseService->storePotentialCase($request);
 
         if ($result['status'] == 'success') {
-            return redirect('/affaires')->with('success', $result['message']);
+            return response()->json([
+                'status' => 'success',
+                'message' => $result['message'],
+            ], 201);
         } else {
-            return redirect()->back()->with('error', $result['message']);
+            return response()->json([
+                'status' => 'error',
+                'message' => $result['message'],
+            ], 400);
         }
     }
 
-
     public function edit_potential_case($id)
     {
-        Log::info('Entering edit_potential_case method with ID: ' . $id);
+        Log::info('Entering editPotentialCase method with ID: ' . $id);
 
         $potentialCase = $this->potentialCaseService->editPotentialCase($id);
         Log::info('Data for editing potential case:', ['potentialCase' => $potentialCase]);
 
-        return view('potential_cases.edit_potential_case', [
-            'potentialCase' => $potentialCase['potentialCase'],  
-            'services' => $potentialCase['services'],  
-            'clients' => $potentialCase['clients']   
-        ]);
+        if ($potentialCase) {
+            return response()->json([
+                'potentialCase' => $potentialCase['potentialCase'],
+                'services' => $potentialCase['services'],
+                'clients' => $potentialCase['clients']
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Potential case not found',
+        ], 404);
     }
 
     public function update_potential_case(Request $request, $id)
     {
-        Log::info('Entering update_potential_case method with ID: ' . $id);
+        Log::info('Entering updatePotentialCase method with ID: ' . $id);
 
         $validated = $request->validate([
             'client_id' => 'sometimes|exists:clients,id',
@@ -87,12 +92,19 @@ class PotencialCaseController extends Controller
 
         if ($result['status'] == 'success') {
             Log::info('Potential case updated successfully');
-            return redirect('/affaires')->with('success', $result['message']);
+            return response()->json([
+                'status' => 'success',
+                'message' => $result['message'],
+            ]);
         } else {
             Log::error('Failed to update potential case: ' . $result['message']);
-            return redirect()->back()->with('error', $result['message']);
+            return response()->json([
+                'status' => 'error',
+                'message' => $result['message'],
+            ], 400);
         }
     }
+
     public function getBranchesByService(Request $request)
     {
         $serviceIds = $request->input('service_ids');
@@ -100,7 +112,6 @@ class PotencialCaseController extends Controller
 
         return response()->json($services);
     }
-
 
     public function editBranchesByService(Request $request)
     {
@@ -131,13 +142,21 @@ class PotencialCaseController extends Controller
 
         return response()->json(['success' => true]);
     }
+
     public function delete_potential_case($id)
     {
         $result = $this->potentialCaseService->deletePotencialCase($id);
+
         if ($result['status'] == 'success') {
-            return redirect('/affaires')->with('success', $result['message']);
+            return response()->json([
+                'status' => 'success',
+                'message' => $result['message'],
+            ]);
         } else {
-            return redirect()->back()->with('error', $result['message']);
+            return response()->json([
+                'status' => 'error',
+                'message' => $result['message'],
+            ], 400);
         }
     }
 }
