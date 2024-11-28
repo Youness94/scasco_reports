@@ -35,7 +35,10 @@ class BrancheController extends Controller
             'description' => 'nullable',
             'service_id' => 'required|exists:services,id',
         ], [
-            'name.required' => 'Veuillez entrer le nom du poste.',
+            'name.required' => 'Le nom est obligatoire.',
+            'description.nullable' => 'La description est optionnelle.',
+            'service_id.required' => 'L\'ID du service est obligatoire.',
+            'service_id.exists' => 'Le service avec cet ID n\'existe pas.',
         ]);
 
         $response = $this->brancheService->createBranche($validatedData);
@@ -56,7 +59,10 @@ class BrancheController extends Controller
             'description' => 'nullable',
             'service_id' => 'sometimes|exists:services,id',
         ], [
-            'name.sometimes' => 'Veuillez entrer le nom du poste.',
+            'name.sometimes' => 'Le nom est obligatoire.',
+            'description.nullable' => 'La description est optionnelle.',
+            'service_id.sometimes' => 'L\'ID du service est obligatoire.',
+            'service_id.exists' => 'Le service avec cet ID n\'existe pas.',
         ]);
 
         $response = $this->brancheService->updateBranche($id, $validatedData);

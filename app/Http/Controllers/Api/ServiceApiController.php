@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ServiceRequest;
+use App\Http\Requests\UpdateServiceRequest;
 use App\Services\ServiceService;
 use App\Models\Service;
 use Illuminate\Http\Request;
@@ -22,14 +24,9 @@ class ServiceApiController extends Controller
         return response()->json($services);
     }
 
-    public function store_service(Request $request)
+    public function store_service(ServiceRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'description' => 'nullable',
-        ], [
-            'name.required' => 'Veuillez entrer le nom du poste.',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $this->serviceService->createService($validatedData);
@@ -58,16 +55,11 @@ class ServiceApiController extends Controller
         ], 404);
     }
 
-    public function update_service(Request $request, $id)
+    public function update_service(UpdateServiceRequest $request, $id)
     {
         $service = Service::with('creator', 'updater')->findOrFail($id);
 
-        $validatedData = $request->validate([
-            'name' => 'sometimes',
-            'description' => 'sometimes',
-        ], [
-            'name.sometimes' => 'Veuillez entrer le nom du poste.',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $this->serviceService->updateService($service, $validatedData);

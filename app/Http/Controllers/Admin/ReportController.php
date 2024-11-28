@@ -42,7 +42,12 @@ class ReportController extends Controller
             'contenu' => 'required',
             'potencial_case_id' => 'required|exists:potencial_cases,id',
             'appointment_id' => 'nullable|exists:appointments,id',
-        ], []);
+        ], [
+            'contenu.required' => 'Le contenu est requis.',
+            'potencial_case_id.required' => 'Le cas potentiel est requis.',
+            'potencial_case_id.exists' => 'Le cas potentiel sélectionné n\'existe pas.',
+            'appointment_id.exists' => 'L\'appointment sélectionné n\'existe pas.',
+        ]);
 
         try {
             $this->reportService->createReport($validatedData);
@@ -66,7 +71,12 @@ class ReportController extends Controller
             'contenu' => 'sometimes',
             'potencial_case_id' => 'sometimes|exists:potencial_cases,id',
             'appointment_id' => 'sometimes|exists:appointments,id',
-        ], []);
+        ], [
+            'contenu.sometimes' => 'Le contenu est requis.',
+            'potencial_case_id.sometimes' => 'Le cas potentiel est requis.',
+            'potencial_case_id.exists' => 'Le cas potentiel sélectionné n\'existe pas.',
+            'appointment_id.exists' => 'L\'appointment sélectionné n\'existe pas.',
+        ]);
 
         try {
             $this->reportService->updateReport($id, $validatedData);

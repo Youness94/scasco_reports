@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PositionRequest;
+use App\Http\Requests\UpdatePositionRequest;
 use App\Services\PositionService;
 use Illuminate\Http\Request;
 
@@ -27,13 +29,9 @@ class PositionApiController extends Controller
         return response()->json($positions);
     }
 
-    public function store_position(Request $request)
+    public function store_position(PositionRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-        ], [
-            'name.required' => 'Veuillez entrer le nom du poste.',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $this->positionService->createPosition($validatedData);
@@ -63,13 +61,9 @@ class PositionApiController extends Controller
         ], 404);
     }
 
-    public function update_position(Request $request, $id)
+    public function update_position(UpdatePositionRequest $request, $id)
     {
-        $validatedData = $request->validate([
-            'name' => 'sometimes',
-        ], [
-            'name.sometimes' => 'Veuillez entrer le nom du poste.',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $this->positionService->updatePosition($id, $validatedData);

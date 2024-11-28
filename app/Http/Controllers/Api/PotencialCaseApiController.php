@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PotencialCaseRequest;
+use App\Http\Requests\UpdatePotencialCaseRequest;
 use App\Services\PotentialCaseService;
 use App\Models\PotentialCase;
 use Illuminate\Http\Request;
@@ -26,18 +28,12 @@ class PotencialCaseApiController extends Controller
     public function add_potential_case()
     {
         $data = $this->potentialCaseService->getAllClientsAndServices();
-    
+
         return response()->json($data);
     }
-    public function storePotentialCase(Request $request)
+    public function storePotentialCase(PotencialCaseRequest $request)
     {
-        $validatedData = $request->validate([
-            'client_id' => 'required|exists:clients,id',
-            'services' => 'required|array',
-            'services.*' => 'exists:services,id',
-            'branches' => 'nullable|array',
-            'branches.*' => 'exists:branches,id',
-        ]);
+        $validatedData = $request->validated();
 
         $result = $this->potentialCaseService->storePotentialCase($request);
 
@@ -75,18 +71,12 @@ class PotencialCaseApiController extends Controller
         ], 404);
     }
 
-    public function update_potential_case(Request $request, $id)
+    public function update_potential_case(UpdatePotencialCaseRequest $request, $id)
     {
         Log::info('Entering updatePotentialCase method with ID: ' . $id);
 
-        $validated = $request->validate([
-            'client_id' => 'sometimes|exists:clients,id',
-            'services' => 'sometimes|array',
-            'services.*' => 'exists:services,id',
-            'branches' => 'nullable|array',
-            'branches.*' => 'exists:branches,id',
-        ]);
-        Log::info('Request validated successfully:', $validated);
+        $validatedData = $request->validated();
+        Log::info('Request validated successfully:', $validatedData);
 
         $result = $this->potentialCaseService->updatePotentialCase($request, $id);
 

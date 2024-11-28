@@ -46,7 +46,8 @@ if (!function_exists('set_active')) {
 
 // // ----------------------------login ------------------------------//
 Route::post('/login', [UserController::class, 'login']);
-
+Route::post('password-email', [UserController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::post('reset-password', [UserController::class, 'resetPassword'])->name('password.reset');
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [UserController::class, 'logoutUser']);

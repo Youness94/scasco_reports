@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ReportRequest;
+use App\Http\Requests\UpdateReportRequest;
 use App\Services\ReportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -28,18 +30,10 @@ class ReportApiController extends Controller
         return response()->json($appointments);
     }
 
-    public function store_report(Request $request)
+    public function store_report(ReportRequest $request)
     {
-        $validatedData = $request->validate([
-            'contenu' => 'required',
-            'potencial_case_id' => 'required|exists:potencial_cases,id',
-            'appointment_id' => 'nullable|exists:appointments,id',
-        ], [
-            'contenu.required' => 'Le contenu est requis.',
-            'potencial_case_id.required' => 'Le cas potentiel est requis.',
-            'potencial_case_id.exists' => 'Le cas potentiel sélectionné n\'existe pas.',
-            'appointment_id.exists' => 'L\'appointment sélectionné n\'existe pas.',
-        ]);
+        $validatedData = $request->validated();
+       
 
         try {
             $this->reportService->createReport($validatedData);
@@ -70,17 +64,9 @@ class ReportApiController extends Controller
         ], 404);
     }
 
-    public function update_report(Request $request, $id)
+    public function update_report(UpdateReportRequest $request, $id)
     {
-        $validatedData = $request->validate([
-            'contenu' => 'sometimes',
-            'potencial_case_id' => 'sometimes|exists:potencial_cases,id',
-            'appointment_id' => 'sometimes|exists:appointments,id',
-        ], [
-            'contenu.sometimes' => 'Le contenu est requis.',
-            'potencial_case_id.sometimes' => 'Le cas potentiel est requis.',
-            'appointment_id.sometimes' => 'L\'appointment est requis.',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $this->reportService->updateReport($id, $validatedData);

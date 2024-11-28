@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ClientRequest;
+use App\Http\Requests\UpdateClientRequest;
 use App\Services\ClientService;
 use App\Models\City;
 use Illuminate\Http\Request;
@@ -28,21 +30,10 @@ class ClientApiController extends Controller
         return response()->json($data);
     }
 
-    public function store_client(Request $request)
+
+    public function store_client(ClientRequest $request)
     {
-        $validatedData = $request->validate([
-            'client_first_name' => 'required',
-            'client_last_name' => 'required',
-            'client_address' => 'required',
-            'client_phone' => 'required',
-            'client_email' => 'required',
-            'RC' => 'nullable',
-            'ICE' => 'nullable',
-            'client_type' => 'required',
-            'city_id' => 'required|exists:cities,id',
-        ], [
-            'name.required' => 'Veuillez entrer le nom du poste.',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $this->clientService->storeClient($validatedData);
@@ -75,21 +66,9 @@ class ClientApiController extends Controller
         ], 404);
     }
 
-    public function update_client(Request $request, $id)
+    public function update_client(UpdateClientRequest $request, $id)
     {
-        $validatedData = $request->validate([
-            'client_first_name' => 'sometimes',
-            'client_last_name' => 'sometimes',
-            'client_address' => 'sometimes',
-            'client_phone' => 'sometimes',
-            'client_email' => 'sometimes',
-            'RC' => 'nullable',
-            'ICE' => 'nullable',
-            'client_type' => 'sometimes',
-            'city_id' => 'sometimes|exists:cities,id',
-        ], [
-            'name.sometimes' => 'Veuillez entrer le nom du poste.',
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $this->clientService->updateClient($id, $validatedData);

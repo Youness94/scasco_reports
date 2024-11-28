@@ -37,7 +37,10 @@ class ServiceController extends Controller
             'name' => 'required',
             'description' => 'nullable',
         ], [
-            'name.required' => 'Veuillez entrer le nom du poste.',
+            'name.required' => 'Le nom est requis.',
+            'name.string' => 'Le nom doit être une chaîne de caractères.',
+            'name.max' => 'Le nom ne peut pas dépasser 255 caractères.',
+            'description.string' => 'La description doit être une chaîne de caractères.',
         ]);
 
         try {
@@ -61,7 +64,10 @@ class ServiceController extends Controller
             'name' => 'sometimes',
             'description' => 'sometimes',
         ], [
-            'name.sometimes' => 'Veuillez entrer le nom du poste.',
+            'name.required' => 'Le nom est requis.',
+            'name.string' => 'Le nom doit être une chaîne de caractères.',
+            'name.max' => 'Le nom ne peut pas dépasser 255 caractères.',
+            'description.string' => 'La description doit être une chaîne de caractères.',
         ]);
 
         try {

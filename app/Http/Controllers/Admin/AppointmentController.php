@@ -50,6 +50,12 @@ class AppointmentController extends Controller
             'place' => 'required',
             'status' => 'nullable',
             'potencial_case_id' => 'required|exists:potencial_cases,id',
+        ], [
+            'date_appointment.required' => 'La date du rendez-vous est obligatoire.',
+            'place.required' => 'Le lieu du rendez-vous est obligatoire.',
+            'status.nullable' => 'Le statut est optionnel.',
+            'potencial_case_id.required' => 'L\'ID du cas potentiel est obligatoire.',
+            'potencial_case_id.exists' => 'Le cas potentiel avec cet ID n\'existe pas.',
         ]);
 
         $result = $this->appointmentService->storeAppointment($validatedData);
@@ -74,6 +80,12 @@ class AppointmentController extends Controller
             'place' => 'sometimes',
             'status' => 'sometimes',
             'potencial_case_id' => 'sometimes|exists:potencial_cases,id',
+        ], [
+            'date_appointment.sometimes' => 'La date du rendez-vous est obligatoire.',
+            'place.sometimes' => 'Le lieu du rendez-vous est obligatoire.',
+            'status.nullable' => 'Le statut est optionnel.',
+            'potencial_case_id.sometimes' => 'L\'ID du cas potentiel est obligatoire.',
+            'potencial_case_id.exists' => 'Le cas potentiel avec cet ID n\'existe pas.',
         ]);
 
         $result = $this->appointmentService->updateAppointment($validatedData, $id);

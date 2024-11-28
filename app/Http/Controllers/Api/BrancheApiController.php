@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BrancheRequest;
+use App\Http\Requests\UpdateBrancheRequest;
 use App\Services\BrancheService;
 use Illuminate\Http\Request;
 
@@ -28,15 +30,9 @@ class BrancheApiController extends Controller
         return response()->json(compact('branches', 'services'));
     }
 
-    public function store_branche(Request $request)
+    public function store_branche(BrancheRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'description' => 'nullable',
-            'service_id' => 'required|exists:services,id',
-        ], [
-            'name.required' => 'Veuillez entrer le nom du poste.',
-        ]);
+        $validatedData = $request->validated();
 
         $response = $this->brancheService->createBranche($validatedData);
         
@@ -58,15 +54,9 @@ class BrancheApiController extends Controller
         return response()->json(['error' => 'Branche not found'], 404);
     }
 
-    public function update_branche(Request $request, $id)
+    public function update_branche(UpdateBrancheRequest $request, $id)
     {
-        $validatedData = $request->validate([
-            'name' => 'sometimes|required',
-            'description' => 'nullable',
-            'service_id' => 'sometimes|required|exists:services,id',
-        ], [
-            'name.required' => 'Veuillez entrer le nom du poste.',
-        ]);
+        $validatedData = $request->validated();
 
         $response = $this->brancheService->updateBranche($id, $validatedData);
         

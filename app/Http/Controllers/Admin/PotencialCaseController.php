@@ -44,6 +44,14 @@ class PotencialCaseController extends Controller
             'services.*' => 'exists:services,id',
             'branches' => 'nullable|array',
             'branches.*' => 'exists:branches,id',
+        ], [
+            'client_id.required' => 'Le client est obligatoire.',
+            'client_id.exists' => 'Le client spécifié n\'existe pas.',
+            'services.required' => 'Les services sont obligatoires.',
+            'services.array' => 'Les services doivent être fournis sous forme de tableau.',
+            'services.*.exists' => 'Un ou plusieurs services spécifiés n\'existent pas.',
+            'branches.array' => 'Les branches doivent être fournies sous forme de tableau.',
+            'branches.*.exists' => 'Une ou plusieurs branches spécifiées n\'existent pas.',
         ]);
 
         $result = $this->potentialCaseService->storePotentialCase($request);
@@ -80,6 +88,14 @@ class PotencialCaseController extends Controller
             'services.*' => 'exists:services,id',
             'branches' => 'nullable|array',
             'branches.*' => 'exists:branches,id',
+        ], [
+            'client_id.sometimes' => 'Le client est obligatoire.',
+            'client_id.exists' => 'Le client spécifié n\'existe pas.',
+            'services.sometimes' => 'Les services sont obligatoires.',
+            'services.array' => 'Les services doivent être fournis sous forme de tableau.',
+            'services.*.exists' => 'Un ou plusieurs services spécifiés n\'existent pas.',
+            'branches.array' => 'Les branches doivent être fournies sous forme de tableau.',
+            'branches.*.exists' => 'Une ou plusieurs branches spécifiées n\'existent pas.',
         ]);
         Log::info('Request validated successfully:', $validated);
 

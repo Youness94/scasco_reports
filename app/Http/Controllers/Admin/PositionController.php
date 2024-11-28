@@ -32,7 +32,7 @@ class PositionController extends Controller
         $validatedData = $request->validate([
             'name' => 'required',
         ], [
-            'name.required' => 'Veuillez entrer le nom du poste.',
+           'name.required' => 'Le nom est obligatoire.',
         ]);
 
         try {
@@ -54,7 +54,7 @@ class PositionController extends Controller
         $validatedData = $request->validate([
             'name' => 'sometimes',
         ], [
-            'name.sometimes' => 'Veuillez entrer le nom du poste.',
+           'name.sometimes' => 'Le nom est obligatoire.',
         ]);
 
         try {

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-
-
+use App\Http\Requests\AppointmentRequest;
+use App\Http\Requests\UpdateAppointmentRequest;
 use App\Services\AppointmentService;
 use Illuminate\Http\Request;
 
@@ -40,15 +40,9 @@ class AppointmentApiController extends Controller
         return response()->json($data);
     }
 
-    public function store_appointment(Request $request)
+    public function store_appointment(AppointmentRequest $request)
     {
-        $validatedData = $request->validate([
-            'date_appointment' => 'required',
-            'place' => 'required',
-            'status' => 'nullable',
-            'potencial_case_id' => 'required|exists:potencial_cases,id',
-        ]);
-
+        $validatedData = $request->validated();
         $result = $this->appointmentService->storeAppointment($validatedData);
 
         if ($result['status'] == 'success') {
@@ -69,15 +63,9 @@ class AppointmentApiController extends Controller
         return response()->json(['error' => 'Appointment not found'], 404);
     }
 
-    public function update_appointment(Request $request, $id)
+    public function update_appointment(UpdateAppointmentRequest $request, $id)
     {
-        $validatedData = $request->validate([
-            'date_appointment' => 'sometimes|required',
-            'place' => 'sometimes|required',
-            'status' => 'sometimes|nullable',
-            'potencial_case_id' => 'sometimes|required|exists:potencial_cases,id',
-        ]);
-
+        $validatedData = $request->validated();
         $result = $this->appointmentService->updateAppointment($validatedData, $id);
 
         if ($result['status'] == 'success') {

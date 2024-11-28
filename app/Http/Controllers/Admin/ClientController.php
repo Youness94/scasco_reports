@@ -41,7 +41,16 @@ class ClientController extends Controller
             'client_type' => 'required',
             'city_id' => 'required|exists:cities,id',
         ], [
-            'name.required' => 'Veuillez entrer le nom du poste.',
+            'client_first_name.required' => 'Le prénom du client est obligatoire.',
+            'client_last_name.required' => 'Le nom du client est obligatoire.',
+            'client_address.required' => 'L\'adresse du client est obligatoire.',
+            'client_phone.required' => 'Le téléphone du client est obligatoire.',
+            'client_email.required' => 'L\'email du client est obligatoire.',
+            'RC.nullable' => 'Le numéro RC est optionnel.',
+            'ICE.nullable' => 'Le numéro ICE est optionnel.',
+            'client_type.required' => 'Le type de client est obligatoire.',
+            'city_id.required' => 'La ville est obligatoire.',
+            'city_id.exists' => 'La ville sélectionnée n\'existe pas.',
         ]);
 
         try {
@@ -72,7 +81,16 @@ class ClientController extends Controller
             'client_type' => 'sometimes',
             'city_id' => 'sometimes|exists:cities,id',
         ], [
-            'name.sometimes' => 'Veuillez entrer le nom du poste.',
+            'client_first_name.sometimes' => 'Le prénom du client est obligatoire.',
+            'client_last_name.sometimes' => 'Le nom du client est obligatoire.',
+            'client_address.sometimes' => 'L\'adresse du client est obligatoire.',
+            'client_phone.sometimes' => 'Le téléphone du client est obligatoire.',
+            'client_email.sometimes' => 'L\'email du client est obligatoire.',
+            'RC.nullable' => 'Le numéro RC est optionnel.',
+            'ICE.nullable' => 'Le numéro ICE est optionnel.',
+            'client_type.sometimes' => 'Le type de client est obligatoire.',
+            'city_id.sometimes' => 'La ville est obligatoire.',
+            'city_id.exists' => 'La ville sélectionnée n\'existe pas.',
         ]);
 
         try {

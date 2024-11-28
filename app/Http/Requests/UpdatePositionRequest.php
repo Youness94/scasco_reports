@@ -6,34 +6,38 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-
-class ForgotPasswordRequest extends FormRequest
+class UpdatePositionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
 
-    public function rules()
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
     {
         return [
-            'email' => 'required|email|exists:users,email',
+            'name' => 'sometimes',
         ];
     }
-
+    /**
+     * Get the custom validation messages.
+     *
+     * @return array
+     */
     public function messages()
     {
         return [
-            'email.required' => 'L\'adresse e-mail est obligatoire.',
-            'email.email' => 'L\'adresse e-mail doit être une adresse valide.',
-            'email.exists' => 'Aucun utilisateur n\'a été trouvé avec cette adresse e-mail.',
+            'name.sometimes' => 'Le nom est obligatoire.',
         ];
     }
-
-    
     public function failedValidation(Validator $validator){
 
         throw new HttpResponseException(   response()->json(  [
