@@ -12,8 +12,8 @@
 @section('content')
 @component('components.breadcrumb')
 @slot('li_1') <a href="{{ route('accueil') }}">Tableau de Bord</a> @endslot
-@slot('title') List des Admins  @endslot
-@endcomponent 
+@slot('title') List des Admins @endslot
+@endcomponent
 <div class="page-wrapper">
     <div class="content container-fluid">
         <!-- <div class="page-header mb-3 mb-lg-4 mt-3">
@@ -35,7 +35,7 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
-                <div class="card-header">Informations Admin</div>
+                    <div class="card-header">Informations Admin</div>
                     <div class="card-body">
                         <form action="{{ route('admin.update', ['id' => $user->id]) }}" method="post">
                             @csrf
@@ -93,7 +93,7 @@
 
                                 <div class="col-12 col-sm-4 mb-3">
                                     <label>Role<span class="login-danger"></span></label>
-                                    <select class="form-control select @error('role_name') is-invalid @enderror" name="roles" id="roles">
+                                    <select class="form-control select @error('role_name') is-invalid @enderror" name="roles[]" id="roles">
 
                                         @foreach($roles as $role)
                                         <option value="{{ $role }}" {{ old('roles', $user->roles->pluck('name')->first()) == $role ? 'selected' : '' }}>
@@ -107,13 +107,22 @@
                                     </span>
                                     @enderror
                                 </div>
-                                <div class="col-12 col-sm-4 mb-3">
-                                    <label>Type d'utilisateur <span class="login-danger"></span></label>
-                                    <select class="form-control select" name="user_type">
-                                        <option disabled>{{ old('user_type') }}</option>
-                                        <option value="Admin" {{ $user->user_type == 'Admin' ? 'selected' : '' }}>Admin</option>
-                                        <option value="Client" {{ $user->user_type == 'Client' ? 'selected' : '' }}>Client</option>
+                                <!-- responsibles -->
+                                <div class="col-md-4 mb-3" id="responsible_div" style="display:none;">
+                                    <label class="form-label" for="responsible_id">Responsable</label>
+                                    <select id="responsible_id" class="js-example-basic-single form-control @error('responsible_id') is-invalid @enderror" name="responsible_id">
+                                        <option selected disabled value="">Choisissez Responsable</option>
+                                        @foreach ($responsibles as $responsible)
+                                        <option value="{{ $responsible->id }}" {{ old('responsible_id', $user->responsible_id) == $responsible->id ? 'selected' : '' }}>
+                                            {{ $responsible->first_name }} {{ $responsible->last_name }}
+                                        </option>
+                                        @endforeach
                                     </select>
+                                    @error('responsible_id')
+                                    <span class="invalid-feedback" role="alert">
+                                        <span class="text-danger">{{ $message }}</span>
+                                    </span>
+                                    @enderror
                                 </div>
 
                                 <!-- <div class="mb-3">
@@ -157,4 +166,28 @@
     </div>
 </div>
 </div>
+@endsection
+@section('script')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const rolesSelect = document.getElementById('roles');
+        const responsibleDiv = document.getElementById('responsible_div');
+
+        // Show/hide responsible div based on the selected role
+        function toggleResponsibleDiv() {
+            const selectedRole = rolesSelect.value;
+            if (selectedRole === 'Admin' || selectedRole === 'Commercial') {
+                responsibleDiv.style.display = 'block';
+            } else {
+                responsibleDiv.style.display = 'none';
+            }
+        }
+
+        // Initial check on page load
+        toggleResponsibleDiv();
+
+        // Check on role change
+        rolesSelect.addEventListener('change', toggleResponsibleDiv);
+    });
+</script>
 @endsection

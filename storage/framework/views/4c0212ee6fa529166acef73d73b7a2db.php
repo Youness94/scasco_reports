@@ -108,7 +108,7 @@ endif;
 unset($__errorArgs, $__bag); ?>
                                                 </div>
                                                 <div class="col-12 col-sm-4 mb-3">
-                                                      <label>Phone: <span class="login-danger">*</span></label>
+                                                      <label>Téléphone: <span class="login-danger">*</span></label>
                                                       <input type="number" class="form-control <?php $__errorArgs = ['phonenumber'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -130,8 +130,9 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                                                 </div>
+                                                <!-- Role -->
                                                 <div class="col-12 col-sm-4 mb-3">
-                                                      <label>Role Name <span class="login-danger">*</span></label>
+                                                      <label>Position<span class="login-danger">*</span></label>
                                                       <select class="form-control select <?php $__errorArgs = ['roles'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -139,8 +140,8 @@ if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>" name="roles" id="roles" value="<?php echo e(old('roles')); ?>">
-                                                            <option selected disabled>Role Type</option>
+unset($__errorArgs, $__bag); ?>" name="roles[]" id="roles" value="<?php echo e(old('roles')); ?>">
+                                                            <option selected disabled>Position</option>
                                                             <?php $__currentLoopData = $roles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $role): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                             <option value="<?php echo e($role); ?>"><?php echo e($role); ?></option>
                                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -158,29 +159,38 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
                                                 </div>
-                                                <!-- <option value="Partenaire Admin">Partenaire Admin</option>
-                                                                  <option value="Partenaire Super Admin">Partenaire Super Admin</option> -->
-                                                <!-- <div class="col-12 col-sm-4 mb-3">
-                                                      <label for="">Roles</label>
-                                                      <select name="roles" class="form-control" multiple>
-                                                            <option value="">Select Role</option>
-                                                            <?php $__currentLoopData = $roles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $role): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                            <option value="<?php echo e($role); ?>"><?php echo e($role); ?></option>
+                                                <!-- responsibles -->
+                                                <div class="col-md-4 mb-3" id="responsible_div" style="display:none;">
+                                                      <label class="form-label" for="responsible_id">Responsable</label>
+                                                      <select id="responsible_id" class="js-example-basic-single form-control <?php $__errorArgs = ['responsible_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" name="responsible_id">
+                                                            <option selected disabled value="">Choisissez Responsable</option>
+                                                            <?php $__currentLoopData = $responsibles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $responsible): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                            <option value="<?php echo e($responsible->id); ?>" <?php echo e(old('responsible_id') == $responsible->id ? 'selected' : ''); ?>>
+                                                                  <?php echo e($responsible->first_name); ?> <?php echo e($responsible->last_name); ?>
+
+                                                            </option>
                                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                       </select>
-                                                      <?php $__errorArgs = ['role_name'];
+                                                      <?php $__errorArgs = ['responsible_id'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
                                                       <span class="invalid-feedback" role="alert">
-                                                            <strong><?php echo e($message); ?></strong>
+                                                            <span class="text-danger"><?php echo e($message); ?></span>
                                                       </span>
                                                       <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
-                                                </div> -->
+                                                </div>
 
 
                                                 <div class="col-12 col-sm-4 mb-3">
@@ -221,5 +231,23 @@ unset($__errorArgs, $__bag); ?>
             </div>
       </div>
 </div>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('script'); ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const rolesSelect = document.getElementById('roles');
+        const responsibleDiv = document.getElementById('responsible_div');
+
+        rolesSelect.addEventListener('change', function () {
+            const selectedRole = this.value;
+            if (selectedRole === 'Admin' || selectedRole === 'Commercial') {
+                responsibleDiv.style.display = 'block';
+            } else {
+                responsibleDiv.style.display = 'none';
+            }
+        });
+    });
+</script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\YOUNESS-DEVL\Desktop\scasco_reports\resources\views/usermanagement/add_user.blade.php ENDPATH**/ ?>

@@ -47,23 +47,23 @@ class UserRolePermissionSeeder extends Seeder
         
 
 
-
+// 'Admin', 'Responsable', 'Super Responsable', 'Commercial'
         // Create Roles
-        $superAdminRole = Role::create(['name' => 'Super Admin']); //as super-admin
-        $adminRole = Role::create(['name' => 'Admin']);
-        $commercialRole = Role::create(['name' => 'Commercial']);
+        $superResponsableRole = Role::create(['name' => 'Super Responsable']); //as super-admin
         $responsableRole = Role::create(['name' => 'Responsable']);
+        $commercialRole = Role::create(['name' => 'Commercial']);
+        $adminRole = Role::create(['name' => 'Admin']);
      
 
         // Lets give all permission to super-admin role.
         $allPermissionNames = Permission::pluck('name')->toArray();
 
-        $superAdminRole->givePermissionTo($allPermissionNames);
+        $superResponsableRole->givePermissionTo($allPermissionNames);
 
         // Let's give few permissions to admin role.
-        $adminRole->givePermissionTo([
-            'voir les positions', 'créer position', 'mettre à jour le position','supprimer position',
-    ]);
+    //     $adminRole->givePermissionTo([
+    //         'voir les positions', 'créer position', 'mettre à jour le position','supprimer position',
+    // ]);
        
 
         

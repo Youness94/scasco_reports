@@ -21,19 +21,91 @@ class AppointmentService
 
     public function getAllAppointments()
     {
-        return Appointment::with('creator', 'updater', 'potential_case.client')->get();
-    }
+        $user = auth()->user();
 
+        if ($user->user_type == 'Super Responsable') {
+            return Appointment::with('creator', 'updater', 'potential_case.client')->get();
+        }
+
+        if ($user->user_type == 'Responsable') {
+            return Appointment::with('creator', 'updater', 'potential_case.client')
+                ->whereIn('creator_id', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->get();
+        }
+
+        if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
+            return Appointment::with('creator', 'updater', 'potential_case.client')
+                ->where('creator_id', $user->id)
+                ->get();
+        }
+
+        return [];
+    }
+    // public function getClientByCase($potencial_case_id)
+    // {
+    //     $potential_case = PotencialCase::with('client')->find($potencial_case_id);
+
+    //     if ($potential_case) {
+    //         return [
+    //             'client_id' => $potential_case->client->id,
+    //             'client_first_name' => $potential_case->client->client_first_name,
+    //             'client_last_name' => $potential_case->client->client_last_name,
+    //         ];
+    //     }
+
+    //     return null;
+    // }
     public function getClientByCase($potencial_case_id)
     {
-        $potential_case = PotencialCase::with('client')->find($potencial_case_id);
+        $user = auth()->user();
 
-        if ($potential_case) {
-            return [
-                'client_id' => $potential_case->client->id,
-                'client_first_name' => $potential_case->client->client_first_name,
-                'client_last_name' => $potential_case->client->client_last_name,
-            ];
+        if ($user->user_type == 'Super Responsable') {
+            $potential_case = PotencialCase::with('client')->find($potencial_case_id);
+            if ($potential_case) {
+                return [
+                    'client_id' => $potential_case->client->id,
+                    'client_first_name' => $potential_case->client->client_first_name,
+                    'client_last_name' => $potential_case->client->client_last_name,
+                ];
+            }
+        }
+
+        if ($user->user_type == 'Responsable') {
+            $potential_case = PotencialCase::with('client')
+                ->whereIn('creator_id', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->find($potencial_case_id);
+
+            if ($potential_case) {
+                return [
+                    'client_id' => $potential_case->client->id,
+                    'client_first_name' => $potential_case->client->client_first_name,
+                    'client_last_name' => $potential_case->client->client_last_name,
+                ];
+            }
+        }
+
+        if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
+            $potential_case = PotencialCase::with('client')
+                ->where('creator_id', $user->id)
+                ->find($potencial_case_id);
+
+            if ($potential_case) {
+                return [
+                    'client_id' => $potential_case->client->id,
+                    'client_first_name' => $potential_case->client->client_first_name,
+                    'client_last_name' => $potential_case->client->client_last_name,
+                ];
+            }
         }
 
         return null;
@@ -41,8 +113,44 @@ class AppointmentService
 
     public function addAppointmentData()
     {
-        $appointments = Appointment::with('creator', 'updater')->get();
-        $potential_cases = PotencialCase::with('client')->get();
+        $user = auth()->user();
+        $appointments = [];
+        $potential_cases = [];
+
+        if ($user->user_type == 'Super Responsable') {
+            $appointments = Appointment::with('creator', 'updater')->get();
+            $potential_cases = PotencialCase::with('client')->get();
+        }
+
+        if ($user->user_type == 'Responsable') {
+            $appointments = Appointment::with('creator', 'updater')
+                ->whereIn('creator_id', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->get();
+
+            $potential_cases = PotencialCase::with('client')
+                ->whereIn('creator_id', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->get();
+        }
+
+        if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
+            $appointments = Appointment::with('creator', 'updater')
+                ->where('creator_id', $user->id)
+                ->get();
+
+            $potential_cases = PotencialCase::with('client')
+                ->where('creator_id', $user->id)
+                ->get();
+        }
 
         return compact('appointments', 'potential_cases');
     }
@@ -84,8 +192,44 @@ class AppointmentService
 
     public function getEditAppointmentData($id)
     {
-        $appointment = Appointment::with('creator', 'updater', 'potential_case.client')->findOrFail($id);
-        $potential_cases = PotencialCase::with('client')->get();
+        $user = auth()->user();
+        $appointment = null;
+        $potential_cases = [];
+
+        if ($user->user_type == 'Super Responsable') {
+            $appointment = Appointment::with('creator', 'updater', 'potential_case.client')->findOrFail($id);
+            $potential_cases = PotencialCase::with('client')->get();
+        }
+
+        if ($user->user_type == 'Responsable') {
+            $appointment = Appointment::with('creator', 'updater', 'potential_case.client')
+                ->whereIn('creator_id', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->findOrFail($id);
+
+            $potential_cases = PotencialCase::with('client')
+                ->whereIn('creator_id', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->get();
+        }
+
+        if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
+            $appointment = Appointment::with('creator', 'updater', 'potential_case.client')
+                ->where('creator_id', $user->id)
+                ->findOrFail($id);
+
+            $potential_cases = PotencialCase::with('client')
+                ->where('creator_id', $user->id)
+                ->get();
+        }
 
         return compact('appointment', 'potential_cases');
     }
@@ -127,9 +271,39 @@ class AppointmentService
 
     public function deleteAppointment($id)
     {
-        $appointment = Appointment::with('creator', 'updater')->findOrFail($id);
-        $appointment->delete();
+        $user = auth()->user();
+        $appointment = null;
 
-        return ['status' => 'success', 'message' => 'Appointment deleted successfully'];
+        if ($user->user_type == 'Super Responsable') {
+            $appointment = Appointment::with('creator', 'updater')->findOrFail($id);
+        }
+
+        if ($user->user_type == 'Responsable') {
+            $appointment = Appointment::with('creator', 'updater')
+                ->whereIn('creator_id', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->findOrFail($id);
+        }
+
+        if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
+            $appointment = Appointment::with('creator', 'updater')
+                ->where('creator_id', $user->id)
+                ->findOrFail($id);
+        }
+
+        if (!$appointment) {
+            return ['status' => 'error', 'message' => 'You are not authorized to delete this appointment'];
+        }
+
+        try {
+            $appointment->delete();
+            return ['status' => 'success', 'message' => 'Appointment deleted successfully'];
+        } catch (\Exception $e) {
+            return ['status' => 'error', 'message' => 'Error deleting appointment: ' . $e->getMessage()];
+        }
     }
 }

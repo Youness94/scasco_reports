@@ -66,7 +66,7 @@
                                                       @enderror
                                                 </div>
                                                 <div class="col-12 col-sm-4 mb-3">
-                                                      <label>Phone: <span class="login-danger">*</span></label>
+                                                      <label>Téléphone: <span class="login-danger">*</span></label>
                                                       <input type="number" class="form-control @error('phonenumber') is-invalid @enderror" name="phonenumber" value="{{ old('phonenumber') }}">
                                                       @error('phonenumber')
                                                       <span class="invalid-feedback" role="alert">
@@ -74,10 +74,11 @@
                                                       </span>
                                                       @enderror
                                                 </div>
+                                                <!-- Role -->
                                                 <div class="col-12 col-sm-4 mb-3">
-                                                      <label>Role Name <span class="login-danger">*</span></label>
-                                                      <select class="form-control select @error('roles') is-invalid @enderror" name="roles" id="roles" value="{{ old('roles') }}">
-                                                            <option selected disabled>Role Type</option>
+                                                      <label>Position<span class="login-danger">*</span></label>
+                                                      <select class="form-control select @error('roles') is-invalid @enderror" name="roles[]" id="roles" value="{{ old('roles') }}">
+                                                            <option selected disabled>Position</option>
                                                             @foreach ($roles as $role)
                                                             <option value="{{ $role }}">{{ $role }}</option>
                                                             @endforeach
@@ -88,22 +89,23 @@
                                                       </span>
                                                       @enderror
                                                 </div>
-                                                <!-- <option value="Partenaire Admin">Partenaire Admin</option>
-                                                                  <option value="Partenaire Super Admin">Partenaire Super Admin</option> -->
-                                                <!-- <div class="col-12 col-sm-4 mb-3">
-                                                      <label for="">Roles</label>
-                                                      <select name="roles" class="form-control" multiple>
-                                                            <option value="">Select Role</option>
-                                                            @foreach ($roles as $role)
-                                                            <option value="{{ $role }}">{{ $role }}</option>
+                                                <!-- responsibles -->
+                                                <div class="col-md-4 mb-3" id="responsible_div" style="display:none;">
+                                                      <label class="form-label" for="responsible_id">Responsable</label>
+                                                      <select id="responsible_id" class="js-example-basic-single form-control @error('responsible_id') is-invalid @enderror" name="responsible_id">
+                                                            <option selected disabled value="">Choisissez Responsable</option>
+                                                            @foreach ($responsibles as $responsible)
+                                                            <option value="{{ $responsible->id }}" {{ old('responsible_id') == $responsible->id ? 'selected' : '' }}>
+                                                                  {{ $responsible->first_name }} {{ $responsible->last_name }}
+                                                            </option>
                                                             @endforeach
                                                       </select>
-                                                      @error('role_name')
+                                                      @error('responsible_id')
                                                       <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $message }}</strong>
+                                                            <span class="text-danger">{{ $message }}</span>
                                                       </span>
                                                       @enderror
-                                                </div> -->
+                                                </div>
 
 
                                                 <div class="col-12 col-sm-4 mb-3">
@@ -130,4 +132,22 @@
             </div>
       </div>
 </div>
+@endsection
+
+@section('script')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const rolesSelect = document.getElementById('roles');
+        const responsibleDiv = document.getElementById('responsible_div');
+
+        rolesSelect.addEventListener('change', function () {
+            const selectedRole = this.value;
+            if (selectedRole === 'Admin' || selectedRole === 'Commercial') {
+                responsibleDiv.style.display = 'block';
+            } else {
+                responsibleDiv.style.display = 'none';
+            }
+        });
+    });
+</script>
 @endsection

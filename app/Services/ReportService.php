@@ -21,18 +21,100 @@ class ReportService
 
     public function getAllReports()
     {
-        return Report::with('creator', 'updater', 'potential_case', 'appointment')->get();
+        $user = auth()->user();
+    
+        if ($user->user_type == 'Super Responsable') {
+            return Report::with('creator', 'updater', 'potential_case', 'appointment')->get();
+        }
+    
+        if ($user->user_type == 'Responsable') {
+            return Report::with('creator', 'updater', 'potential_case', 'appointment')
+                ->whereIn('creator_id', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->get();
+        }
+    
+        if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
+            return Report::with('creator', 'updater', 'potential_case', 'appointment')
+                ->where('creator_id', $user->id)
+                ->get();
+        }
+    
+        return [];
     }
-
+    
     public function getAppointmentsByCase($potencial_case_id)
     {
-        return Appointment::where('potencial_case_id', $potencial_case_id)->get();
+        $user = auth()->user();
+    
+        if ($user->user_type == 'Super Responsable') {
+            return Appointment::where('potencial_case_id', $potencial_case_id)->get();
+        }
+    
+        if ($user->user_type == 'Responsable') {
+            return Appointment::where('potencial_case_id', $potencial_case_id)
+                ->whereIn('creator_id', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->get();
+        }
+    
+        if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
+            return Appointment::where('potencial_case_id', $potencial_case_id)
+                ->where('creator_id', $user->id)
+                ->get();
+        }
+   
+        return [];
     }
-
+    
     public function getPotentialCasesAndAppointments()
     {
-        $potential_cases = PotencialCase::all();
-        $appointments = Appointment::all();
+        $user = auth()->user();
+        $potential_cases = [];
+    
+        if ($user->user_type == 'Super Responsable') {
+            $potential_cases = PotencialCase::all();
+        }
+    
+        if ($user->user_type == 'Responsable') {
+            $potential_cases = PotencialCase::whereIn('creator_id', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->orWhere('responsible_id', $user->id) 
+                ->get();
+        }
+    
+        if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
+            $potential_cases = PotencialCase::where('creator_id', $user->id)->get();
+        }
+    
+        $appointments = Appointment::when($user->user_type == 'Super Responsable', function ($query) {
+            return $query;
+        })
+        ->when($user->user_type == 'Responsable', function ($query) use ($user) {
+            return $query->whereIn('creator_id', function ($query) use ($user) {
+                $query->select('id')
+                    ->from('users')
+                    ->where('responsible_id', $user->id)
+                    ->whereIn('user_type', ['Admin', 'Commercial']);
+            });
+        })
+        ->when($user->user_type == 'Admin' || $user->user_type == 'Commercial', function ($query) use ($user) {
+            return $query->where('creator_id', $user->id);
+        })
+        ->get();
+    
         return compact('potential_cases', 'appointments');
     }
 
@@ -68,7 +150,35 @@ class ReportService
 
     public function getReport($id)
     {
-        return Report::with('creator', 'updater', 'potential_case', 'appointment')->findOrFail($id);
+        $user = auth()->user();
+        $report = null;
+    
+        if ($user->user_type == 'Super Responsable') {
+            $report = Report::with('creator', 'updater', 'potential_case', 'appointment')->findOrFail($id);
+        }
+    
+        if ($user->user_type == 'Responsable') {
+            $report = Report::with('creator', 'updater', 'potential_case', 'appointment')
+                ->whereIn('creator_id', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->findOrFail($id);
+        }
+    
+        if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
+            $report = Report::with('creator', 'updater', 'potential_case', 'appointment')
+                ->where('creator_id', $user->id)
+                ->findOrFail($id);
+        }
+    
+        if (!$report) {
+            abort(403, 'Unauthorized action or report not found.');
+        }
+    
+        return $report;
     }
 
     public function updateReport($id, array $data)
@@ -101,8 +211,39 @@ class ReportService
 
     public function deleteReport($id)
     {
-        $report = Report::with('creator', 'updater', 'potential_case')->findOrFail($id);
-        $report->delete();
-        return $report;
+        $user = auth()->user();
+        $report = null;
+
+        if ($user->user_type == 'Super Responsable') {
+            $report = Report::with('creator', 'updater', 'potential_case')->findOrFail($id);
+        }
+    
+        if ($user->user_type == 'Responsable') {
+            $report = Report::with('creator', 'updater', 'potential_case')
+                ->whereIn('creator_id', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->findOrFail($id);
+        }
+    
+        if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
+            $report = Report::with('creator', 'updater', 'potential_case')
+                ->where('creator_id', $user->id)
+                ->findOrFail($id);
+        }
+   
+        if (!$report) {
+            abort(403, 'Unauthorized action or report not found.');
+        }
+    
+        try {
+            $report->delete();
+            return ['status' => 'success', 'message' => 'Report deleted successfully'];
+        } catch (\Exception $e) {
+            return ['status' => 'error', 'message' => 'Error deleting report: ' . $e->getMessage()];
+        }
     }
 }

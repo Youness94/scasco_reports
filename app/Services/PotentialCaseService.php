@@ -20,7 +20,30 @@ class PotentialCaseService
     }
     public function getAllPotentialCases()
     {
-        return PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->get();
+        $user = auth()->user();
+
+        if ($user->user_type == 'Super Responsable') {
+            return PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->get();
+        }
+
+        if ($user->user_type == 'Responsable') {
+            return PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
+                ->whereIn('creator_id', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->get();
+        }
+        if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
+
+            return PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
+                ->where('creator_id', $user->id)
+                ->get();
+        }
+
+        return PotencialCase::none();
     }
 
     public function getAllClientsAndServices()
@@ -84,10 +107,39 @@ class PotentialCaseService
 
     public function editPotentialCase($id)
     {
-        $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->findOrFail($id);
+        $user = auth()->user();
+        $potentialCase = null;
+  
+        if ($user->user_type == 'Super Responsable') {
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->findOrFail($id);
+        }
+   
+        if ($user->user_type == 'Responsable') {
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
+                ->whereIn('creator_id', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->findOrFail($id);
+        }
+
+        if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
+                ->where('creator_id', $user->id)
+                ->findOrFail($id);
+        }
+    
+    
+        if (!$potentialCase) {
+            abort(404, 'Potential Case not found');
+        }
+    
+        
         $services = Service::with('branches')->get();
         $clients = Client::all();
-
+    
         return [
             'potentialCase' => $potentialCase,
             'services' => $services,
@@ -165,11 +217,37 @@ class PotentialCaseService
 
     public function deletePotencialCase($id)
     {
-        $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->findOrFail($id);
-        try {
+        $user = auth()->user();
+        $potentialCase = null;
+    
+        if ($user->user_type == 'Super Responsable') {
             $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->findOrFail($id);
+        }
+   
+        if ($user->user_type == 'Responsable') {
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
+                ->whereIn('creator_id', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->findOrFail($id);
+        }
+  
+        if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
+                ->where('creator_id', $user->id)
+                ->findOrFail($id);
+        }
+    
+        if (!$potentialCase) {
+            return ['status' => 'error', 'message' => 'You do not have permission to delete this case or the case does not exist.'];
+        }
+    
+        try {
             $potentialCase->delete();
-
+    
             return ['status' => 'success', 'message' => 'Potencial Case deleted successfully'];
         } catch (\Exception $e) {
             return ['status' => 'error', 'message' => 'Error deleting potential case: ' . $e->getMessage()];

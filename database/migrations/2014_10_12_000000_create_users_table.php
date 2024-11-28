@@ -23,10 +23,10 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique()->nullable();
             $table->string('phonenumber')->unique()->nullable();
             $table->string('status')->nullable()->default('Active');
-            $table->string('user_type')->default('Client');
+            $table->enum('user_type', ['Admin', 'Responsable', 'Super Responsable', 'Commercial'])->default('Commercial');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-
+            $table->foreignId('responsible_id')->nullable()->constrained('users')->onDelete('set null');
             $table->string('reset_password_token')->nullable();
             $table->timestamp('reset_password_token_expiry')->nullable();
             

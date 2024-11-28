@@ -22,7 +22,7 @@ class CreateAdminUserSeeder extends Seeder
             'email' => 'support@gmail.com',
             'phonenumber' => '0645068364',
             'status' => 'Active',
-            'user_type' => 'Admin',
+            'user_type' => 'Super Responsable',
             'photo' => null,
             'email_verified_at' => now(),
             'password' => bcrypt('12345678'),
@@ -31,18 +31,18 @@ class CreateAdminUserSeeder extends Seeder
             'updated_at' => now(),
         ]);
   
-        $superAdminRole = Role::where('name', 'Super Admin')->first();
+        $superResponsableRole = Role::where('name', 'Super Responsable')->first();
 
-        if (!$superAdminRole) {
+        if (!$superResponsableRole) {
             // If the role doesn't exist, create it
-            $superAdminRole = Role::create(['name' => 'Super Admin']);
+            $superResponsableRole = Role::create(['name' => 'Super Responsable']);
         }
 
         $permissions = Permission::pluck('id', 'id')->all();
 
-        $superAdminRole->syncPermissions($permissions);
+        $superResponsableRole->syncPermissions($permissions);
 
-        $user->assignRole([$superAdminRole->id]);
+        $user->assignRole([$superResponsableRole->id]);
 
 }
 }

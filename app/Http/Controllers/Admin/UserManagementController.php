@@ -29,7 +29,7 @@ class UserManagementController extends Controller
 
     public function index()
     {
-        $users = User::where('user_type', 'Admin')->get();
+        $users = User::all();
         $userRoles = [];
         foreach ($users as $user) {
             $userRoles[$user->id] = $user->roles->pluck('name')->implode(', ');
@@ -40,8 +40,8 @@ class UserManagementController extends Controller
     public function userAdd()
     {
         $roles = Role::pluck('name', 'name')->all();
-        $user = User::where('user_type', 'Admin')->latest()->get();
-        return view('usermanagement.add_user', compact('user', 'roles'));
+        $responsibles = User::where('user_type', 'Responsable')->latest()->get();
+        return view('usermanagement.add_user', compact('responsibles', 'roles'));
     }
 
     public function userStore(Request $request)
@@ -51,7 +51,7 @@ class UserManagementController extends Controller
             'first_name' => 'required',
             'last_name' => 'required',
             'email' => 'required|email|unique:users,email',
-            // 'role_name' => 'required',
+            'responsible_id' => 'nullable|exists:users,id',
             'password' => 'required|min:8',
             'phonenumber' => 'nullable|min:8|unique:users,phonenumber',
             'roles' => 'required',
@@ -69,14 +69,16 @@ class UserManagementController extends Controller
             'user_type.string' => 'Le type d\'utilisateur doit être une chaîne de caractères.',
         ]);
         try {
+            $role = $validatedData['roles'][0];
             $user = User::create([
                 'first_name' => $validatedData['first_name'],
                 'last_name' => $validatedData['last_name'],
                 'email' => $validatedData['email'],
-                'user_type' => $validatedData['user_type'] ?? 'Admin',
+                'user_type' => $role ?? 'Commercial',
                 'status' => $request->input('status', 'Active'),
                 'password' => bcrypt($validatedData['password']),
                 'phonenumber' => $validatedData['phonenumber'],
+                'responsible_id' => $validatedData['responsible_id'] ?? null,
             ]);
 
 
@@ -99,6 +101,7 @@ class UserManagementController extends Controller
         try {
 
             $user = User::where('user_type', 'Admin')->findOrFail($id);
+            $responsibles = User::where('user_type', 'Responsable')->latest()->get();
             $roles = Role::pluck('name', 'name')->all();
             $userRoles = $user->roles()->pluck('name', 'name')->all();
 
@@ -107,7 +110,7 @@ class UserManagementController extends Controller
                 // $userRoles,
                 // $roles,
             ]);
-            return view('usermanagement.user_update', compact('user', 'roles', 'userRoles'));
+            return view('usermanagement.user_update', compact('user', 'roles', 'userRoles','responsibles'));
         } catch (\Exception $e) {
             Log::error('Error viewing user: ' . $e->getMessage());
             session()->flash('error', 'User view failed :(');
