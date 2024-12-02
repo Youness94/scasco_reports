@@ -3,7 +3,9 @@
 
 namespace App\Services;
 
+use App\Http\Requests\ClientRequest;
 use App\Models\Branche;
+use App\Models\City;
 use App\Models\Client;
 use App\Models\PotencialCase;
 use App\Models\Service;
@@ -50,8 +52,8 @@ class PotentialCaseService
     {
         $services = Service::with('branches')->get();
         $clients = Client::all();
-
-        return compact('clients', 'services');
+        $cities = City::all();
+        return compact('clients', 'services','cities');
     }
 
     public function storePotentialCase($request)
@@ -139,11 +141,12 @@ class PotentialCaseService
         
         $services = Service::with('branches')->get();
         $clients = Client::all();
-    
+        $cities = City::all();
         return [
             'potentialCase' => $potentialCase,
             'services' => $services,
-            'clients' => $clients
+            'clients' => $clients,
+            'cities' => $cities,
         ];
     }
 
@@ -187,6 +190,8 @@ class PotentialCaseService
             return ['status' => 'error', 'message' => $e->getMessage() ?: 'DB Error'];
         }
     }
+
+
     public function getBranchesByService($serviceIds)
     {
         // Get services with branches for the selected services
@@ -205,25 +210,34 @@ class PotentialCaseService
     public function updateBranchesForService($serviceId, $branchIds)
     {
         $service = Service::findOrFail($serviceId);
-        $service->branches()->sync($branchIds);
-    }
 
+        foreach ($branchIds as $branchId) {
+            $branch = Branche::find($branchId);
+            if ($branch) {
+                $branch->service_id = $serviceId;
+                $branch->save();
+            }
+        }
+    }
+    
     public function removeBranchesFromService($serviceId)
     {
         $service = Service::findOrFail($serviceId);
-        $service->branches()->detach();
+    
+        Branche::where('service_id', $serviceId)->update(['service_id' => null]);
+    
+        Branche::where('service_id', $serviceId)->delete();
     }
-
 
     public function deletePotencialCase($id)
     {
         $user = auth()->user();
         $potentialCase = null;
-    
+
         if ($user->user_type == 'Super Responsable') {
             $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->findOrFail($id);
         }
-   
+
         if ($user->user_type == 'Responsable') {
             $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
                 ->whereIn('created_by', function ($query) use ($user) {
@@ -234,20 +248,20 @@ class PotentialCaseService
                 })
                 ->findOrFail($id);
         }
-  
+
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
             $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
                 ->where('created_by', $user->id)
                 ->findOrFail($id);
         }
-    
+
         if (!$potentialCase) {
             return ['status' => 'error', 'message' => 'You do not have permission to delete this case or the case does not exist.'];
         }
-    
+
         try {
             $potentialCase->delete();
-    
+
             return ['status' => 'success', 'message' => 'Potencial Case deleted successfully'];
         } catch (\Exception $e) {
             return ['status' => 'error', 'message' => 'Error deleting potential case: ' . $e->getMessage()];

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ClientRequest;
 use App\Models\Branche;
 use App\Models\Client;
 use App\Models\PotencialCase;
 use App\Models\Service;
+use App\Services\ClientService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -16,10 +18,11 @@ use App\Services\PotentialCaseService;
 class PotencialCaseController extends Controller
 {
     protected $potentialCaseService;
-
-    public function __construct(PotentialCaseService $potentialCaseService)
+    protected $clientService;
+    public function __construct(PotentialCaseService $potentialCaseService, ClientService $clientService)
     {
         $this->potentialCaseService = $potentialCaseService;
+        $this->clientService = $clientService;
     }
 
 
@@ -72,9 +75,10 @@ class PotencialCaseController extends Controller
         Log::info('Data for editing potential case:', ['potentialCase' => $potentialCase]);
 
         return view('potential_cases.edit_potential_case', [
-            'potentialCase' => $potentialCase['potentialCase'],  
-            'services' => $potentialCase['services'],  
-            'clients' => $potentialCase['clients']   
+            'potentialCase' => $potentialCase['potentialCase'],
+            'services' => $potentialCase['services'],
+            'clients' => $potentialCase['clients'],
+            'cities' => $potentialCase['cities'],
         ]);
     }
 
@@ -109,6 +113,25 @@ class PotencialCaseController extends Controller
             return redirect()->back()->with('error', $result['message']);
         }
     }
+    public function store_client_potential_case(ClientRequest $request)
+    {
+        $validatedData = $request->validated();
+
+        try {
+            $client = $this->clientService->storeClient($validatedData);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Client created successfully',
+                'client_id' => $client->id,
+                'client_name' => $client->client_first_name . ' ' . $client->client_last_name,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Client not created: ' . $e->getMessage(),
+            ], 400);
+        }
+    }
     public function getBranchesByService(Request $request)
     {
         $serviceIds = $request->input('service_ids');
@@ -121,32 +144,49 @@ class PotencialCaseController extends Controller
     public function editBranchesByService(Request $request)
     {
         $serviceId = $request->service_id;
-        $result = $this->potentialCaseService->getBranchesByService($serviceId);
-
-        return response()->json([
-            'service_name' => $result['service_name'],
-            'branches' => $result['branches']
-        ]);
+    
+        try {
+            $result = $this->potentialCaseService->editBranchesByService($serviceId);
+    
+            return response()->json([
+                'service_name' => $result['service_name'],
+                'branches' => $result['branches']
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in editBranchesByService: ' . $e->getMessage());
+            return response()->json(['error' => 'Something went wrong'], 500);
+        }
     }
-
+    
     public function updateBranchesForService(Request $request)
     {
         $serviceId = $request->service_id;
-        $branchIds = $request->branch_ids;
-
-        $this->potentialCaseService->updateBranchesForService($serviceId, $branchIds);
-
-        return response()->json(['success' => true]);
+        $branchIds = $request->branch_ids; // array of branch IDs to associate with the service
+    
+        try {
+            // Calling the service layer method to update the branches
+            $this->potentialCaseService->updateBranchesForService($serviceId, $branchIds);
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            Log::error('Error in updateBranchesForService: ' . $e->getMessage());
+            return response()->json(['error' => 'Something went wrong'], 500);
+        }
     }
-
+    
     public function removeBranchesFromService(Request $request)
     {
         $serviceId = $request->service_id;
-
-        $this->potentialCaseService->removeBranchesFromService($serviceId);
-
-        return response()->json(['success' => true]);
+    
+        try {
+    
+            $this->potentialCaseService->removeBranchesFromService($serviceId);
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            Log::error('Error in removeBranchesFromService: ' . $e->getMessage());
+            return response()->json(['error' => 'Something went wrong'], 500);
+        }
     }
+    
     public function delete_potential_case($id)
     {
         $result = $this->potentialCaseService->deletePotencialCase($id);

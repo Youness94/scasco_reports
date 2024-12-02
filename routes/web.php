@@ -132,9 +132,13 @@ Route::group(['middleware' => ['web', 'auth']], function () {
 
         Route::get('get-branches-by-service', 'getBranchesByService')->name('getBranchesByService');
 
-        Route::post('/update-branches-for-service', 'updateBranchesForService')->name('updateBranchesForService');
-        Route::post('/remove-branches-from-service', 'removeBranchesFromService')->name('removeBranchesFromService');
-        Route::get('/edit-branches-by-service', 'editBranchesByService')->name('editBranchesByService');
+        Route::get('/edit-branches-by-service',  'editBranchesByService')->name('edit.branches.by.service');
+        Route::post('/update-branches-for-service', 'updateBranchesForService')->name('update.branches.for.service');
+        Route::post('/remove-branches-from-service',  'removeBranchesFromService')->name('remove.branches.from.service');
+        
+
+        Route::post('store/client_potential_case',  'store_client_potential_case')->name('store.client.potential.case');
+       
     });
 
     Route::controller(ReportController::class)->group(function () {
