@@ -16,6 +16,10 @@ class PotencialCase extends Model
         'updated_by',
       
     ];
+    protected $casts = [
+        'created_at' => 'datetime', 
+        'updated_at' => 'datetime', 
+    ];
     public function caseHistories()
     {
         return $this->hasMany(PotencialCaseHisotry::class);

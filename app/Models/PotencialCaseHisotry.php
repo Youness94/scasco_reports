@@ -13,11 +13,16 @@ class PotencialCaseHisotry extends Model
     protected $fillable = [
         'comment', 'action_type', 'action_date', 'potencial_case_id', 'appointment_id', 'report_id', 'created_by'
     ];
-
+    protected $casts = [
+        'action_date' => 'datetime',
+        'created_at' => 'datetime', 
+        'updated_at' => 'datetime', 
+    ];
     public function user()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
 
     public function appointment()
     {

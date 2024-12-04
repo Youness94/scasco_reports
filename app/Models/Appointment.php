@@ -18,7 +18,11 @@ class Appointment extends Model
         'updated_by',
         'client_id',
     ];
-
+    protected $casts = [
+        'date_appointment' => 'datetime',
+        'created_at' => 'datetime', 
+        'updated_at' => 'datetime', 
+    ];
     public function caseHistories()
     {
         return $this->hasMany(PotencialCaseHisotry::class, 'appointment_id');

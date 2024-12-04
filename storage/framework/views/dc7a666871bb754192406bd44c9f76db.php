@@ -1,8 +1,8 @@
-@extends('layouts.master')
-@section('title')
-@lang('translation.task-details')
-@endsection
-@section('content')
+
+<?php $__env->startSection('title'); ?>
+<?php echo app('translator')->get('translation.task-details'); ?>
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('content'); ?>
 <div class="row">
     <div class="col-xxl-3">
         <div class="card">
@@ -13,16 +13,16 @@
                         colors="primary:#405189,secondary:#02a8b5" style="width:90px;height:90px">
                     </lord-icon>
                 </div>
-                @php
+                <?php
                 $latestAppointment = $potentialCase->appointments()->latest()->first();
-                @endphp
-                @if($latestAppointment)
-                <h3 class="mb-1">{{ \Carbon\Carbon::parse($latestAppointment->date_appointment)->format('d M Y') }}</h3>
-                <h5 class="fs-14 mb-4">{{ $latestAppointment->place }}</h5>
-                @else
+                ?>
+                <?php if($latestAppointment): ?>
+                <h3 class="mb-1"><?php echo e(\Carbon\Carbon::parse($latestAppointment->date_appointment)->format('d M Y')); ?></h3>
+                <h5 class="fs-14 mb-4"><?php echo e($latestAppointment->place); ?></h5>
+                <?php else: ?>
                 <h3 class="mb-1">No appointment available</h3>
                 <h5 class="fs-14 mb-4">N/A</h5>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
         <!--end card-->
@@ -30,19 +30,34 @@
             <div class="card-body">
                 <form class="mt-4">
                     <div class="mb-4">
-                        <select id="appointment_status" class="form-control @error('status') is-invalid @enderror" name="status">
+                        <select id="appointment_status" class="form-control <?php $__errorArgs = ['status'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" name="status">
                             <!-- <option value="">Select Task board</option> -->
-                            @foreach (['pending', 'completed', 'cancelled'] as $status)
-                            <option value="{{ $status }}" {{ old('status', $potentialCase->status) == $status ? 'selected' : '' }}>
-                                {{ ucfirst($status) }}
+                            <?php $__currentLoopData = ['pending', 'completed', 'cancelled']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($status); ?>" <?php echo e(old('status', $potentialCase->status) == $status ? 'selected' : ''); ?>>
+                                <?php echo e(ucfirst($status)); ?>
+
                             </option>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
-                        @error('status')
+                        <?php $__errorArgs = ['status'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
                         <span class="invalid-feedback" role="alert">
-                            <span class="text-danger">{{ $message }}</span>
+                            <span class="text-danger"><?php echo e($message); ?></span>
                         </span>
-                        @enderror
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
 
                     </div>
                 </form>
@@ -51,34 +66,34 @@
                         <tbody>
                             <tr>
                                 <td class="fw-medium">Numéro d'Affaire</td>
-                                <td>{{$potentialCase->case_number}}</td>
+                                <td><?php echo e($potentialCase->case_number); ?></td>
                             </tr>
                             <tr>
                                 <td class="fw-medium">Client</td>
-                                <td>{{$potentialCase->client->client_first_name}} {{$potentialCase->client->client_first_name}}</td>
+                                <td><?php echo e($potentialCase->client->client_first_name); ?> <?php echo e($potentialCase->client->client_first_name); ?></td>
                             </tr>
                             <tr>
                                 <td class="fw-medium">Statu</td>
                                 <td>
-                                    @switch($potentialCase->case_status)
-                                    @case('pending')
+                                    <?php switch($potentialCase->case_status):
+                                    case ('pending'): ?>
                                     <a class="badge bg-secondary-subtle text-warning">En attente</a>
-                                    @break
-                                    @case('completed')
+                                    <?php break; ?>
+                                    <?php case ('completed'): ?>
                                     <a class="badge bg-secondary-subtle text-success">Complété</a>
-                                    @break
-                                    @case('cancelled')
+                                    <?php break; ?>
+                                    <?php case ('cancelled'): ?>
                                     <a class="badge bg-secondary-subtle text-danger">Annulé</a>
-                                    @break
-                                    @default
+                                    <?php break; ?>
+                                    <?php default: ?>
                                     <a class="badge bg-secondary-subtle text-muted">Pas de statut</a>
-                                    @endswitch
+                                    <?php endswitch; ?>
                                 </td>
 
                             </tr>
                             <tr>
                                 <td class="fw-medium">Date de création</td>
-                                <td>{{ \Carbon\Carbon::parse($potentialCase->created_at )->format('F d, Y') ?? 'N/V' }}</td>
+                                <td><?php echo e(\Carbon\Carbon::parse($potentialCase->created_at )->format('F d, Y') ?? 'N/V'); ?></td>
                             </tr>
                         </tbody>
                     </table>
@@ -98,17 +113,17 @@
                     <li>
                         <div class="d-flex align-items-center">
                             <div class="flex-shrink-0">
-                                <!-- <img src="{{ URL::asset('build/images/users/avatar-8.jpg') }}" alt=""
+                                <!-- <img src="<?php echo e(URL::asset('build/images/users/avatar-8.jpg')); ?>" alt=""
                                     class="avatar-xs rounded-circle shadow"> -->
-                                @if(!empty($potentialCase->creator->photo) && file_exists(public_path('photos/admin_images/' . $potentialCase->creator->photo)))
-                                <img class="rounded-circle" src="{{ url('photos/admin_images/'.$potentialCase->creator->photo) }}" alt="profile" width="50">
+                                <?php if(!empty($potentialCase->creator->photo) && file_exists(public_path('photos/admin_images/' . $potentialCase->creator->photo))): ?>
+                                <img class="rounded-circle" src="<?php echo e(url('photos/admin_images/'.$potentialCase->creator->photo)); ?>" alt="profile" width="50">
 
-                                @else
-                                <img class="rounded-circle" src="{{ url('/photos/image_not_found/imagenotfound.jpg') }}" alt="profile" width="31">
-                                @endif
+                                <?php else: ?>
+                                <img class="rounded-circle" src="<?php echo e(url('/photos/image_not_found/imagenotfound.jpg')); ?>" alt="profile" width="31">
+                                <?php endif; ?>
                             </div>
                             <div class="flex-grow-1 ms-2">
-                                <h6 class="mb-1"><a href="pages-profile" class="text-body">{{$potentialCase->creator->first_name}} {{$potentialCase->creator->first_name}}</a></h6>
+                                <h6 class="mb-1"><a href="pages-profile" class="text-body"><?php echo e($potentialCase->creator->first_name); ?> <?php echo e($potentialCase->creator->first_name); ?></a></h6>
                                 <p class="text-muted mb-0">Nom</p>
                             </div>
 
@@ -117,7 +132,7 @@
                     <!-- <li>
                         <div class="d-flex align-items-center">
                             <div class="flex-shrink-0">
-                                <img src="{{ URL::asset('build/images/users/avatar-8.jpg') }}" alt=""
+                                <img src="<?php echo e(URL::asset('build/images/users/avatar-8.jpg')); ?>" alt=""
                                     class="avatar-xs rounded-circle shadow">
                             </div>
                             <div class="flex-grow-1 ms-2">
@@ -148,7 +163,7 @@
                     <li>
                         <div class="d-flex align-items-center">
                             <div class="flex-shrink-0">
-                                <img src="{{ URL::asset('build/images/users/avatar-2.jpg') }}" alt=""
+                                <img src="<?php echo e(URL::asset('build/images/users/avatar-2.jpg')); ?>" alt=""
                                     class="avatar-xs rounded-circle shadow">
                             </div>
                             <div class="flex-grow-1 ms-2">
@@ -194,28 +209,29 @@
                         their grammar, their pronunciation and their most common words.</p> -->
 
                     <div class="row">
-                        @foreach($potentialCase->services as $service)
+                        <?php $__currentLoopData = $potentialCase->services; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="col-12 col-md-4 mb-3">
-                            <h6 class="mb-3 fw-semibold text-uppercase">{{ $service->name }}</h6>
+                            <h6 class="mb-3 fw-semibold text-uppercase"><?php echo e($service->name); ?></h6>
 
                             <ul class="ps-3 list-unstyled vstack gap-2">
-                                @if($service->branches->isNotEmpty())
-                                @foreach($service->branches as $branch)
+                                <?php if($service->branches->isNotEmpty()): ?>
+                                <?php $__currentLoopData = $service->branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <li>
                                     <div class="form-check">
-                                        <!-- <input class="form-check-input" type="" value="" id="productTask{{ $branch->id }}"> -->
-                                        <label class="form-check-label" for="productTask{{ $branch->id }}">
-                                            {{ $branch->name }}
+                                        <!-- <input class="form-check-input" type="" value="" id="productTask<?php echo e($branch->id); ?>"> -->
+                                        <label class="form-check-label" for="productTask<?php echo e($branch->id); ?>">
+                                            <?php echo e($branch->name); ?>
+
                                         </label>
                                     </div>
                                 </li>
-                                @endforeach
-                                @else
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <?php else: ?>
                                 <p>No branches available</p>
-                                @endif
+                                <?php endif; ?>
                             </ul>
                         </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
 
 
@@ -252,21 +268,21 @@
                         <h5 class="card-title mb-4">Commentaires</h5>
 
                         <div data-simplebar style="height: 508px;" class="px-3 mx-n3 mb-2">
-                            @foreach($potentialCase->caseHistories as $history)
+                            <?php $__currentLoopData = $potentialCase->caseHistories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $history): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="d-flex mb-4">
                                 <div class="flex-shrink-0">
-                                    @if(!empty($history->user->photo) && file_exists(public_path('photos/admin_images/' . $history->user->photo)))
-                                    <img class="rounded-circle" src="{{ url('photos/admin_images/'.$history->user->photo) }}" alt="profile" width="50">
-                                    @else
-                                    <img class="rounded-circle" src="{{ url('/photos/image_not_found/imagenotfound.jpg') }}" alt="profile" width="31">
-                                    @endif
+                                    <?php if(!empty($history->user->photo) && file_exists(public_path('photos/admin_images/' . $history->user->photo))): ?>
+                                    <img class="rounded-circle" src="<?php echo e(url('photos/admin_images/'.$history->user->photo)); ?>" alt="profile" width="50">
+                                    <?php else: ?>
+                                    <img class="rounded-circle" src="<?php echo e(url('/photos/image_not_found/imagenotfound.jpg')); ?>" alt="profile" width="31">
+                                    <?php endif; ?>
                                 </div>
                                 <div class="flex-grow-1 ms-3">
-                                    <h5 class="fs-13"><a href="pages-profile" class="text-body">{{$history->user->frist_name}} {{$history->user->last_name}}</a> <small class="text-muted">{{ $history->created_at->format('d M Y - h:iA') }}</small></h5>
-                                    <p class="text-muted">{{$history->comment}}</p>
+                                    <h5 class="fs-13"><a href="pages-profile" class="text-body"><?php echo e($history->user->frist_name); ?> <?php echo e($history->user->last_name); ?></a> <small class="text-muted"><?php echo e($history->created_at->format('d M Y - h:iA')); ?></small></h5>
+                                    <p class="text-muted"><?php echo e($history->comment); ?></p>
                                 </div>
                             </div>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                         <form class="mt-4">
                             <div class="row g-3">
@@ -302,20 +318,20 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($potentialCase->appointments as $appointment)
+                                    <?php $__currentLoopData = $potentialCase->appointments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $appointment): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="ms-3 flex-grow-1">
-                                                    <h6 class="fs-15 mb-0 text-body">{{$appointment->client->client_first_name}} {{$appointment->client->client_last_name}}</h6>
+                                                    <h6 class="fs-15 mb-0 text-body"><?php echo e($appointment->client->client_first_name); ?> <?php echo e($appointment->client->client_last_name); ?></h6>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>{{$appointment->client->client_phone}}</td>
-                                        <td>{{$appointment->place}}</td>
-                                        <td>{{ \Carbon\Carbon::parse($appointment->date_appointment)->format('d M Y') }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($appointment->created_at)->format('d M Y - h:iA') }}</td>
-                                        <td>{{$appointment->creator->first_name}}</td>
+                                        <td><?php echo e($appointment->client->client_phone); ?></td>
+                                        <td><?php echo e($appointment->place); ?></td>
+                                        <td><?php echo e(\Carbon\Carbon::parse($appointment->date_appointment)->format('d M Y')); ?></td>
+                                        <td><?php echo e(\Carbon\Carbon::parse($appointment->created_at)->format('d M Y - h:iA')); ?></td>
+                                        <td><?php echo e($appointment->creator->first_name); ?></td>
                                         <!-- <td>
                                             <div class="dropdown">
                                                 <a href="javascript:void(0);" class="btn btn-light btn-icon"
@@ -341,7 +357,7 @@
                                             </div>
                                         </td> -->
                                     </tr>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </tbody>
                             </table>
                             <!--end table-->
@@ -361,24 +377,25 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($potentialCase->reports as $report)
+                                    <?php $__empty_1 = true; $__currentLoopData = $potentialCase->reports; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $report): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                     <tr>
                                         <th scope="row">
                                             <div class="d-flex align-items-center">
                                                 <div class="flex-grow-1 ms-2">
-                                                    {{$report->id}}
+                                                    <?php echo e($report->id); ?>
+
                                                 </div>
                                             </div>
                                         </th>
-                                        <td>{{ \Carbon\Carbon::parse($report->date_report)->format('d M Y - h:iA') }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($report->appointment->date_appointment)->format('d M Y') }} {{ $report->appointment->place }}</td>
-                                        <td>{{ $report->potential_case->case_number }}</td>
+                                        <td><?php echo e(\Carbon\Carbon::parse($report->date_report)->format('d M Y - h:iA')); ?></td>
+                                        <td><?php echo e(\Carbon\Carbon::parse($report->appointment->date_appointment)->format('d M Y')); ?> <?php echo e($report->appointment->place); ?></td>
+                                        <td><?php echo e($report->potential_case->case_number); ?></td>
                                     </tr>
-                                    @empty
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                     <tr>
                                         <td colspan="4" class="text-center">Aucun rapport disponible pour cette affaire.</td>
                                     </tr>
-                                    @endforelse
+                                    <?php endif; ?>
                                 </tbody>
                             </table>
                             <!--end table-->
@@ -397,7 +414,8 @@
 <!--end row-->
 
 
-@endsection
-@section('script')
-<script src="{{ URL::asset('build/js/app.js') }}"></script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('script'); ?>
+<script src="<?php echo e(URL::asset('build/js/app.js')); ?>"></script>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\YOUNESS-DEVL\Desktop\scasco_reports\resources\views/potential_cases/potential_case_details.blade.php ENDPATH**/ ?>

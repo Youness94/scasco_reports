@@ -15,4 +15,8 @@ class CaseServices extends Model
         'branch_ids',
       
     ];
+    protected $casts = [
+        'created_at' => 'datetime', 
+        'updated_at' => 'datetime', 
+    ];
 }

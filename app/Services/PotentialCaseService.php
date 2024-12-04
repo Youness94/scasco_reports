@@ -267,4 +267,47 @@ class PotentialCaseService
             return ['status' => 'error', 'message' => 'Error deleting potential case: ' . $e->getMessage()];
         }
     }
+
+    public function detailsPotentialCase($id)
+    {
+        $user = auth()->user();
+        $potentialCase = null;
+  
+        if ($user->user_type == 'Super Responsable') {
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches', 'caseHistories.user', 'appointments.creator', 'reports.creator', 'reports.appointment', 'reports.potential_case',])->findOrFail($id);
+        }
+   
+        if ($user->user_type == 'Responsable') {
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches', 'caseHistories.user', 'appointments.creator', 'reports.creator', 'reports.appointment', 'reports.potential_case',])
+                ->whereIn('created_by', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->findOrFail($id);
+        }
+
+        if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches', 'caseHistories.user', 'appointments.creator', 'reports.creator', 'reports.appointment', 'reports.potential_case',])
+                ->where('created_by', $user->id)
+                ->findOrFail($id);
+        }
+    
+    
+        if (!$potentialCase) {
+            abort(404, 'Potential Case not found');
+        }
+    
+        
+        $services = Service::with('branches')->get();
+        $clients = Client::all();
+        $cities = City::all();
+        return [
+            'potentialCase' => $potentialCase,
+            'services' => $services,
+            'clients' => $clients,
+            'cities' => $cities,
+        ];
+    }
 }

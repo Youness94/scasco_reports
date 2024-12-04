@@ -196,4 +196,19 @@ class PotencialCaseController extends Controller
             return redirect()->back()->with('error', $result['message']);
         }
     }
+
+    public function display_potential_case($id)
+    {
+        Log::info('Entering display_potential_case method with ID: ' . $id);
+
+        $potentialCase = $this->potentialCaseService->detailsPotentialCase($id);
+        Log::info('Data for editing potential case:', ['potentialCase' => $potentialCase]);
+
+        return view('potential_cases.potential_case_details', [
+            'potentialCase' => $potentialCase['potentialCase'],
+            'services' => $potentialCase['services'],
+            'clients' => $potentialCase['clients'],
+            'cities' => $potentialCase['cities'],
+        ]);
+    }
 }

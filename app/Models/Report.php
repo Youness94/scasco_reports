@@ -18,6 +18,11 @@ class Report extends Model
         'updated_by',
       
     ];
+    protected $casts = [
+        'date_report' => 'datetime',
+        'created_at' => 'datetime', 
+        'updated_at' => 'datetime', 
+    ];
     public function caseHistories()
     {
         return $this->hasMany(PotencialCaseHisotry::class, 'report_id');

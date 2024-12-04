@@ -23,7 +23,10 @@ class Client extends Model
         'updated_by',
         'city_id',
     ];
-
+    protected $casts = [
+        'created_at' => 'datetime', 
+        'updated_at' => 'datetime', 
+    ];
     public function potentialCases()
     {
         return $this->hasMany(PotencialCase::class, 'client_id');
