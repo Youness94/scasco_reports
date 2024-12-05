@@ -1,23 +1,22 @@
-@extends('layouts.master')
-@section('title')
-@lang('translation.dashboards')
-@endsection
-@section('css')
-<link href="{{ URL::asset('build/libs/jsvectormap/css/jsvectormap.min.css')}}" rel="stylesheet" type="text/css" />
-<link href="{{ URL::asset('build/libs/swiper/swiper-bundle.min.css')}}" rel="stylesheet" type="text/css" />
+<?php $__env->startSection('title'); ?>
+<?php echo app('translator')->get('translation.dashboards'); ?>
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('css'); ?>
+<link href="<?php echo e(URL::asset('build/libs/jsvectormap/css/jsvectormap.min.css')); ?>" rel="stylesheet" type="text/css" />
+<link href="<?php echo e(URL::asset('build/libs/swiper/swiper-bundle.min.css')); ?>" rel="stylesheet" type="text/css" />
 <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
 <!--datatable responsive css-->
 <link href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap.min.css" rel="stylesheet" type="text/css" />
 <link href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css" rel="stylesheet" type="text/css" />
-@endsection
-@section('content')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('content'); ?>
 
     <div class="row project-wrapper">
     <div class="row mb-3 pb-1">
                 <div class="col-12">
                     <div class="d-flex align-items-lg-center flex-lg-row flex-column">
                         <div class="flex-grow-1">
-                            <h4 class="fs-16 mb-1">Bonjour, {{ Auth::user()->first_name}}!</h4>
+                            <h4 class="fs-16 mb-1">Bonjour, <?php echo e(Auth::user()->first_name); ?>!</h4>
                             <p class="text-muted mb-0">Voici ce qui se passe avec votre tableau de bord aujourd'hui.</p>
                         </div>
                         <div class="mt-3 mt-lg-0">
@@ -32,7 +31,7 @@
                                     </div>
                                     <!--end col-->
                                     <div class="col-auto">
-                                        <a href="{{ route('add.potential_case') }}" class="btn btn-soft-primary"><i class="ri-add-circle-line align-middle me-1"></i>
+                                        <a href="<?php echo e(route('add.potential_case')); ?>" class="btn btn-soft-primary"><i class="ri-add-circle-line align-middle me-1"></i>
                                             Ajouter Affaire</a>
                                     </div>
                                     <!--end col-->
@@ -307,7 +306,7 @@
                                 <tr>
                                     <td class="fw-medium">Brand Logo Design</td>
                                     <td>
-                                        <img src="{{ URL::asset('build/images/users/avatar-1.jpg') }}"
+                                        <img src="<?php echo e(URL::asset('build/images/users/avatar-1.jpg')); ?>"
                                             class="avatar-xxs rounded-circle me-1 shadow" alt="">
                                         <a href="javascript: void(0);" class="text-reset">Donald
                                             Risher</a>
@@ -328,19 +327,19 @@
                                         <div class="avatar-group flex-nowrap">
                                             <div class="avatar-group-item">
                                                 <a href="javascript: void(0);" class="d-inline-block">
-                                                    <img src="{{ URL::asset('build/images/users/avatar-1.jpg') }}" alt=""
+                                                    <img src="<?php echo e(URL::asset('build/images/users/avatar-1.jpg')); ?>" alt=""
                                                         class="rounded-circle avatar-xxs shadow">
                                                 </a>
                                             </div>
                                             <div class="avatar-group-item">
                                                 <a href="javascript: void(0);" class="d-inline-block">
-                                                    <img src="{{ URL::asset('build/images/users/avatar-2.jpg') }}" alt=""
+                                                    <img src="<?php echo e(URL::asset('build/images/users/avatar-2.jpg')); ?>" alt=""
                                                         class="rounded-circle avatar-xxs shadow">
                                                 </a>
                                             </div>
                                             <div class="avatar-group-item">
                                                 <a href="javascript: void(0);" class="d-inline-block">
-                                                    <img src="{{ URL::asset('build/images/users/avatar-3.jpg') }}" alt=""
+                                                    <img src="<?php echo e(URL::asset('build/images/users/avatar-3.jpg')); ?>" alt=""
                                                         class="rounded-circle avatar-xxs shadow">
                                                 </a>
                                             </div>
@@ -352,7 +351,7 @@
                                 <tr>
                                     <td class="fw-medium">Redesign - Landing Page</td>
                                     <td>
-                                        <img src="{{ URL::asset('build/images/users/avatar-2.jpg') }}"
+                                        <img src="<?php echo e(URL::asset('build/images/users/avatar-2.jpg')); ?>"
                                             class="avatar-xxs rounded-circle me-1 shadow" alt="">
                                         <a href="javascript: void(0);" class="text-reset">Prezy
                                             William</a>
@@ -373,13 +372,13 @@
                                         <div class="avatar-group">
                                             <div class="avatar-group-item">
                                                 <a href="javascript: void(0);" class="d-inline-block">
-                                                    <img src="{{ URL::asset('build/images/users/avatar-5.jpg') }}" alt=""
+                                                    <img src="<?php echo e(URL::asset('build/images/users/avatar-5.jpg')); ?>" alt=""
                                                         class="rounded-circle avatar-xxs shadow">
                                                 </a>
                                             </div>
                                             <div class="avatar-group-item">
                                                 <a href="javascript: void(0);" class="d-inline-block">
-                                                    <img src="{{ URL::asset('build/images/users/avatar-6.jpg') }}" alt=""
+                                                    <img src="<?php echo e(URL::asset('build/images/users/avatar-6.jpg')); ?>" alt=""
                                                         class="rounded-circle avatar-xxs shadow">
                                                 </a>
                                             </div>
@@ -391,7 +390,7 @@
                                 <tr>
                                     <td class="fw-medium">Multipurpose Landing Template</td>
                                     <td>
-                                        <img src="{{ URL::asset('build/images/users/avatar-3.jpg') }}"
+                                        <img src="<?php echo e(URL::asset('build/images/users/avatar-3.jpg')); ?>"
                                             class="avatar-xxs rounded-circle me-1 shadow" alt="">
                                         <a href="javascript: void(0);" class="text-reset">Boonie
                                             Hoynas</a>
@@ -412,13 +411,13 @@
                                         <div class="avatar-group">
                                             <div class="avatar-group-item">
                                                 <a href="javascript: void(0);" class="d-inline-block">
-                                                    <img src="{{ URL::asset('build/images/users/avatar-7.jpg') }}" alt=""
+                                                    <img src="<?php echo e(URL::asset('build/images/users/avatar-7.jpg')); ?>" alt=""
                                                         class="rounded-circle avatar-xxs shadow">
                                                 </a>
                                             </div>
                                             <div class="avatar-group-item">
                                                 <a href="javascript: void(0);" class="d-inline-block">
-                                                    <img src="{{ URL::asset('build/images/users/avatar-8.jpg') }}" alt=""
+                                                    <img src="<?php echo e(URL::asset('build/images/users/avatar-8.jpg')); ?>" alt=""
                                                         class="rounded-circle avatar-xxs shadow">
                                                 </a>
                                             </div>
@@ -430,7 +429,7 @@
                                 <tr>
                                     <td class="fw-medium">Chat Application</td>
                                     <td>
-                                        <img src="{{ URL::asset('build/images/users/avatar-5.jpg') }}"
+                                        <img src="<?php echo e(URL::asset('build/images/users/avatar-5.jpg')); ?>"
                                             class="avatar-xxs rounded-circle me-1 shadow" alt="">
                                         <a href="javascript: void(0);" class="text-reset">Pauline
                                             Moll</a>
@@ -451,7 +450,7 @@
                                         <div class="avatar-group">
                                             <div class="avatar-group-item">
                                                 <a href="javascript: void(0);" class="d-inline-block">
-                                                    <img src="{{ URL::asset('build/images/users/avatar-2.jpg') }}" alt=""
+                                                    <img src="<?php echo e(URL::asset('build/images/users/avatar-2.jpg')); ?>" alt=""
                                                         class="rounded-circle avatar-xxs shadow">
                                                 </a>
                                             </div>
@@ -463,7 +462,7 @@
                                 <tr>
                                     <td class="fw-medium">Create Wireframe</td>
                                     <td>
-                                        <img src="{{ URL::asset('build/images/users/avatar-6.jpg') }}"
+                                        <img src="<?php echo e(URL::asset('build/images/users/avatar-6.jpg')); ?>"
                                             class="avatar-xxs rounded-circle me-1 shadow" alt="">
                                         <a href="javascript: void(0);" class="text-reset">James
                                             Bangs</a>
@@ -484,19 +483,19 @@
                                         <div class="avatar-group">
                                             <div class="avatar-group-item">
                                                 <a href="javascript: void(0);" class="d-inline-block">
-                                                    <img src="{{ URL::asset('build/images/users/avatar-1.jpg') }}" alt=""
+                                                    <img src="<?php echo e(URL::asset('build/images/users/avatar-1.jpg')); ?>" alt=""
                                                         class="rounded-circle avatar-xxs shadow">
                                                 </a>
                                             </div>
                                             <div class="avatar-group-item">
                                                 <a href="javascript: void(0);" class="d-inline-block">
-                                                    <img src="{{ URL::asset('build/images/users/avatar-6.jpg') }}" alt=""
+                                                    <img src="<?php echo e(URL::asset('build/images/users/avatar-6.jpg')); ?>" alt=""
                                                         class="rounded-circle avatar-xxs shadow">
                                                 </a>
                                             </div>
                                             <div class="avatar-group-item">
                                                 <a href="javascript: void(0);" class="d-inline-block">
-                                                    <img src="{{ URL::asset('build/images/users/avatar-4.jpg') }}" alt=""
+                                                    <img src="<?php echo e(URL::asset('build/images/users/avatar-4.jpg')); ?>" alt=""
                                                         class="rounded-circle avatar-xxs shadow">
                                                 </a>
                                             </div>
@@ -587,7 +586,7 @@
                                         <a href="javascript: void(0);" class="d-inline-block"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title=""
                                             data-bs-original-title="Mary Stoner">
-                                            <img src="{{ URL::asset('build/images/users/avatar-2.jpg') }}" alt=""
+                                            <img src="<?php echo e(URL::asset('build/images/users/avatar-2.jpg')); ?>" alt=""
                                                 class="rounded-circle avatar-xxs shadow">
                                         </a>
                                     </td>
@@ -608,7 +607,7 @@
                                         <a href="javascript: void(0);" class="d-inline-block"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title=""
                                             data-bs-original-title="Den Davis">
-                                            <img src="{{ URL::asset('build/images/users/avatar-7.jpg') }}" alt=""
+                                            <img src="<?php echo e(URL::asset('build/images/users/avatar-7.jpg')); ?>" alt=""
                                                 class="rounded-circle avatar-xxs shadow">
                                         </a>
                                     </td>
@@ -629,7 +628,7 @@
                                         <a href="javascript: void(0);" class="d-inline-block"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title=""
                                             data-bs-original-title="Alex Brown">
-                                            <img src="{{ URL::asset('build/images/users/avatar-6.jpg') }}" alt=""
+                                            <img src="<?php echo e(URL::asset('build/images/users/avatar-6.jpg')); ?>" alt=""
                                                 class="rounded-circle avatar-xxs shadow">
                                         </a>
                                     </td>
@@ -650,7 +649,7 @@
                                         <a href="javascript: void(0);" class="d-inline-block"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title=""
                                             data-bs-original-title="Prezy Morin">
-                                            <img src="{{ URL::asset('build/images/users/avatar-5.jpg') }}" alt=""
+                                            <img src="<?php echo e(URL::asset('build/images/users/avatar-5.jpg')); ?>" alt=""
                                                 class="rounded-circle avatar-xxs shadow">
                                         </a>
                                     </td>
@@ -671,7 +670,7 @@
                                         <a href="javascript: void(0);" class="d-inline-block"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title=""
                                             data-bs-original-title="Stine Nielsen">
-                                            <img src="{{ URL::asset('build/images/users/avatar-1.jpg') }}" alt=""
+                                            <img src="<?php echo e(URL::asset('build/images/users/avatar-1.jpg')); ?>" alt=""
                                                 class="rounded-circle avatar-xxs shadow">
                                         </a>
                                     </td>
@@ -692,7 +691,7 @@
                                         <a href="javascript: void(0);" class="d-inline-block"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title=""
                                             data-bs-original-title="Jansh William">
-                                            <img src="{{ URL::asset('build/images/users/avatar-4.jpg') }}" alt=""
+                                            <img src="<?php echo e(URL::asset('build/images/users/avatar-4.jpg')); ?>" alt=""
                                                 class="rounded-circle avatar-xxs shadow">
                                         </a>
                                     </td>
@@ -749,7 +748,7 @@
                             <tbody>
                                 <tr>
                                     <td class="d-flex">
-                                        <img src="{{ URL::asset('build/images/users/avatar-1.jpg') }}" alt=""
+                                        <img src="<?php echo e(URL::asset('build/images/users/avatar-1.jpg')); ?>" alt=""
                                             class="avatar-xs rounded-3 shadow me-2">
                                         <div>
                                             <h5 class="fs-13 mb-0">Donald Risher</h5>
@@ -770,7 +769,7 @@
                                 </tr><!-- end tr -->
                                 <tr>
                                     <td class="d-flex">
-                                        <img src="{{ URL::asset('build/images/users/avatar-2.jpg') }}" alt=""
+                                        <img src="<?php echo e(URL::asset('build/images/users/avatar-2.jpg')); ?>" alt=""
                                             class="avatar-xs rounded-3 shadow me-2">
                                         <div>
                                             <h5 class="fs-13 mb-0">Jansh Brown</h5>
@@ -790,7 +789,7 @@
                                 </tr><!-- end tr -->
                                 <tr>
                                     <td class="d-flex">
-                                        <img src="{{ URL::asset('build/images/users/avatar-7.jpg') }}" alt=""
+                                        <img src="<?php echo e(URL::asset('build/images/users/avatar-7.jpg')); ?>" alt=""
                                             class="avatar-xs rounded-3 shadow me-2">
                                         <div>
                                             <h5 class="fs-13 mb-0">Carroll Adams</h5>
@@ -810,7 +809,7 @@
                                 </tr><!-- end tr -->
                                 <tr>
                                     <td class="d-flex">
-                                        <img src="{{ URL::asset('build/images/users/avatar-4.jpg') }}" alt=""
+                                        <img src="<?php echo e(URL::asset('build/images/users/avatar-4.jpg')); ?>" alt=""
                                             class="avatar-xs rounded-3 shadow me-2">
                                         <div>
                                             <h5 class="fs-13 mb-0">William Pinto</h5>
@@ -830,7 +829,7 @@
                                 </tr><!-- end tr -->
                                 <tr>
                                     <td class="d-flex">
-                                        <img src="{{ URL::asset('build/images/users/avatar-6.jpg') }}" alt=""
+                                        <img src="<?php echo e(URL::asset('build/images/users/avatar-6.jpg')); ?>" alt=""
                                             class="avatar-xs rounded-3 shadow me-2">
                                         <div>
                                             <h5 class="fs-13 mb-0">Garry Fournier</h5>
@@ -850,7 +849,7 @@
                                 </tr><!-- end tr -->
                                 <tr>
                                     <td class="d-flex">
-                                        <img src="{{ URL::asset('build/images/users/avatar-5.jpg') }}" alt=""
+                                        <img src="<?php echo e(URL::asset('build/images/users/avatar-5.jpg')); ?>" alt=""
                                             class="avatar-xs rounded-3 shadow me-2">
                                         <div>
                                             <h5 class="fs-13 mb-0">Susan Denton</h5>
@@ -872,7 +871,7 @@
                                 </tr><!-- end tr -->
                                 <tr>
                                     <td class="d-flex">
-                                        <img src="{{ URL::asset('build/images/users/avatar-3.jpg') }}" alt=""
+                                        <img src="<?php echo e(URL::asset('build/images/users/avatar-3.jpg')); ?>" alt=""
                                             class="avatar-xs rounded-3 shadow me-2">
                                         <div>
                                             <h5 class="fs-13 mb-0">Joseph Jackson</h5>
@@ -936,7 +935,7 @@
                                 <li class="chat-list left">
                                     <div class="conversation-list">
                                         <div class="chat-avatar">
-                                            <img src="{{ URL::asset('build/images/users/avatar-2.jpg') }}" alt=""
+                                            <img src="<?php echo e(URL::asset('build/images/users/avatar-2.jpg')); ?>" alt=""
                                                 class="shadow">
                                         </div>
                                         <div class="user-chat-content">
@@ -1015,7 +1014,7 @@
                                 <li class="chat-list left">
                                     <div class="conversation-list">
                                         <div class="chat-avatar">
-                                            <img src="{{ URL::asset('build/images/users/avatar-2.jpg') }}" alt=""
+                                            <img src="<?php echo e(URL::asset('build/images/users/avatar-2.jpg')); ?>" alt=""
                                                 class="shadow">
                                         </div>
                                         <div class="user-chat-content">
@@ -1120,7 +1119,7 @@
                                 <li class="chat-list left">
                                     <div class="conversation-list">
                                         <div class="chat-avatar">
-                                            <img src="{{ URL::asset('build/images/users/avatar-2.jpg') }}" alt=""
+                                            <img src="<?php echo e(URL::asset('build/images/users/avatar-2.jpg')); ?>" alt=""
                                                 class="shadow">
                                         </div>
                                         <div class="user-chat-content">
@@ -1129,8 +1128,8 @@
                                                     <div class="message-img-list">
                                                         <div>
                                                             <a class="popup-img d-inline-block"
-                                                                href="{{ URL::asset('build/images/small/img-1.jpg') }}">
-                                                                <img src="{{ URL::asset('build/images/small/img-1.jpg') }}"
+                                                                href="<?php echo e(URL::asset('build/images/small/img-1.jpg')); ?>">
+                                                                <img src="<?php echo e(URL::asset('build/images/small/img-1.jpg')); ?>"
                                                                     alt="" class="rounded border">
                                                             </a>
                                                         </div>
@@ -1146,7 +1145,7 @@
                                                                     </a>
                                                                     <div class="dropdown-menu">
                                                                         <a class="dropdown-item"
-                                                                            href="{{ URL::asset('build/images/small/img-1.jpg') }}"
+                                                                            href="<?php echo e(URL::asset('build/images/small/img-1.jpg')); ?>"
                                                                             download=""><i
                                                                                 class="ri-download-2-line me-2 text-muted align-bottom"></i>Download</a>
                                                                         <a class="dropdown-item" href="#"><i
@@ -1167,8 +1166,8 @@
                                                     <div class="message-img-list">
                                                         <div>
                                                             <a class="popup-img d-inline-block"
-                                                                href="{{ URL::asset('build/images/small/img-2.jpg') }}">
-                                                                <img src="{{ URL::asset('build/images/small/img-2.jpg') }}"
+                                                                href="<?php echo e(URL::asset('build/images/small/img-2.jpg')); ?>">
+                                                                <img src="<?php echo e(URL::asset('build/images/small/img-2.jpg')); ?>"
                                                                     alt="" class="rounded border">
                                                             </a>
                                                         </div>
@@ -1184,7 +1183,7 @@
                                                                     </a>
                                                                     <div class="dropdown-menu">
                                                                         <a class="dropdown-item"
-                                                                            href="{{ URL::asset('build/images/small/img-2.jpg') }}"
+                                                                            href="<?php echo e(URL::asset('build/images/small/img-2.jpg')); ?>"
                                                                             download=""><i
                                                                                 class="ri-download-2-line me-2 text-muted align-bottom"></i>Download</a>
                                                                         <a class="dropdown-item" href="#"><i
@@ -1315,9 +1314,9 @@
             </div><!-- end card -->
         </div><!-- end col -->
     </div><!-- end row -->
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('script')
+<?php $__env->startSection('script'); ?>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
@@ -1330,21 +1329,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
 
-<script src="{{ URL::asset('build/js/pages/dashboard-projects.init.js') }}"></script>
+<script src="<?php echo e(URL::asset('build/js/pages/dashboard-projects.init.js')); ?>"></script>
 <!-- apexcharts -->
-<script src="{{ URL::asset('build/libs/apexcharts/apexcharts.min.js') }}"></script>
-<script src="{{ URL::asset('build/libs/jsvectormap/js/jsvectormap.min.js') }}"></script>
-<script src="{{ URL::asset('build/libs/jsvectormap/maps/world-merc.js') }}"></script>
-<script src="{{ URL::asset('build/libs/swiper/swiper-bundle.min.js')}}"></script>
-<script src="{{ URL::asset('build/js/pages/chartjs.init.js') }}"></script>
+<script src="<?php echo e(URL::asset('build/libs/apexcharts/apexcharts.min.js')); ?>"></script>
+<script src="<?php echo e(URL::asset('build/libs/jsvectormap/js/jsvectormap.min.js')); ?>"></script>
+<script src="<?php echo e(URL::asset('build/libs/jsvectormap/maps/world-merc.js')); ?>"></script>
+<script src="<?php echo e(URL::asset('build/libs/swiper/swiper-bundle.min.js')); ?>"></script>
+<script src="<?php echo e(URL::asset('build/js/pages/chartjs.init.js')); ?>"></script>
 <!-- dashboard init -->
-<script src="{{ URL::asset('build/js/pages/dashboard-ecommerce.init.js') }}"></script>
-<script src="{{ URL::asset('build/js/app.js') }}"></script>
+<script src="<?php echo e(URL::asset('build/js/pages/dashboard-ecommerce.init.js')); ?>"></script>
+<script src="<?php echo e(URL::asset('build/js/app.js')); ?>"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-<script src="{{ URL::asset('build/js/pages/apexcharts-pie.init.js') }}"></script>
-<script src="{{ URL::asset('build/js/pages/apexcharts-bar.init.js') }}"></script>
+<script src="<?php echo e(URL::asset('build/js/pages/apexcharts-pie.init.js')); ?>"></script>
+<script src="<?php echo e(URL::asset('build/js/pages/apexcharts-bar.init.js')); ?>"></script>
 
 <script>
     // Get reference to the span element where the date will be displayed
@@ -1380,4 +1379,5 @@
 
 
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\YOUNESS-DEVL\Desktop\scasco_reports\resources\views/dashboard/accueil.blade.php ENDPATH**/ ?>
