@@ -20,7 +20,7 @@
                 <h3 class="mb-1">{{ \Carbon\Carbon::parse($latestAppointment->date_appointment)->format('d M Y') }}</h3>
                 <h5 class="fs-14 mb-4">{{ $latestAppointment->place }}</h5>
                 @else
-                <h3 class="mb-1">No appointment available</h3>
+                <h3 class="mb-1">Aucun rendez-vous disponible</h3>
                 <h5 class="fs-14 mb-4">N/A</h5>
                 @endif
             </div>
@@ -28,22 +28,40 @@
         <!--end card-->
         <div class="card mb-3">
             <div class="card-body">
-                <form class="mt-4">
-                    <div class="mb-4">
-                        <select id="appointment_status" class="form-control @error('status') is-invalid @enderror" name="status">
-                            <!-- <option value="">Select Task board</option> -->
-                            @foreach (['pending', 'completed', 'cancelled'] as $status)
-                            <option value="{{ $status }}" {{ old('status', $potentialCase->status) == $status ? 'selected' : '' }}>
-                                {{ ucfirst($status) }}
-                            </option>
-                            @endforeach
-                        </select>
-                        @error('status')
-                        <span class="invalid-feedback" role="alert">
-                            <span class="text-danger">{{ $message }}</span>
-                        </span>
-                        @enderror
+                <form class="mt-4" autocomplete="off" method="POST" action="{{ route('update.status.potential.case', ['id' => $potentialCase->id]) }}" enctype="multipart/form-data">
+                    @csrf
 
+                    <div class="row g-3 mb-4 align-items-center">
+                        <div class="col-lg-8">
+                            <select id="case_status" class="form-control @error('case_status') is-invalid @enderror" name="case_status">
+                                @foreach (['pending', 'completed', 'processing', 'cancelled'] as $case_status)
+                                @php
+                                // Manually define the translation mapping
+                                $statusTranslations = [
+                                'pending' => 'En attente',
+                                'completed' => 'Terminé',
+                                'processing' => 'En cours',
+                                'cancelled' => 'Annulé',
+                                ];
+                                $translatedStatus = ucfirst($statusTranslations[$case_status]);
+                                @endphp
+                                <option value="{{ $case_status }}" {{ old('case_status', $potentialCase->case_status) == $case_status ? 'selected' : '' }}>
+                                    {{ $translatedStatus }}
+                                </option>
+                                @endforeach
+                            </select>
+                            @error('case_status')
+                            <span class="invalid-feedback" role="alert">
+                                <span class="text-danger">{{ $message }}</span>
+                            </span>
+                            @enderror
+                        </div>
+                        <!--end col-->
+
+                        <div class="col-lg-4">
+                            <button type="submit" class="btn btn-success w-100">Modifier</button>
+                        </div>
+                        <!--end col-->
                     </div>
                 </form>
                 <div class="table-card">
@@ -211,7 +229,7 @@
                                 </li>
                                 @endforeach
                                 @else
-                                <p>No branches available</p>
+                                <p>Aucune branche disponible</p>
                                 @endif
                             </ul>
                         </div>
@@ -252,7 +270,7 @@
                         <h5 class="card-title mb-4">Commentaires</h5>
 
                         <div data-simplebar style="height: 508px;" class="px-3 mx-n3 mb-2">
-                            @foreach($potentialCase->caseHistories as $history)
+                            @foreach($potentialCase->caseHistories->sortByDesc('created_at') as $history)
                             <div class="d-flex mb-4">
                                 <div class="flex-shrink-0">
                                     @if(!empty($history->user->photo) && file_exists(public_path('photos/admin_images/' . $history->user->photo)))
@@ -262,24 +280,25 @@
                                     @endif
                                 </div>
                                 <div class="flex-grow-1 ms-3">
-                                    <h5 class="fs-13"><a href="pages-profile" class="text-body">{{$history->user->frist_name}} {{$history->user->last_name}}</a> <small class="text-muted">{{ $history->created_at->format('d M Y - h:iA') }}</small></h5>
+                                    <h5 class="fs-13"><a href="pages-profile" class="text-body">{{$history->user->first_name}} {{$history->user->last_name}}</a> <small class="text-muted">{{ $history->created_at->format('d M Y - h:iA') }}</small></h5>
                                     <p class="text-muted">{{$history->comment}}</p>
                                 </div>
                             </div>
                             @endforeach
                         </div>
-                        <form class="mt-4">
+                        <form class="mt-4" autocomplete="off" method="POST" action="{{ route('store.comment.potential.case', ['id' => $potentialCase->id]) }}" enctype="multipart/form-data">
+                            @csrf
                             <div class="row g-3">
                                 <div class="col-lg-12">
                                     <label for="exampleFormControlTextarea1" class="form-label">Laisser des Commentaires</label>
                                     <textarea class="form-control bg-light border-light" id="exampleFormControlTextarea1" rows="3"
-                                        placeholder="Entrez des commentaires"></textarea>
+                                        name="comment" placeholder="Entrez des commentaires"></textarea>
                                 </div>
                                 <!--end col-->
                                 <div class="col-12 text-end">
-                                    <button type="button" class="btn btn-ghost-secondary btn-icon waves-effect me-1"><i
-                                            class="ri-attachment-line fs-16"></i></button>
-                                    <a href="javascript:void(0);" class="btn btn-success">Poster un Commentaire</a>
+                                    <!-- <button type="button" class="btn btn-ghost-secondary btn-icon waves-effect me-1"><i
+                                            class="ri-attachment-line fs-16"></i></button> -->
+                                    <button type="submit" class="btn btn-success">Poster un Commentaire</button>
                                 </div>
                             </div>
                             <!--end row-->

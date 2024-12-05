@@ -133,7 +133,7 @@ class ReportService
             ]);
             $this->potencialCaseHisotryService->createHistoryRecord(
                 'report_added', 
-                'Report added to the case', 
+                'Compte rendu ajouté à l\'affaire', 
                 $potentialCase, 
                 null, 
                 $report->id, 
@@ -194,7 +194,7 @@ class ReportService
             $report->save();
             $this->potencialCaseHisotryService->createHistoryRecord(
                 'updated', 
-                'Report updated', 
+                'Compte rendu a été mise à jour', 
                 $report->potential_case, 
                 null, 
                 $report->id, 

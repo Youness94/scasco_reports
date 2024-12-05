@@ -136,7 +136,10 @@ Route::group(['middleware' => ['web', 'auth']], function () {
         Route::post('/update-branches-for-service', 'updateBranchesForService')->name('update.branches.for.service');
         Route::post('/remove-branches-from-service',  'removeBranchesFromService')->name('remove.branches.from.service');
         
-
+        
+        Route::post('update/status_potential_case/{id}',  'updateStatusPotentialCase')->name('update.status.potential.case');
+        Route::post('store/commnet_potential_case/{id}',  'createCommentPotentialCase')->name('store.comment.potential.case');
+        // Route::get('/potential-case/{id}/comments', 'getUpdatedComments')->name('potential.case.comments');
         Route::post('store/client_potential_case',  'store_client_potential_case')->name('store.client.potential.case');
        
     });

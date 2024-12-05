@@ -51,7 +51,7 @@ class ReportController extends Controller
 
         try {
             $this->reportService->createReport($validatedData);
-            return redirect('/comptes-rendus')->with('success', 'Report created successfully');
+            return redirect('/comptes-rendus')->with('success', 'Compte rendu ajouté à l\'affaire avec succès');
         } catch (\Exception $e) {
             return redirect('/ajouter-compte-rendu')->with('error', 'Report not created');
         }
@@ -80,7 +80,7 @@ class ReportController extends Controller
 
         try {
             $this->reportService->updateReport($id, $validatedData);
-            return redirect('/comptes-rendus')->with('success', 'Report updated successfully');
+            return redirect('/comptes-rendus')->with('success', 'Compte rendu a été mis à jour avec succè');
         } catch (\Exception $e) {
             return redirect('/modifier-compte-rendu/' . $id)->with('error', 'Report not updated');
         }

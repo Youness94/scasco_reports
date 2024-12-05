@@ -174,7 +174,7 @@ class AppointmentService
 
             $this->potencialCaseHisotryService->createHistoryRecord(
                 'appointment_added',
-                'Appointment added to the case',
+                'Rendez-vous ajouté à l\'affaire',
                 $potentialCase,
                 $appointment->id,
                 null,
@@ -182,7 +182,7 @@ class AppointmentService
             );
 
             DB::commit();
-            return ['status' => 'success', 'message' => 'Appointment created successfully'];
+            return ['status' => 'success', 'message' => 'Rendez-vous ajouté à l\'affaire avec succès'];
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Appointment creation failed: ' . $e->getMessage());
@@ -253,7 +253,7 @@ class AppointmentService
 
             $this->potencialCaseHisotryService->createHistoryRecord(
                 'updated',
-                'Appointment updated',
+                'Rendez-vous a été mise à jour',
                 $potentialCase,
                 $appointment->id,
                 null,
@@ -261,7 +261,7 @@ class AppointmentService
             );
 
             DB::commit();
-            return ['status' => 'success', 'message' => 'Appointment updated successfully'];
+            return ['status' => 'success', 'message' => 'Rendez-vous a été mis à jour avec succès'];
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Appointment update failed: ' . $e->getMessage());

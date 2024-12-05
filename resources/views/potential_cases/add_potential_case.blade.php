@@ -364,7 +364,7 @@
             var formData = new FormData(this);
 
             $.ajax({
-                url: "{{ route('store.client.potential.case') }}", // Your controller method route
+                url: "{{ route('store.client.potential.case') }}", 
                 method: 'POST',
                 data: formData,
                 processData: false,

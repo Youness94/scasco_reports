@@ -8,7 +8,9 @@ use App\Models\Branche;
 use App\Models\City;
 use App\Models\Client;
 use App\Models\PotencialCase;
+use App\Models\PotencialCaseHisotry;
 use App\Models\Service;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -53,7 +55,7 @@ class PotentialCaseService
         $services = Service::with('branches')->get();
         $clients = Client::all();
         $cities = City::all();
-        return compact('clients', 'services','cities');
+        return compact('clients', 'services', 'cities');
     }
 
     public function storePotentialCase($request)
@@ -90,7 +92,7 @@ class PotentialCaseService
             }
             $this->potencialCaseHisotryService->createHistoryRecord(
                 'created',
-                'Potential case created',
+                'L\'affaire créé',
                 $potentialCase,
                 null,
                 null,
@@ -98,7 +100,7 @@ class PotentialCaseService
             );
             DB::commit();
 
-            return ['status' => 'success', 'message' => 'Potential case created successfully'];
+            return ['status' => 'success', 'message' => 'L\'affaire a été créé avec succès'];
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Potential case creation failed: ' . $e->getMessage());
@@ -111,11 +113,11 @@ class PotentialCaseService
     {
         $user = auth()->user();
         $potentialCase = null;
-  
+
         if ($user->user_type == 'Super Responsable') {
             $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->findOrFail($id);
         }
-   
+
         if ($user->user_type == 'Responsable') {
             $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
                 ->whereIn('created_by', function ($query) use ($user) {
@@ -132,13 +134,13 @@ class PotentialCaseService
                 ->where('created_by', $user->id)
                 ->findOrFail($id);
         }
-    
-    
+
+
         if (!$potentialCase) {
             abort(404, 'Potential Case not found');
         }
-    
-        
+
+
         $services = Service::with('branches')->get();
         $clients = Client::all();
         $cities = City::all();
@@ -179,10 +181,10 @@ class PotentialCaseService
                     'branch_ids' => json_encode($branchIds),
                 ]);
             }
-            $this->potencialCaseHisotryService->createHistoryRecord('updated', 'Potential case updated', $potentialCase, null, null, $user->id);
+            $this->potencialCaseHisotryService->createHistoryRecord('updated', 'L\'affaire a été mise à jour', $potentialCase, null, null, $user->id);
             DB::commit();
 
-            return ['status' => 'success', 'message' => 'Potential case updated successfully'];
+            return ['status' => 'success', 'message' => 'L\'affaire a été mise à jour avec succès'];
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Potential case update failed: ' . $e->getMessage());
@@ -219,13 +221,13 @@ class PotentialCaseService
             }
         }
     }
-    
+
     public function removeBranchesFromService($serviceId)
     {
         $service = Service::findOrFail($serviceId);
-    
+
         Branche::where('service_id', $serviceId)->update(['service_id' => null]);
-    
+
         Branche::where('service_id', $serviceId)->delete();
     }
 
@@ -272,11 +274,11 @@ class PotentialCaseService
     {
         $user = auth()->user();
         $potentialCase = null;
-  
+
         if ($user->user_type == 'Super Responsable') {
             $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches', 'caseHistories.user', 'appointments.creator', 'reports.creator', 'reports.appointment', 'reports.potential_case',])->findOrFail($id);
         }
-   
+
         if ($user->user_type == 'Responsable') {
             $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches', 'caseHistories.user', 'appointments.creator', 'reports.creator', 'reports.appointment', 'reports.potential_case',])
                 ->whereIn('created_by', function ($query) use ($user) {
@@ -293,13 +295,13 @@ class PotentialCaseService
                 ->where('created_by', $user->id)
                 ->findOrFail($id);
         }
-    
-    
+
+
         if (!$potentialCase) {
             abort(404, 'Potential Case not found');
         }
-    
-        
+
+
         $services = Service::with('branches')->get();
         $clients = Client::all();
         $cities = City::all();
@@ -310,4 +312,94 @@ class PotentialCaseService
             'cities' => $cities,
         ];
     }
+
+
+    public function createCommentPotentialCase($validated, $id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $user = Auth::user();
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->findOrFail($id);
+
+            PotencialCaseHisotry::create([
+                'comment' => $validated['comment'],
+                'action_type' => 'created',
+                'action_date' => Carbon::now(),
+                'potencial_case_id' => $potentialCase->id,
+                'created_by' => $user->id,
+            ]);
+
+            DB::commit();
+            return ['status' => 'success', 'message' => 'Le commentaire a été créé avec succès'];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Potential case update failed: ' . $e->getMessage());
+
+            return ['status' => 'error', 'message' => $e->getMessage() ?: 'DB Error'];
+        }
+    }
+    public function updateStatusPotentialCase($validated, $id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $user = Auth::user();
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->findOrFail($id);
+            $statusTranslations = [
+                'pending' => 'En attente',
+                'completed' => 'Terminé',
+                'processing' => 'En cours',
+                'cancelled' => 'Annulé',
+            ];
+    
+            $translatedStatus = isset($statusTranslations[$validated['case_status']])
+                ? $statusTranslations[$validated['case_status']]
+                : 'Non défini'; 
+            $potentialCase->update([
+                'case_status' =>  $validated['case_status'],
+                'updated_by' => $user->id,
+            ]);
+
+            PotencialCaseHisotry::create([
+                'comment' => "Statut modifié à: $translatedStatus",
+                'action_type' => 'status_changed',
+                'action_date' => Carbon::now(),
+                'potencial_case_id' => $potentialCase->id,
+                'created_by' => $user->id,
+            ]);
+
+            DB::commit();
+            return ['status' => 'success', 'message' => 'statu a été mise à jour avec succès'];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Potential case update failed: ' . $e->getMessage());
+
+            return ['status' => 'error', 'message' => $e->getMessage() ?: 'DB Error'];
+        }
+    }
+
+
+    // public function storeComment($validatedData, $id)
+    // {
+    //     DB::beginTransaction();
+    //     try {
+    //         $user = Auth::user();
+    //         $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->findOrFail($id);
+    //         $history = PotencialCaseHisotry::create([
+    //             'comment' => $validatedData['comment'], 
+    //             'action_type' => 'created',
+    //             'action_date' => Carbon::now(),
+    //             'potencial_case_id' => $potentialCase->id,
+    //             'created_by' => $user->id,
+    //         ]);
+    //         $history->load('user');
+    //         DB::commit();
+    //         return $history;
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('Comment creation failed: ' . $e->getMessage());
+    //         throw $e;
+    //     }
+    // }
 }

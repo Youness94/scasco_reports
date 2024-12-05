@@ -144,10 +144,10 @@ class PotencialCaseController extends Controller
     public function editBranchesByService(Request $request)
     {
         $serviceId = $request->service_id;
-    
+
         try {
             $result = $this->potentialCaseService->editBranchesByService($serviceId);
-    
+
             return response()->json([
                 'service_name' => $result['service_name'],
                 'branches' => $result['branches']
@@ -157,12 +157,12 @@ class PotencialCaseController extends Controller
             return response()->json(['error' => 'Something went wrong'], 500);
         }
     }
-    
+
     public function updateBranchesForService(Request $request)
     {
         $serviceId = $request->service_id;
         $branchIds = $request->branch_ids; // array of branch IDs to associate with the service
-    
+
         try {
             // Calling the service layer method to update the branches
             $this->potentialCaseService->updateBranchesForService($serviceId, $branchIds);
@@ -172,13 +172,13 @@ class PotencialCaseController extends Controller
             return response()->json(['error' => 'Something went wrong'], 500);
         }
     }
-    
+
     public function removeBranchesFromService(Request $request)
     {
         $serviceId = $request->service_id;
-    
+
         try {
-    
+
             $this->potentialCaseService->removeBranchesFromService($serviceId);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
@@ -186,7 +186,7 @@ class PotencialCaseController extends Controller
             return response()->json(['error' => 'Something went wrong'], 500);
         }
     }
-    
+
     public function delete_potential_case($id)
     {
         $result = $this->potentialCaseService->deletePotencialCase($id);
@@ -211,4 +211,76 @@ class PotencialCaseController extends Controller
             'cities' => $potentialCase['cities'],
         ]);
     }
+
+    public function createCommentPotentialCase(Request $request, $id)
+    {
+        // Validate incoming request
+        $validated = $request->validate([
+            'comment' => 'required|string',
+        ], [
+            'comment.required' => 'Le commentaire est obligatoire.',
+            'comment.string' => 'Le commentaire doit être une chaîne de caractères valide.' 
+        ]);
+
+        try {
+            $response = $this->potentialCaseService->createCommentPotentialCase($validated, $id);
+
+            // Return success response with the comment
+            // return redirect()->back()->with('error', $result['message']);
+            return redirect()->back()->with(['success' => true, 'message' => $response['message']]);
+        } catch (\Exception $e) {
+            Log::error('Error in createCommentPotentialCase: ' . $e->getMessage());
+
+            return response()->json(['error' => 'Something went wrong'], 500);
+        }
+    }
+
+    public function updateStatusPotentialCase(Request $request, $id)
+    {
+        // Validate incoming request
+        $validated = $request->validate([
+            'case_status' => 'required|in:pending,completed,processing,cancelled',
+        ], [
+            'case_status.required' => 'Le statut est obligatoire.',
+            'case_status.in' => 'Le statut sélectionné n\'est pas valide.',
+        ]);
+    
+
+        try {
+            $response = $this->potentialCaseService->updateStatusPotentialCase($validated, $id);
+
+            return redirect()->back()->with(['success' => true, 'message' => $response['message']]);
+        } catch (\Exception $e) {
+            Log::error('Error in createCommentPotentialCase: ' . $e->getMessage());
+
+            return response()->json(['error' => 'Something went wrong'], 500);
+        }
+    }
+
+   
+
+    // public function createCommentPotentialCase(Request $request, $id)
+    // {
+    //     $validatedData = $request->validate([
+    //         'comment' => 'required|string',
+    //     ], [
+    //         'comment.required' => 'Le commentaire est obligatoire.',
+    //         'comment.string' => 'Le commentaire doit être une chaîne de caractères valide.' 
+    //     ]);
+    //     try {
+    //         $history = $this->potentialCaseService->storeComment($validatedData, $id);
+    //         $commentHtml = view('potential_cases.comments', compact('history'))->render();
+
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'Commentaire created successfully',
+    //         'comment_html' => $commentHtml,
+    //     ], 201);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'Comment not created: ' . $e->getMessage(),
+    //         ], 400);
+    //     }
+    // }
 }

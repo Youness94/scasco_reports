@@ -20,7 +20,7 @@
                 <h3 class="mb-1"><?php echo e(\Carbon\Carbon::parse($latestAppointment->date_appointment)->format('d M Y')); ?></h3>
                 <h5 class="fs-14 mb-4"><?php echo e($latestAppointment->place); ?></h5>
                 <?php else: ?>
-                <h3 class="mb-1">No appointment available</h3>
+                <h3 class="mb-1">Aucun rendez-vous disponible</h3>
                 <h5 class="fs-14 mb-4">N/A</h5>
                 <?php endif; ?>
             </div>
@@ -28,37 +28,55 @@
         <!--end card-->
         <div class="card mb-3">
             <div class="card-body">
-                <form class="mt-4">
-                    <div class="mb-4">
-                        <select id="appointment_status" class="form-control <?php $__errorArgs = ['status'];
+                <form class="mt-4" autocomplete="off" method="POST" action="<?php echo e(route('update.status.potential.case', ['id' => $potentialCase->id])); ?>" enctype="multipart/form-data">
+                    <?php echo csrf_field(); ?>
+
+                    <div class="row g-3 mb-4 align-items-center">
+                        <div class="col-lg-8">
+                            <select id="case_status" class="form-control <?php $__errorArgs = ['case_status'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>" name="status">
-                            <!-- <option value="">Select Task board</option> -->
-                            <?php $__currentLoopData = ['pending', 'completed', 'cancelled']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($status); ?>" <?php echo e(old('status', $potentialCase->status) == $status ? 'selected' : ''); ?>>
-                                <?php echo e(ucfirst($status)); ?>
+unset($__errorArgs, $__bag); ?>" name="case_status">
+                                <?php $__currentLoopData = ['pending', 'completed', 'processing', 'cancelled']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $case_status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php
+                                // Manually define the translation mapping
+                                $statusTranslations = [
+                                'pending' => 'En attente',
+                                'completed' => 'Terminé',
+                                'processing' => 'En cours',
+                                'cancelled' => 'Annulé',
+                                ];
+                                $translatedStatus = ucfirst($statusTranslations[$case_status]);
+                                ?>
+                                <option value="<?php echo e($case_status); ?>" <?php echo e(old('case_status', $potentialCase->case_status) == $case_status ? 'selected' : ''); ?>>
+                                    <?php echo e($translatedStatus); ?>
 
-                            </option>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        </select>
-                        <?php $__errorArgs = ['status'];
+                                </option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </select>
+                            <?php $__errorArgs = ['case_status'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
-                        <span class="invalid-feedback" role="alert">
-                            <span class="text-danger"><?php echo e($message); ?></span>
-                        </span>
-                        <?php unset($message);
+                            <span class="invalid-feedback" role="alert">
+                                <span class="text-danger"><?php echo e($message); ?></span>
+                            </span>
+                            <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
+                        </div>
+                        <!--end col-->
 
+                        <div class="col-lg-4">
+                            <button type="submit" class="btn btn-success w-100">Modifier</button>
+                        </div>
+                        <!--end col-->
                     </div>
                 </form>
                 <div class="table-card">
@@ -227,7 +245,7 @@ unset($__errorArgs, $__bag); ?>
                                 </li>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 <?php else: ?>
-                                <p>No branches available</p>
+                                <p>Aucune branche disponible</p>
                                 <?php endif; ?>
                             </ul>
                         </div>
@@ -268,7 +286,7 @@ unset($__errorArgs, $__bag); ?>
                         <h5 class="card-title mb-4">Commentaires</h5>
 
                         <div data-simplebar style="height: 508px;" class="px-3 mx-n3 mb-2">
-                            <?php $__currentLoopData = $potentialCase->caseHistories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $history): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php $__currentLoopData = $potentialCase->caseHistories->sortByDesc('created_at'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $history): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="d-flex mb-4">
                                 <div class="flex-shrink-0">
                                     <?php if(!empty($history->user->photo) && file_exists(public_path('photos/admin_images/' . $history->user->photo))): ?>
@@ -278,24 +296,25 @@ unset($__errorArgs, $__bag); ?>
                                     <?php endif; ?>
                                 </div>
                                 <div class="flex-grow-1 ms-3">
-                                    <h5 class="fs-13"><a href="pages-profile" class="text-body"><?php echo e($history->user->frist_name); ?> <?php echo e($history->user->last_name); ?></a> <small class="text-muted"><?php echo e($history->created_at->format('d M Y - h:iA')); ?></small></h5>
+                                    <h5 class="fs-13"><a href="pages-profile" class="text-body"><?php echo e($history->user->first_name); ?> <?php echo e($history->user->last_name); ?></a> <small class="text-muted"><?php echo e($history->created_at->format('d M Y - h:iA')); ?></small></h5>
                                     <p class="text-muted"><?php echo e($history->comment); ?></p>
                                 </div>
                             </div>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
-                        <form class="mt-4">
+                        <form class="mt-4" autocomplete="off" method="POST" action="<?php echo e(route('store.comment.potential.case', ['id' => $potentialCase->id])); ?>" enctype="multipart/form-data">
+                            <?php echo csrf_field(); ?>
                             <div class="row g-3">
                                 <div class="col-lg-12">
                                     <label for="exampleFormControlTextarea1" class="form-label">Laisser des Commentaires</label>
                                     <textarea class="form-control bg-light border-light" id="exampleFormControlTextarea1" rows="3"
-                                        placeholder="Entrez des commentaires"></textarea>
+                                        name="comment" placeholder="Entrez des commentaires"></textarea>
                                 </div>
                                 <!--end col-->
                                 <div class="col-12 text-end">
-                                    <button type="button" class="btn btn-ghost-secondary btn-icon waves-effect me-1"><i
-                                            class="ri-attachment-line fs-16"></i></button>
-                                    <a href="javascript:void(0);" class="btn btn-success">Poster un Commentaire</a>
+                                    <!-- <button type="button" class="btn btn-ghost-secondary btn-icon waves-effect me-1"><i
+                                            class="ri-attachment-line fs-16"></i></button> -->
+                                    <button type="submit" class="btn btn-success">Poster un Commentaire</button>
                                 </div>
                             </div>
                             <!--end row-->
