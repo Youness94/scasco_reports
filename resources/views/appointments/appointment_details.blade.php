@@ -208,8 +208,10 @@
     document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
         
+        // Pass the appointments from PHP to JavaScript
         var appointments = {!! json_encode($appointments) !!};
-
+        
+        // Initialize FullCalendar
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             events: appointments,
@@ -221,11 +223,14 @@
             droppable: true,
             editable: true,
 
+            // Use eventContent to customize how events are displayed
             eventContent: function(arg) {
-                var clientInfo = '<div><strong>Client:</strong> ' + arg.event.extendedProps.client + '</div>';
-                var placeInfo = '<div><strong>Place:</strong> ' + arg.event.extendedProps.place + '</div>';
-               
-                return { html: arg.event.title + clientInfo + placeInfo };
+                // Add client and place info to the event content
+                var clientInfo = arg.event.extendedProps.client;
+                var placeInfo = arg.event.extendedProps.place;
+                
+                // Return the HTML that will be displayed in the event's content
+                return { html: arg.event.title + '<br>' + 'Client : ' + clientInfo + '<br>' + 'Lieu : ' + placeInfo };
             }
         });
         
@@ -233,4 +238,6 @@
         calendar.render();
     });
 </script>
+
+
 @endsection
