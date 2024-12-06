@@ -131,7 +131,11 @@
                                 <a href="<?php echo e(route('all.appointments')); ?>" class="nav-link <?php echo e(Route::is('all.appointments') ? 'active' : ''); ?>">Les Rendez-Vous</a>
                             </li>
                             <?php endif; ?>
-                          
+                            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('voir les positions')): ?>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('display.appointments')); ?>" class="nav-link <?php echo e(Route::is('all.display.appointments') ? 'active' : ''); ?>">Détailes des Rendez-Vous</a>
+                            </li>
+                            <?php endif; ?>
 
                         </ul>
                     </div>

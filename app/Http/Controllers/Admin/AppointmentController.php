@@ -107,4 +107,18 @@ class AppointmentController extends Controller
 
         return response()->json(['status' => 'Error', 'message' => $result['message']]);
     }
+
+    public function display_appointments()
+    {
+        $appointments = $this->appointmentService->detailsAppointment();
+
+        return view('appointments.appointment_details', compact('appointments'));
+    }
+    // public function details_appointments()
+    // {
+    //     $appointments = $this->appointmentService->detailsAppointment();
+
+    //     // Return the data as a JSON response
+    //     return response()->json($appointments);
+    // }
 }

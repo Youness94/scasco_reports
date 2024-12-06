@@ -166,8 +166,8 @@ Route::group(['middleware' => ['web', 'auth']], function () {
         Route::get('modifier-rendez-vous/{id}', 'edit_appointment')->name('edit.appointment');
         Route::post('update/appointment/{id}',  'update_appointment')->name('update.appointment');
         Route::get('delete/appointment/{id}', 'delete_appointment')->name('delete.appointment');
-        Route::get('détail-de-rendez-vous/{id}', 'display_appointment')->name('display.appointment');
- 
+        Route::get('détail-de-rendez-vous', 'display_appointments')->name('display.appointments');
+        Route::get('afficher-de-rendez-vous', 'details_appointments')->name('details.appointments');
         Route::get('/get-client-by-case/{potencial_case_id}', 'getClientByCase')->name('get.client.by.case');
     });
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Appointment;
 use App\Models\Associe;
 use App\Models\Client;
 use App\Models\Partenaire;
@@ -40,9 +41,12 @@ class HomeController extends Controller
     /** home dashboard */
     public function index()
     {
-       
 
-        return view('dashboard.accueil');
+        $appointments = Appointment::all();
+
+        return view('dashboard.accueil', compact(
+            'appointments',
+        ));
     }
 
 

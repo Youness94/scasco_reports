@@ -131,7 +131,11 @@
                                 <a href="{{route('all.appointments')}}" class="nav-link {{ Route::is('all.appointments') ? 'active' : '' }}">Les Rendez-Vous</a>
                             </li>
                             @endcan
-                          
+                            @can('voir les positions')
+                            <li class="nav-item">
+                                <a href="{{route('display.appointments')}}" class="nav-link {{ Route::is('all.display.appointments') ? 'active' : '' }}">Détailes des Rendez-Vous</a>
+                            </li>
+                            @endcan
 
                         </ul>
                     </div>

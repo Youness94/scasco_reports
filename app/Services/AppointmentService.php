@@ -306,4 +306,22 @@ class AppointmentService
             return ['status' => 'error', 'message' => 'Error deleting appointment: ' . $e->getMessage()];
         }
     }
+
+    public function detailsAppointment()
+    {
+        $appointments = Appointment::with('creator', 'updater', 'potential_case.client')
+            ->get()
+            ->map(function ($appointment) {
+                return [
+                    'id' => $appointment->id,
+                    'title' => $appointment->potential_case->case_number,
+                    'client' => $appointment->client->client_first_name . ' ' . $appointment->client->client_last_name,
+                    'start' => $appointment->date_appointment->toIso8601String(), 
+                    'place' => $appointment->place,
+                    'status' => $appointment->statuts,
+                ];
+            });
+
+        return $appointments;
+    }
 }
