@@ -110,9 +110,13 @@ class AppointmentController extends Controller
 
     public function display_appointments()
     {
-        $appointments = $this->appointmentService->detailsAppointment();
+        $appointmentData = $this->appointmentService->detailsAppointment();
 
-        return view('appointments.appointment_details', compact('appointments'));
+        // Extract appointments and potential_cases from the returned data
+        $appointments = $appointmentData['appointments'];
+        $potential_cases = $appointmentData['potential_cases'];
+
+        return view('appointments.appointment_details', compact('appointments', 'potential_cases'));
     }
     // public function details_appointments()
     // {

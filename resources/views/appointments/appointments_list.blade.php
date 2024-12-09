@@ -59,7 +59,7 @@
                                     <h5 class="card-title mb-0">Les Rendez-Vous</h5>
                                 </div>
                                 <div class="col-md-2 d-flex justify-content-end">
-                                    <a href="{{ route('add.appointment') }}" class="btn btn-success add-btn"><i class="ri-add-line align-bottom me-1"></i> Ajouter</a> <!-- Remove padding from button -->
+                                    <a href="{{ route('add.appointment') }}" class="btn btn-success add-btn"><i class="ri-add-line align-bottom me-1"></i> Ajouter</a> 
                                 </div>
                             </div>
                         </div>
@@ -84,7 +84,7 @@
                                         <td>{{ $appointment->potential_case->client->client_first_name}} {{ $appointment->potential_case->client->client_first_name}}</td>
                                         <td>{{ $appointment->potential_case->client->client_phone ?? "--"}} </td>
                                         <td>{{ $appointment->potential_case->case_number ?? "N/V" }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($appointment->date_appointment)->format('F d, Y') ?? 'N/V' }}</td>²
+                                        <td>{{ \Carbon\Carbon::parse($appointment->date_appointment)->format('F d, Y') ?? 'N/V' }}</td>
                                         <td>{{ $appointment->place ?? "N/V"}}</td>
                                         <td>
                                             @switch($appointment->status)

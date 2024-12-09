@@ -309,7 +309,12 @@ class AppointmentService
 
     public function detailsAppointment()
     {
-        $appointments = Appointment::with('creator', 'updater', 'potential_case.client')
+        $user = auth()->user();
+        $appointments = [];
+        $potential_cases = [];
+
+        if ($user->user_type == 'Super Responsable') {
+            $appointments = Appointment::with('creator', 'updater', 'potential_case.client')
             ->get()
             ->map(function ($appointment) {
                 return [
@@ -321,7 +326,72 @@ class AppointmentService
                     'status' => $appointment->statuts,
                 ];
             });
+            $potential_cases = PotencialCase::with('client')->get();
+        }
 
-        return $appointments;
+        if ($user->user_type == 'Responsable') {
+            $appointments = Appointment::with('creator', 'updater', 'potential_case.client')
+            ->whereIn('created_by', function ($query) use ($user) {
+                $query->select('id')
+                    ->from('users')
+                    ->where('responsible_id', $user->id)
+                    ->whereIn('user_type', ['Admin', 'Commercial']);
+            })
+            ->get()
+            ->map(function ($appointment) {
+                return [
+                    'id' => $appointment->id,
+                    'title' => $appointment->potential_case->case_number,
+                    'client' => $appointment->client->client_first_name . ' ' . $appointment->client->client_last_name,
+                    'start' => $appointment->date_appointment->toIso8601String(), 
+                    'place' => $appointment->place,
+                    'status' => $appointment->statuts,
+                ];
+            });
+            $potential_cases = PotencialCase::with('client')
+                ->whereIn('created_by', function ($query) use ($user) {
+                    $query->select('id')
+                        ->from('users')
+                        ->where('responsible_id', $user->id)
+                        ->whereIn('user_type', ['Admin', 'Commercial']);
+                })
+                ->get();
+        }
+
+        if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
+            $appointments = Appointment::with('creator', 'updater', 'potential_case.client')
+            ->where('created_by', $user->id)
+            ->get()
+            ->map(function ($appointment) {
+                return [
+                    'id' => $appointment->id,
+                    'title' => $appointment->potential_case->case_number,
+                    'client' => $appointment->client->client_first_name . ' ' . $appointment->client->client_last_name,
+                    'start' => $appointment->date_appointment->toIso8601String(), 
+                    'place' => $appointment->place,
+                    'status' => $appointment->statuts,
+                ];
+            });
+            $potential_cases = PotencialCase::with('client')
+                ->where('created_by', $user->id)
+                ->get();
+        }
+        // $appointments = Appointment::with('creator', 'updater', 'potential_case.client')
+        //     ->get()
+        //     ->map(function ($appointment) {
+        //         return [
+        //             'id' => $appointment->id,
+        //             'title' => $appointment->potential_case->case_number,
+        //             'client' => $appointment->client->client_first_name . ' ' . $appointment->client->client_last_name,
+        //             'start' => $appointment->date_appointment->toIso8601String(), 
+        //             'place' => $appointment->place,
+        //             'status' => $appointment->statuts,
+        //         ];
+        //     });
+
+        return [
+            'appointments' => $appointments,
+            'potential_cases' => $potential_cases,
+        ];
     }
 }
