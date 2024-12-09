@@ -28,8 +28,14 @@ class Service extends Model
     public function branches(){
         return $this->hasMany(Branche::class);
     }
+    // public function potencialCases()
+    // {
+    //     return $this->belongsToMany(PotencialCase::class)->withPivot('branch_ids');
+    // }
     public function potencialCases()
     {
-        return $this->belongsToMany(PotencialCase::class)->withPivot('branch_ids');
+        return $this->belongsToMany(PotencialCase::class, 'potencial_case_service')
+        ->withPivot('branch_data')  // Ensure this is included to access 'branch_data'
+        ->withTimestamps(); 
     }
 }

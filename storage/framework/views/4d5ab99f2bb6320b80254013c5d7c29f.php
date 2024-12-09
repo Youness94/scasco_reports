@@ -437,82 +437,133 @@ unset($__errorArgs, $__bag); ?>
 <script src="<?php echo e(URL::asset('build/js/app.js')); ?>"></script>
 
 <script>
-    $(document).ready(function() {
-        $('#services').select2({
-            placeholder: "Select Services",
-            closeOnSelect: false,
-            templateResult: formatState,
-            templateSelection: formatState
-        });
-
-        function formatState(opt) {
-            if (!opt.id) {
-                return opt.text;
-            }
-            var optimage = $(opt.element).data('image');
-            if (!optimage) {
-                return opt.text;
-            } else {
-                var $opt = $(
-                    '<span><input type="checkbox" /> ' + opt.text + '</span>'
-                );
-                return $opt;
-            }
-        };
-
-        // Service selection handler
-        $('#services').on('change', function() {
-            var serviceIds = $(this).val();
-
-            // Only fetch branches for the newly selected services
-            var newServiceIds = serviceIds.filter(id => !$('#branches-container').data('loaded-services')?.includes(id));
-
-            if (newServiceIds.length) {
-                $.ajax({
-                    url: "<?php echo e(route('getBranchesByService')); ?>",
-                    method: 'GET',
-                    data: {
-                        service_ids: newServiceIds
-                    },
-                    success: function(response) {
-                        if (response.length) {
-                            response.forEach(function(service) {
-                                var html = `
-                                    <div class="mb-3" id="service-branches-${service.id}">
-                                        <label class="form-label">Branches for ${service.name}</label>
-                                        <select name="branches[${service.id}][]" class="form-control branches-select" multiple>
-                                `;
-                                service.branches.forEach(function(branch) {
-                                    html += `<option value="${branch.id}">${branch.name}</option>`;
-                                });
-                                html += `
-                                        </select>
-                                    </div>
-                                `;
-                                $('#branches-container').append(html);
-                            });
-
-                            // Initialize select2 for the new branch selects
-                            $('.branches-select').select2({
-                                placeholder: "Select Branches",
-                                closeOnSelect: false,
-                                templateResult: formatState,
-                                templateSelection: formatState
-                            });
-
-                            // Track loaded services to avoid redundant fetching
-                            var loadedServices = $('#branches-container').data('loaded-services') || [];
-                            $('#branches-container').data('loaded-services', [...new Set([...loadedServices, ...newServiceIds])]);
-                        }
-                    },
-                    error: function() {
-                        alert('Error loading branches');
-                    }
-                });
-            }
-        });
+$(document).ready(function() {
+    // Initialize select2 for the services dropdown
+    $('#services').select2({
+        placeholder: "Select Services",
+        closeOnSelect: false,
+        templateResult: formatState,
+        templateSelection: formatState
     });
+
+    function formatState(opt) {
+        if (!opt.id) {
+            return opt.text;
+        }
+        var optimage = $(opt.element).data('image');
+        if (!optimage) {
+            return opt.text;
+        } else {
+            var $opt = $(
+                '<span><input type="checkbox" /> ' + opt.text + '</span>'
+            );
+            return $opt;
+        }
+    }
+
+    // Service selection handler
+    $('#services').on('change', function() {
+        var serviceIds = $(this).val();
+
+        // Only fetch branches for the newly selected services
+        var newServiceIds = serviceIds.filter(id => !$('#branches-container').data('loaded-services')?.includes(id));
+
+        if (newServiceIds.length) {
+            $.ajax({
+                url: "<?php echo e(route('getBranchesByService')); ?>",
+                method: 'GET',
+                data: {
+                    service_ids: newServiceIds
+                },
+                success: function(response) {
+                    if (response.length) {
+                        response.forEach(function(service) {
+                            // Build the HTML for branches and amounts for each service
+                            var html = `
+                                <div class="mb-3" id="service-branches-${service.id}">
+                                    <label class="form-label">Branches for ${service.name}</label>
+                                    <select name="branches[${service.id}][]" class="form-control branches-select" multiple>
+                            `;
+                            service.branches.forEach(function(branch) {
+                                html += `
+                                    <option value="${branch.id}" data-branch="${branch.name}">${branch.name}</option>
+                                `;
+                            });
+                            html += `
+                                    </select>
+                                    <div class="mt-2" id="amount-container-${service.id}">
+                                        <!-- Amounts for branches will be dynamically added here -->
+                                    </div>
+                                </div>
+                            `;
+                            $('#branches-container').append(html);
+                        });
+
+                        // Reinitialize select2 for the new branch select elements
+                        $('.branches-select').select2({
+                            placeholder: "Select Branches",
+                            closeOnSelect: false,
+                            templateResult: formatState,
+                            templateSelection: formatState
+                        });
+
+                        // Track loaded services to avoid redundant fetching
+                        var loadedServices = $('#branches-container').data('loaded-services') || [];
+                        $('#branches-container').data('loaded-services', [...new Set([...loadedServices, ...newServiceIds])]);
+                    }
+                },
+                error: function() {
+                    alert('Error loading branches');
+                }
+            });
+        }
+    });
+
+    $('#branches-container').on('change', '.branches-select', function() {
+    var serviceId = $(this).attr('name').match(/\d+/)[0]; // Extract the service ID
+    var selectedBranches = $(this).val();
+    var amountContainer = $('#amount-container-' + serviceId);  // Get the amount container for this service
+
+    // Clear previous amount input fields
+    amountContainer.empty();
+
+    // Log the selected branches for debugging
+    console.log("Selected branches for serviceId " + serviceId + ": ", selectedBranches);
+
+    // If no branches are selected, we can exit early
+    if (!selectedBranches || selectedBranches.length === 0) {
+        return;
+    }
+
+    // For each selected branch, create a corresponding amount input field
+    selectedBranches.forEach(function(branchId) {
+        // Log the branchId to confirm it's being iterated correctly
+        console.log("Processing branchId: ", branchId);
+
+        // Correctly select the option by value from the entire branches-container
+        var branchOption = $('#branches-container select option[value="' + branchId + '"]');
+        console.log("Branch option element: ", branchOption);
+
+        // Get the branch name from the data-branch attribute
+        var branchName = branchOption.data('branch');
+        console.log("Branch name: ", branchName);  // This should log the correct branch name
+
+        // Now use the correct branchName in the label
+        var amountHtml = `
+            <div class="branch-amount">
+                <label for="amount-${serviceId}-${branchId}">${branchName} chiffre d'affaire</label>
+                <input type="number" name="amounts[${serviceId}][]" class="form-control branch-amount-input" placeholder="Enter amount for ${branchName}" required step="0.01" min="0" />
+            </div>
+        `;
+        amountContainer.append(amountHtml);
+    });
+
+});
+
+});
+
 </script>
+
 <script>
     $(document).ready(function() {
         // Handle Add Client Modal submission

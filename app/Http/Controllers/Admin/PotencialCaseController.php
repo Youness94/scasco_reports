@@ -47,6 +47,9 @@ class PotencialCaseController extends Controller
             'services.*' => 'exists:services,id',
             'branches' => 'nullable|array',
             'branches.*' => 'exists:branches,id',
+            'amounts' => 'nullable|array', 
+            'amounts.*' => 'nullable|array', 
+            'amounts.*.*' => 'nullable|numeric|between:.01,999999999999.99',
         ], [
             'client_id.required' => 'Le client est obligatoire.',
             'client_id.exists' => 'Le client spécifié n\'existe pas.',
@@ -55,6 +58,9 @@ class PotencialCaseController extends Controller
             'services.*.exists' => 'Un ou plusieurs services spécifiés n\'existent pas.',
             'branches.array' => 'Les branches doivent être fournies sous forme de tableau.',
             'branches.*.exists' => 'Une ou plusieurs branches spécifiées n\'existent pas.',
+            'amounts.array' => 'Les montants doivent être fournis sous forme de tableau.',
+            'amounts.*.array' => 'Les montants doivent être associés à chaque service.',
+            'amounts.*.*.numeric' => 'Les montants doivent être des nombres valides.',
         ]);
 
         $result = $this->potentialCaseService->storePotentialCase($request);

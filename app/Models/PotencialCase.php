@@ -50,9 +50,15 @@ class PotencialCase extends Model
         return $this->belongsTo(Client::class, 'client_id');
     }
 
+    // public function services()
+    // {
+    //     return $this->belongsToMany(Service::class)->withPivot('branch_ids');
+    // }
     public function services()
     {
-        return $this->belongsToMany(Service::class)->withPivot('branch_ids');
+        return $this->belongsToMany(Service::class, 'potencial_case_service')
+        ->withPivot('branch_data')  // Ensure this is included to access 'branch_data'
+        ->withTimestamps();
     }
     public function getBranchNamesAttribute()
     {

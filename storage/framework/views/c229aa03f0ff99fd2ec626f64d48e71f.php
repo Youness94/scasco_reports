@@ -83,9 +83,10 @@
                                 <tbody>
                                     <?php $__currentLoopData = $all_potential_cases; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $all_potential_case): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr>
-                                        <td><?php echo e($all_potential_case->case_number ?? N/V); ?></td>
-                                        <td><?php echo e($all_potential_case->client->client_first_name ?? N/V); ?></td>
-                                        <td><?php echo e($all_potential_case->case_status ?? N/V); ?></td>
+                                        <td><?php echo e($all_potential_case->case_number ?? 'N/V'); ?></td>
+                                        <td><?php echo e($all_potential_case->client->client_first_name ?? 'N/V'); ?></td>
+                                        <td><?php echo e($all_potential_case->case_status ?? 'N/V'); ?></td>
+
                                         <!-- Display Services -->
                                         <td>
                                             <?php $__currentLoopData = $all_potential_case->services; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -93,22 +94,36 @@
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </td>
 
-                                        <!-- Display Branches -->
+                                        <!-- Display Branches and Amounts -->
                                         <td>
-                                            <?php $__currentLoopData = $all_potential_case->services; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <?php
-                                            $branchIds = json_decode($service->pivot->branch_ids ?? '[]', true);
-                                            ?>
-                                            <?php $__currentLoopData = $branchIds; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branchId): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <?php
-                                            $branch = \App\Models\Branche::find($branchId);
-                                            ?>
-                                            <?php echo e($branch->name ?? 'N/V'); ?>
+                                            // Initialize an array to store branch data (ID -> Amount mapping)
+                                            $branchData = [];
 
-                                            <?php if(!$loop->last): ?>, <?php endif; ?>
-                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                            // Loop through each service to gather branch data
+                                            foreach ($all_potential_case->services as $service) {
+                                            $branchDataArray = json_decode($service->pivot->branch_data, true) ?? [];
+
+                                            // Loop through the branch data and map each branch to its amount
+                                            foreach ($branchDataArray as $branch) {
+                                            $branchData[$branch['branch_id']] = $branch['amount'];
+                                            }
+                                            }
+
+                                            // Get distinct branch IDs and retrieve branch names
+                                            $branchIds = array_keys($branchData);
+                                            $branches = \App\Models\Branche::whereIn('id', $branchIds)->get();
+                                            ?>
+
+                                            <?php $__currentLoopData = $branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php
+                                            $amount = $branchData[$branch->id] ?? 'N/V';
+                                            ?>
+                                            <div><?php echo e($branch->name ?? 'N/V'); ?> - <?php echo e($amount); ?></div>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </td>
+
+                                        <!-- Actions -->
                                         <td>
                                             <div class="dropdown d-inline-block">
                                                 <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -125,6 +140,7 @@
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </tbody>
                             </table>
+
                         </div>
                     </div>
                 </div>
@@ -156,6 +172,4 @@
     <script src="<?php echo e(URL::asset('build/js/app.js')); ?>"></script>
 
     <?php $__env->stopSection(); ?>
-
-
 <?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\YOUNESS-DEVL\Desktop\scasco_reports\resources\views/potential_cases/potential_cases_list.blade.php ENDPATH**/ ?>

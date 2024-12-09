@@ -80,9 +80,10 @@
                                 <tbody>
                                     @foreach ($all_potential_cases as $all_potential_case)
                                     <tr>
-                                        <td>{{ $all_potential_case->case_number ?? N/V }}</td>
-                                        <td>{{ $all_potential_case->client->client_first_name ?? N/V}}</td>
-                                        <td>{{ $all_potential_case->case_status ?? N/V }}</td>
+                                        <td>{{ $all_potential_case->case_number ?? 'N/V' }}</td>
+                                        <td>{{ $all_potential_case->client->client_first_name ?? 'N/V' }}</td>
+                                        <td>{{ $all_potential_case->case_status ?? 'N/V' }}</td>
+
                                         <!-- Display Services -->
                                         <td>
                                             @foreach($all_potential_case->services as $service)
@@ -90,21 +91,36 @@
                                             @endforeach
                                         </td>
 
-                                        <!-- Display Branches -->
+                                        <!-- Display Branches and Amounts -->
                                         <td>
-                                            @foreach ($all_potential_case->services as $service)
                                             @php
-                                            $branchIds = json_decode($service->pivot->branch_ids ?? '[]', true);
+                                            // Initialize an array to store branch data (ID -> Amount mapping)
+                                            $branchData = [];
+
+                                            // Loop through each service to gather branch data
+                                            foreach ($all_potential_case->services as $service) {
+                                            $branchDataArray = json_decode($service->pivot->branch_data, true) ?? [];
+
+                                            // Loop through the branch data and map each branch to its amount
+                                            foreach ($branchDataArray as $branch) {
+                                            $branchData[$branch['branch_id']] = $branch['amount'];
+                                            }
+                                            }
+
+                                            // Get distinct branch IDs and retrieve branch names
+                                            $branchIds = array_keys($branchData);
+                                            $branches = \App\Models\Branche::whereIn('id', $branchIds)->get();
                                             @endphp
-                                            @foreach ($branchIds as $branchId)
+
+                                            @foreach ($branches as $branch)
                                             @php
-                                            $branch = \App\Models\Branche::find($branchId);
+                                            $amount = $branchData[$branch->id] ?? 'N/V';
                                             @endphp
-                                            {{ $branch->name ?? 'N/V' }}
-                                            @if (!$loop->last), @endif
-                                            @endforeach
+                                            <div>{{ $branch->name ?? 'N/V' }} - {{ $amount }}</div>
                                             @endforeach
                                         </td>
+
+                                        <!-- Actions -->
                                         <td>
                                             <div class="dropdown d-inline-block">
                                                 <button class="btn btn-soft-secondary btn-sm dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -121,6 +137,7 @@
                                     @endforeach
                                 </tbody>
                             </table>
+
                         </div>
                     </div>
                 </div>
@@ -152,4 +169,3 @@
     <script src="{{ URL::asset('build/js/app.js') }}"></script>
 
     @endsection
-

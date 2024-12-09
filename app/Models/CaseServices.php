@@ -13,6 +13,8 @@ class CaseServices extends Model
         'potencial_case_id',
         'service_id',
         'branch_ids',
+        // 'branch_amounts',
+        'branch_data',
       
     ];
     protected $casts = [

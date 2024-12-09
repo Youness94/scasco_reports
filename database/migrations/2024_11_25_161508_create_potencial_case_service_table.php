@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('potencial_case_id');
             $table->unsignedBigInteger('service_id');
-            $table->json('branch_ids')->nullable();
+            $table->json('branch_data')->nullable();
+            // $table->json('branch_ids')->nullable();
+            // $table->json('branch_amounts')->nullable();
             $table->timestamps();
 
             $table->foreign('potencial_case_id')->references('id')->on('potencial_cases')->onDelete('cascade');
