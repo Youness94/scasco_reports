@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('case_number');
             $table->enum('case_status', ['pending', 'completed', 'processing', 'cancelled'])->default('pending');
-      
+            $table->string('case_name');
             $table->unsignedBigInteger('client_id');
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('updated_by')->nullable();

@@ -41,11 +41,12 @@ class PotencialCaseController extends Controller
     public function store_potential_case(Request $request)
     {
         $request->validate([
+            'case_name' => 'required',
             'client_id' => 'required|exists:clients,id',
-            'branches' => 'nullable|array',
-            'branches.*' => 'exists:branches,id', 
-            'branch_ca' => 'nullable|array', 
-            'branch_ca.*' => 'numeric|between:.01,999999999999.99', 
+            'branches' => 'required|array',
+            'branches.*' => 'exists:branches,id',
+            'branch_ca' => 'nullable|array',
+            'branch_ca.*' => 'numeric|between:.01,999999999999.99',
         ], [
             'client_id.required' => 'Le client est obligatoire.',
             'client_id.exists' => 'Le client spécifié n\'existe pas.',
@@ -54,9 +55,9 @@ class PotencialCaseController extends Controller
             'branch_ca.*.numeric' => 'Le CA doit être un nombre valide.',
             'branch_ca.*.between' => 'Le CA doit être compris entre 0.01 et 999999999999.99.',
         ]);
-    
+
         $result = $this->potentialCaseService->storePotentialCase($request);
-    
+
         if ($result['status'] == 'success') {
             return redirect('/affaires')->with('success', $result['message']);
         } else {
@@ -84,11 +85,12 @@ class PotencialCaseController extends Controller
     {
         Log::info('Entering update_potential_case method with ID: ' . $id);
         $validated =  $request->validate([
+            'case_name' => 'sometimes',
             'client_id' => 'sometimes|exists:clients,id',
             'branches' => 'nullable|array',
-            'branches.*' => 'exists:branches,id', 
-            'branch_ca' => 'nullable|array', 
-            'branch_ca.*' => 'numeric|between:.01,999999999999.99', 
+            'branches.*' => 'exists:branches,id',
+            'branch_ca' => 'nullable|array',
+            'branch_ca.*' => 'numeric|between:.01,999999999999.99',
         ], [
             'client_id.sometimes' => 'Le client est obligatoire.',
             'client_id.exists' => 'Le client spécifié n\'existe pas.',
@@ -97,12 +99,12 @@ class PotencialCaseController extends Controller
             'branch_ca.*.numeric' => 'Le CA doit être un nombre valide.',
             'branch_ca.*.between' => 'Le CA doit être compris entre 0.01 et 999999999999.99.',
         ]);
-       
-    
+
+
         Log::info('Request validated successfully:', $validated);
-    
+
         $result = $this->potentialCaseService->updatePotentialCase($request, $id);
-    
+
         if ($result['status'] == 'success') {
             Log::info('Potential case updated successfully');
             return redirect('/affaires')->with('success', $result['message']);
@@ -146,14 +148,14 @@ class PotencialCaseController extends Controller
             'service_id' => 'required|integer|exists:services,id',
             'case_id' => 'required|integer|exists:potencial_cases,id',
         ]);
-    
+
         $serviceId = $request->service_id;
         $caseId = $request->case_id;
-    
+
         try {
             // Call the service method, passing both serviceId and caseId
             $result = $this->potentialCaseService->editBranchesByService($serviceId, $caseId);
-    
+
             // Return the service name and branches with amounts
             return response()->json([
                 'service_name' => $result['service_name'],
@@ -165,7 +167,7 @@ class PotencialCaseController extends Controller
                 'service_id' => $serviceId,
                 'case_id' => $caseId
             ]);
-    
+
             // Return a generic error response
             return response()->json(['error' => 'Something went wrong'], 500);
         }
@@ -200,7 +202,7 @@ class PotencialCaseController extends Controller
         }
     }
 
-    
+
 
     public function delete_potential_case($id)
     {
@@ -234,7 +236,7 @@ class PotencialCaseController extends Controller
             'comment' => 'required|string',
         ], [
             'comment.required' => 'Le commentaire est obligatoire.',
-            'comment.string' => 'Le commentaire doit être une chaîne de caractères valide.' 
+            'comment.string' => 'Le commentaire doit être une chaîne de caractères valide.'
         ]);
 
         try {
@@ -259,7 +261,7 @@ class PotencialCaseController extends Controller
             'case_status.required' => 'Le statut est obligatoire.',
             'case_status.in' => 'Le statut sélectionné n\'est pas valide.',
         ]);
-    
+
 
         try {
             $response = $this->potentialCaseService->updateStatusPotentialCase($validated, $id);
@@ -272,7 +274,7 @@ class PotencialCaseController extends Controller
         }
     }
 
-   
+
 
     // public function createCommentPotentialCase(Request $request, $id)
     // {

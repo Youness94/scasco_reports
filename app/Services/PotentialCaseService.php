@@ -77,6 +77,7 @@ class PotentialCaseService
 
             // Create a new PotentialCase
             $potentialCase = PotencialCase::create([
+                'case_name' => $request->input('case_name'),
                 'case_number' => $generated_number,
                 'case_status' => 'pending',
                 'client_id' => $request->input('client_id'),
@@ -168,7 +169,7 @@ class PotentialCaseService
             'cities' => $cities,
         ];
     }
-    
+
     public function updatePotentialCase($request, $id)
     {
         DB::beginTransaction();
@@ -180,40 +181,27 @@ class PotentialCaseService
             // Update the potential case details
             $potentialCase->update([
                 'client_id' => $request->input('client_id'),
+                'case_name' => $request->input('case_name'),
                 'updated_by' => $user->id,
             ]);
 
-            // Detach old services and their associated branches and amounts
-            $potentialCase->services()->detach();
+            $potentialCase->branches()->detach();
 
-            // Attach new services with their corresponding branches and amounts
-            foreach ($request->services as $serviceId) {
-                $service = Service::findOrFail($serviceId);
+            if ($request->has('branches') && $request->has('branch_ca')) {
+                $branches = $request->input('branches');
+                $branchCaValues = $request->input('branch_ca');
 
-                // Get the associated branch IDs and amounts for this service
-                $branchIds = $request->branches[$serviceId] ?? [];
-                $amounts = $request->amounts[$serviceId] ?? [];
 
-                // Ensure both arrays (branchIds and amounts) are the same length
-                if (count($branchIds) !== count($amounts)) {
-                    throw new \Exception('Mismatch between branch IDs and amounts');
+                foreach ($branches as $branchId) {
+                    $branchCaValue = $branchCaValues[$branchId] ?? null;
+
+                    if ($branchCaValue) {
+                        $potentialCase->branches()->attach($branchId, [
+                            'branch_ca' => $branchCaValue, 
+                        ]);
+                    }
                 }
-
-                // Prepare the branch_data array to store both branch_id and amount
-                $branchData = [];
-                foreach ($branchIds as $index => $branchId) {
-                    $branchData[] = [
-                        'branch_id' => $branchId,
-                        'amount' => $amounts[$index] ?? 0,  // Default to 0 if not provided
-                    ];
-                }
-
-                // Attach the service with its branch data (branch_id and amount)
-                $potentialCase->services()->attach($serviceId, [
-                    'branch_data' => json_encode($branchData),  // Store the array of branch_id and amount in the branch_data field
-                ]);
             }
-
             // Create a history record for the update
             $this->potencialCaseHisotryService->createHistoryRecord('updated', 'L\'affaire a été mise à jour', $potentialCase, null, null, $user->id);
 
