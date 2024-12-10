@@ -63,17 +63,19 @@
 
                                     </div>
 
-                                    <!-- Service -->
                                     <div class="col-md-4 mb-3">
-                                        <label class="form-label" for="services">Select Services</label>
-                                        <select id="services" name="services[]" class="form-control" multiple>
-                                            @foreach($services as $service)
-                                            <option value="{{ $service->id }}">{{ $service->name }}</option>
+                                        <label class="form-label" for="branches">Branches</label>
+                                        <select id="branches" name="branches[]" class="form-control" multiple>
+                                            @foreach($branches as $branch)
+                                            <option value="{{ $branch->id }}" {{ in_array($branch->id, old('branches', [])) ? 'selected' : '' }}>{{ $branch->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    <!-- Branche -->
-                                    <div id="branches-container" class="col-md-4 mb-3"></div>
+
+                                    <!-- Dynamic Branch CA Inputs -->
+                                    <div id="branch-ca-inputs" class="col-md-4 mb-3">
+                                        <!-- Dynamically generated branch_ca inputs will go here -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -281,128 +283,92 @@
 
 <script>
     $(document).ready(function() {
-        // Initialize select2 for the services dropdown
-        $('#services').select2({
-            placeholder: "Select Services",
+        // Initialize select2 for the branches dropdown
+        $('#branches').select2({
+            placeholder: "Select branches",
             closeOnSelect: false,
             templateResult: formatState,
             templateSelection: formatState
         });
 
+        // Format the display of each option in select2
         function formatState(opt) {
             if (!opt.id) {
                 return opt.text;
             }
             var optimage = $(opt.element).data('image');
+            var branchName = opt.text;
             if (!optimage) {
-                return opt.text;
+                return branchName;
             } else {
-                var $opt = $(
-                    '<span><input type="checkbox" /> ' + opt.text + '</span>'
-                );
+                var $opt = $('<span>' + branchName + '</span>');
                 return $opt;
             }
         }
 
-        // Service selection handler
-        $('#services').on('change', function() {
-            var serviceIds = $(this).val();
+        // Store previously entered branch CA values
+        var previousBranchCA = @json(old('branch_ca', []));
 
-            // Only fetch branches for the newly selected services
-            var newServiceIds = serviceIds.filter(id => !$('#branches-container').data('loaded-services')?.includes(id));
+        // Function to save the current branch CA values for previously selected branches
+        function saveBranchCAValues() {
+            var branchInputs = $('#branch-ca-inputs .form-control');
+            branchInputs.each(function() {
+                var branchId = $(this).attr('id').replace('branch_ca_', ''); // Extract branch ID from input ID
+                var branchCAValue = $(this).val(); // Get the current branch CA value
+                if (branchId) {
+                    previousBranchCA[branchId] = branchCAValue; // Store the value in the object
+                }
+            });
+        }
 
-            if (newServiceIds.length) {
-                $.ajax({
-                    url: "{{ route('getBranchesByService') }}",
-                    method: 'GET',
-                    data: {
-                        service_ids: newServiceIds
-                    },
-                    success: function(response) {
-                        if (response.length) {
-                            response.forEach(function(service) {
-                                // Build the HTML for branches and amounts for each service
-                                var html = `
-                                <div class="mb-3" id="service-branches-${service.id}">
-                                    <label class="form-label">Branches for ${service.name}</label>
-                                    <select name="branches[${service.id}][]" class="form-control branches-select" multiple>
-                            `;
-                                service.branches.forEach(function(branch) {
-                                    html += `
-                                    <option value="${branch.id}" data-branch="${branch.name}">${branch.name}</option>
-                                `;
-                                });
-                                html += `
-                                    </select>
-                                    <div class="mt-2" id="amount-container-${service.id}">
-                                        <!-- Amounts for branches will be dynamically added here -->
-                                    </div>
-                                </div>
-                            `;
-                                $('#branches-container').append(html);
-                            });
+        // Event listener for changes in the branches dropdown
+        $('#branches').on('change', function() {
+            var selectedBranches = $(this).val(); // Get the selected branch IDs
+            var branchInputs = $('#branch-ca-inputs'); // Container for branch CA input fields
 
-                            // Reinitialize select2 for the new branch select elements
-                            $('.branches-select').select2({
-                                placeholder: "Select Branches",
-                                closeOnSelect: false,
-                                templateResult: formatState,
-                                templateSelection: formatState
-                            });
-
-                            // Track loaded services to avoid redundant fetching
-                            var loadedServices = $('#branches-container').data('loaded-services') || [];
-                            $('#branches-container').data('loaded-services', [...new Set([...loadedServices, ...newServiceIds])]);
-                        }
-                    },
-                    error: function() {
-                        alert('Error loading branches');
-                    }
-                });
-            }
-        });
-
-        $('#branches-container').on('change', '.branches-select', function() {
-            var serviceId = $(this).attr('name').match(/\d+/)[0]; // Extract the service ID
-            var selectedBranches = $(this).val();
-            var amountContainer = $('#amount-container-' + serviceId); // Get the amount container for this service
-
-            // Clear previous amount input fields
-            amountContainer.empty();
-
-            // Log the selected branches for debugging
-            console.log("Selected branches for serviceId " + serviceId + ": ", selectedBranches);
-
-            // If no branches are selected, we can exit early
-            if (!selectedBranches || selectedBranches.length === 0) {
-                return;
-            }
-
-            // For each selected branch, create a corresponding amount input field
+            // Iterate over selected branches and generate input fields
             selectedBranches.forEach(function(branchId) {
-                // Log the branchId to confirm it's being iterated correctly
-                console.log("Processing branchId: ", branchId);
+                // If the input for this branch doesn't already exist, create it
+                if ($('#branch_ca_' + branchId).length === 0) {
+                    var branchName = $('#branches option[value="' + branchId + '"]').text(); // Get branch name
+                    var branchCAValue = previousBranchCA[branchId] || ''; // Retrieve previous CA value, if exists
 
-                // Correctly select the option by value from the entire branches-container
-                var branchOption = $('#branches-container select option[value="' + branchId + '"]');
-                console.log("Branch option element: ", branchOption);
-
-                // Get the branch name from the data-branch attribute
-                var branchName = branchOption.data('branch');
-                console.log("Branch name: ", branchName); // This should log the correct branch name
-
-                // Now use the correct branchName in the label
-                var amountHtml = `
-            <div class="branch-amount">
-                <label for="amount-${serviceId}-${branchId}">${branchName} chiffre d'affaire</label>
-                <input type="number" name="amounts[${serviceId}][]" class="form-control branch-amount-input" placeholder="Enter amount for ${branchName}" required step="0.01" min="0" />
-            </div>
-        `;
-                amountContainer.append(amountHtml);
+                    var inputHtml = `
+                    <div class="mb-3" id="branch_input_${branchId}">
+                        <label for="branch_ca_${branchId}" class="form-label">${branchName} Branch CA</label>
+                        <input type="number" class="form-control" name="branch_ca[${branchId}]" id="branch_ca_${branchId}" placeholder="Enter CA for ${branchName}" value="${branchCAValue}" required step="0.01" min="0">
+                    </div>
+                    `;
+                    branchInputs.append(inputHtml); // Append the input for this branch
+                }
             });
 
+            // Save the current branch CA values for future reference
+            saveBranchCAValues();
         });
 
+        // Initial population of inputs for already selected branches (if any)
+        var initialBranches = $('#branches').val();
+        if (initialBranches) {
+            var initialBranchInputs = $('#branch-ca-inputs');
+            initialBranchInputs.empty(); // Empty the container before re-appending
+            initialBranches.forEach(function(branchId) {
+                if ($('#branch_ca_' + branchId).length === 0) { // Avoid duplicating the inputs
+                    var branchName = $('#branches option[value="' + branchId + '"]').text();
+                    var branchCAValue = previousBranchCA[branchId] || ''; // Get previous CA value if available
+                    var inputHtml = `
+                    <div class="mb-3" id="branch_input_${branchId}">
+                        <label for="branch_ca_${branchId}" class="form-label">${branchName} Branch CA</label>
+                        <input type="number" class="form-control" name="branch_ca[${branchId}]" id="branch_ca_${branchId}" placeholder="Enter CA for ${branchName}" value="${branchCAValue}" required step="0.01" min="0">
+                    </div>
+                    `;
+                    initialBranchInputs.append(inputHtml); // Append the input field for this branch
+                }
+            });
+
+            // Save the current branch CA values for initial population
+            saveBranchCAValues();
+        }
     });
 </script>
 
@@ -428,10 +394,9 @@
                         // Close the modal
                         $('#showModal').modal('hide');
 
-                        // Optionally, show success message (using Toastr or alert)
                         toastr.success(response.message);
                     } else {
-                        toastr.error(response.message); // Show error message
+                        toastr.error(response.message);
                     }
                 },
                 error: function(error) {

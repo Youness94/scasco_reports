@@ -38,33 +38,25 @@ class PotencialCaseController extends Controller
         $data = $this->potentialCaseService->getAllClientsAndServices();
         return view('potential_cases.add_potential_case', $data);
     }
-
     public function store_potential_case(Request $request)
     {
         $request->validate([
             'client_id' => 'required|exists:clients,id',
-            'services' => 'required|array',
-            'services.*' => 'exists:services,id',
             'branches' => 'nullable|array',
-            'branches.*' => 'exists:branches,id',
-            'amounts' => 'nullable|array', 
-            'amounts.*' => 'nullable|array', 
-            'amounts.*.*' => 'nullable|numeric|between:.01,999999999999.99',
+            'branches.*' => 'exists:branches,id', 
+            'branch_ca' => 'nullable|array', 
+            'branch_ca.*' => 'numeric|between:.01,999999999999.99', 
         ], [
             'client_id.required' => 'Le client est obligatoire.',
             'client_id.exists' => 'Le client spécifié n\'existe pas.',
-            'services.required' => 'Les services sont obligatoires.',
-            'services.array' => 'Les services doivent être fournis sous forme de tableau.',
-            'services.*.exists' => 'Un ou plusieurs services spécifiés n\'existent pas.',
-            'branches.array' => 'Les branches doivent être fournies sous forme de tableau.',
-            'branches.*.exists' => 'Une ou plusieurs branches spécifiées n\'existent pas.',
-            'amounts.array' => 'Les montants doivent être fournis sous forme de tableau.',
-            'amounts.*.array' => 'Les montants doivent être associés à chaque service.',
-            'amounts.*.*.numeric' => 'Les montants doivent être des nombres valides.',
+            'branches.*.exists' => 'Un ou plusieurs branches spécifiés n\'existent pas.',
+            'branch_ca.array' => 'Les valeurs de branch_ca doivent être sous forme de tableau.',
+            'branch_ca.*.numeric' => 'Le CA doit être un nombre valide.',
+            'branch_ca.*.between' => 'Le CA doit être compris entre 0.01 et 999999999999.99.',
         ]);
-
+    
         $result = $this->potentialCaseService->storePotentialCase($request);
-
+    
         if ($result['status'] == 'success') {
             return redirect('/affaires')->with('success', $result['message']);
         } else {
@@ -82,7 +74,7 @@ class PotencialCaseController extends Controller
 
         return view('potential_cases.edit_potential_case', [
             'potentialCase' => $potentialCase['potentialCase'],
-            'services' => $potentialCase['services'],
+            'branches' => $potentialCase['branches'],
             'clients' => $potentialCase['clients'],
             'cities' => $potentialCase['cities'],
         ]);
@@ -91,31 +83,31 @@ class PotencialCaseController extends Controller
     public function update_potential_case(Request $request, $id)
     {
         Log::info('Entering update_potential_case method with ID: ' . $id);
-
-        $validated = $request->validate([
+        $validated =  $request->validate([
             'client_id' => 'sometimes|exists:clients,id',
-            'services' => 'sometimes|array',
-            'services.*' => 'exists:services,id',
             'branches' => 'nullable|array',
-            'branches.*' => 'exists:branches,id',
+            'branches.*' => 'exists:branches,id', 
+            'branch_ca' => 'nullable|array', 
+            'branch_ca.*' => 'numeric|between:.01,999999999999.99', 
         ], [
             'client_id.sometimes' => 'Le client est obligatoire.',
             'client_id.exists' => 'Le client spécifié n\'existe pas.',
-            'services.sometimes' => 'Les services sont obligatoires.',
-            'services.array' => 'Les services doivent être fournis sous forme de tableau.',
-            'services.*.exists' => 'Un ou plusieurs services spécifiés n\'existent pas.',
-            'branches.array' => 'Les branches doivent être fournies sous forme de tableau.',
-            'branches.*.exists' => 'Une ou plusieurs branches spécifiées n\'existent pas.',
+            'branches.*.exists' => 'Un ou plusieurs branches spécifiés n\'existent pas.',
+            'branch_ca.array' => 'Les valeurs de branch_ca doivent être sous forme de tableau.',
+            'branch_ca.*.numeric' => 'Le CA doit être un nombre valide.',
+            'branch_ca.*.between' => 'Le CA doit être compris entre 0.01 et 999999999999.99.',
         ]);
+       
+    
         Log::info('Request validated successfully:', $validated);
-
+    
         $result = $this->potentialCaseService->updatePotentialCase($request, $id);
-
+    
         if ($result['status'] == 'success') {
             Log::info('Potential case updated successfully');
             return redirect('/affaires')->with('success', $result['message']);
         } else {
-            Log::error('Failed to update potential case: ' . $result['message']);
+            Log::error('Failed to update potential case');
             return redirect()->back()->with('error', $result['message']);
         }
     }
@@ -149,17 +141,32 @@ class PotencialCaseController extends Controller
 
     public function editBranchesByService(Request $request)
     {
+        // Ensure both service_id and case_id are present in the request
+        $request->validate([
+            'service_id' => 'required|integer|exists:services,id',
+            'case_id' => 'required|integer|exists:potencial_cases,id',
+        ]);
+    
         $serviceId = $request->service_id;
-
+        $caseId = $request->case_id;
+    
         try {
-            $result = $this->potentialCaseService->editBranchesByService($serviceId);
-
+            // Call the service method, passing both serviceId and caseId
+            $result = $this->potentialCaseService->editBranchesByService($serviceId, $caseId);
+    
+            // Return the service name and branches with amounts
             return response()->json([
                 'service_name' => $result['service_name'],
                 'branches' => $result['branches']
             ]);
         } catch (\Exception $e) {
-            Log::error('Error in editBranchesByService: ' . $e->getMessage());
+            // Log the error with additional details
+            Log::error('Error in editBranchesByService: ' . $e->getMessage(), [
+                'service_id' => $serviceId,
+                'case_id' => $caseId
+            ]);
+    
+            // Return a generic error response
             return response()->json(['error' => 'Something went wrong'], 500);
         }
     }
@@ -193,6 +200,8 @@ class PotencialCaseController extends Controller
         }
     }
 
+    
+
     public function delete_potential_case($id)
     {
         $result = $this->potentialCaseService->deletePotencialCase($id);
@@ -212,7 +221,7 @@ class PotencialCaseController extends Controller
 
         return view('potential_cases.potential_case_details', [
             'potentialCase' => $potentialCase['potentialCase'],
-            'services' => $potentialCase['services'],
+            'branches' => $potentialCase['branches'],
             'clients' => $potentialCase['clients'],
             'cities' => $potentialCase['cities'],
         ]);

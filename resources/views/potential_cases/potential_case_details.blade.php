@@ -204,7 +204,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="text-muted">
-                    <h6 class="mb-3 fw-semibold text-uppercase">Services et Branches</h6>
+                    <h6 class="mb-3 fw-semibold text-uppercase">Branches</h6>
                     <!-- <p>It will be as simple as occidental in fact, it will be Occidental. To an English person, it will
                         seem like simplified English, as a skeptical Cambridge friend of mine told me what Occidental
                         is. The European languages are members of the same family. Their separate existence is a myth.
@@ -212,28 +212,16 @@
                         their grammar, their pronunciation and their most common words.</p> -->
 
                     <div class="row">
-                        @foreach($potentialCase->services as $service)
-                        <div class="col-12 col-md-4 mb-3">
-                            <h6 class="mb-3 fw-semibold text-uppercase">{{ $service->name }}</h6>
+                        @if($branches->isNotEmpty())
+                        @foreach($potentialCase->branches as $branche)
+                        <div class="col-12 col-md-3 mb-3">
+                            <h6 class="mb-3 fw-semibold text-uppercase">{{ $branche->name }}</h6>
 
-                            <ul class="ps-3 list-unstyled vstack gap-2">
-                                @if($service->branches->isNotEmpty())
-                                @foreach($service->branches as $branch)
-                                <li>
-                                    <div class="form-check">
-                                        <!-- <input class="form-check-input" type="" value="" id="productTask{{ $branch->id }}"> -->
-                                        <label class="form-check-label" for="productTask{{ $branch->id }}">
-                                            {{ $branch->name }}
-                                        </label>
-                                    </div>
-                                </li>
-                                @endforeach
-                                @else
-                                <p>Aucune branche disponible</p>
-                                @endif
-                            </ul>
                         </div>
                         @endforeach
+                        @else
+                        <p>Aucune branche disponible</p>
+                        @endif
                     </div>
 
 

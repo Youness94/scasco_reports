@@ -27,11 +27,11 @@ class PotentialCaseService
         $user = auth()->user();
 
         if ($user->user_type == 'Super Responsable') {
-            return PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->get();
+            return PotencialCase::with(['creator', 'updater', 'client', 'branches'])->get();
         }
 
         if ($user->user_type == 'Responsable') {
-            return PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
+            return PotencialCase::with(['creator', 'updater', 'client', 'branches'])
                 ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
@@ -42,7 +42,7 @@ class PotentialCaseService
         }
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
 
-            return PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
+            return PotencialCase::with(['creator', 'updater', 'client', 'branches'])
                 ->where('created_by', $user->id)
                 ->get();
         }
@@ -52,19 +52,20 @@ class PotentialCaseService
 
     public function getAllClientsAndServices()
     {
-        $services = Service::with('branches')->get();
+        // $services = Service::with('branches')->get();
+        $branches = Branche::all();
         $clients = Client::all();
         $cities = City::all();
-        return compact('clients', 'services', 'cities');
+        return compact('clients', 'branches', 'cities');
     }
 
     public function storePotentialCase($request)
     {
         DB::beginTransaction();
-    
+
         try {
             $user = Auth::user();
-    
+
             // Generate a unique case number
             $lastPotentialCaseNumber = DB::table('potential_case_sequences')->first();
             $newPotentialCaseNumber = $lastPotentialCaseNumber ? $lastPotentialCaseNumber->last_potential_case_number + 1 : 1;
@@ -73,7 +74,7 @@ class PotentialCaseService
                 ['last_potential_case_number' => $newPotentialCaseNumber]
             );
             $generated_number = 'A-' . str_pad($newPotentialCaseNumber, 6, '0', STR_PAD_LEFT);
-    
+
             // Create a new PotentialCase
             $potentialCase = PotencialCase::create([
                 'case_number' => $generated_number,
@@ -81,35 +82,25 @@ class PotentialCaseService
                 'client_id' => $request->input('client_id'),
                 'created_by' => $user->id,
             ]);
-    
-            // Iterate over selected services
-            foreach ($request->services as $serviceId) {
-                $service = Service::findOrFail($serviceId);
-    
-                // Get the associated branch IDs and amounts
-                $branchIds = $request->input('branches')[$serviceId] ?? [];
-                $amounts = $request->input('amounts')[$serviceId] ?? [];  // Fetch the amounts for the branches
-    
-                // Ensure both arrays (branchIds and amounts) are the same length
-                if (count($branchIds) !== count($amounts)) {
-                    throw new \Exception('Mismatch between branch IDs and amounts');
+
+            // Iterate over selected branches and store branch_ca values
+            if ($request->has('branches') && $request->has('branch_ca')) {
+                $branches = $request->input('branches'); // Selected branches
+                $branchCaValues = $request->input('branch_ca'); // branch_ca values
+
+                foreach ($branches as $branchId) {
+                    // Ensure a branch_ca value exists for each selected branch
+                    $branchCaValue = $branchCaValues[$branchId] ?? null;
+
+                    if ($branchCaValue) {
+                        // Store the branch and its associated branch_ca value in the pivot table
+                        $potentialCase->branches()->attach($branchId, [
+                            'branch_ca' => $branchCaValue, // The 'turnover' value
+                        ]);
+                    }
                 }
-    
-                // Prepare the branch_data array to store both branch_id and amount
-                $branchData = [];
-                foreach ($branchIds as $index => $branchId) {
-                    $branchData[] = [
-                        'branch_id' => $branchId,
-                        'amount' => $amounts[$index] ?? 0  // Default to 0 if not provided
-                    ];
-                }
-    
-                // Attach each service with its corresponding branch data (branch_id and amount)
-                $potentialCase->services()->attach($serviceId, [
-                    'branch_data' => json_encode($branchData),  // Store the array of branch_id and amount in the branch_data field
-                ]);
             }
-    
+
             // Create a history record
             $this->potencialCaseHisotryService->createHistoryRecord(
                 'created',
@@ -119,14 +110,14 @@ class PotentialCaseService
                 null,
                 $user->id
             );
-    
+
             DB::commit();
-    
+
             return ['status' => 'success', 'message' => 'L\'affaire a été créé avec succès'];
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Potential case creation failed: ' . $e->getMessage());
-    
+
             return ['status' => 'error', 'message' => $e->getMessage() ?: 'DB Error'];
         }
     }
@@ -141,11 +132,11 @@ class PotentialCaseService
         $potentialCase = null;
 
         if ($user->user_type == 'Super Responsable') {
-            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->findOrFail($id);
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'branches'])->findOrFail($id);
         }
 
         if ($user->user_type == 'Responsable') {
-            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'branches'])
                 ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
@@ -156,7 +147,7 @@ class PotentialCaseService
         }
 
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
-            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'branches'])
                 ->where('created_by', $user->id)
                 ->findOrFail($id);
         }
@@ -167,64 +158,65 @@ class PotentialCaseService
         }
 
 
-        $services = Service::with('branches')->get();
+        $branches = Branche::all();
         $clients = Client::all();
         $cities = City::all();
         return [
             'potentialCase' => $potentialCase,
-            'services' => $services,
+            'branches' => $branches,
             'clients' => $clients,
             'cities' => $cities,
         ];
     }
-
+    
     public function updatePotentialCase($request, $id)
     {
         DB::beginTransaction();
 
         try {
             $user = Auth::user();
-            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->findOrFail($id);
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'branches'])->findOrFail($id);
 
-            // Update the potential case
+            // Update the potential case details
             $potentialCase->update([
                 'client_id' => $request->input('client_id'),
                 'updated_by' => $user->id,
             ]);
 
-            // detach old services and their associated branches
+            // Detach old services and their associated branches and amounts
             $potentialCase->services()->detach();
 
-            // attach new services with their corresponding branches
+            // Attach new services with their corresponding branches and amounts
             foreach ($request->services as $serviceId) {
                 $service = Service::findOrFail($serviceId);
-    
-                // Get the associated branch IDs and amounts from the request
+
+                // Get the associated branch IDs and amounts for this service
                 $branchIds = $request->branches[$serviceId] ?? [];
                 $amounts = $request->amounts[$serviceId] ?? [];
-    
-                // Ensure the number of branch IDs and amounts match
+
+                // Ensure both arrays (branchIds and amounts) are the same length
                 if (count($branchIds) !== count($amounts)) {
                     throw new \Exception('Mismatch between branch IDs and amounts');
                 }
-    
-                // Prepare the branch data with IDs and amounts
+
+                // Prepare the branch_data array to store both branch_id and amount
                 $branchData = [];
                 foreach ($branchIds as $index => $branchId) {
                     $branchData[] = [
                         'branch_id' => $branchId,
-                        'amount' => $amounts[$index] ?? 0,  // Default to 0 if no amount is provided
+                        'amount' => $amounts[$index] ?? 0,  // Default to 0 if not provided
                     ];
                 }
-    
+
                 // Attach the service with its branch data (branch_id and amount)
                 $potentialCase->services()->attach($serviceId, [
-                    'branch_data' => json_encode($branchData),
+                    'branch_data' => json_encode($branchData),  // Store the array of branch_id and amount in the branch_data field
                 ]);
             }
-    
+
+            // Create a history record for the update
             $this->potencialCaseHisotryService->createHistoryRecord('updated', 'L\'affaire a été mise à jour', $potentialCase, null, null, $user->id);
-    
+
             DB::commit();
 
             return ['status' => 'success', 'message' => 'L\'affaire a été mise à jour avec succès'];
@@ -237,28 +229,55 @@ class PotentialCaseService
     }
 
 
-   
 
-    public function editBranchesByService($serviceId)
+
+
+    public function editBranchesByService($serviceId, $caseId)
     {
+        // Fetch the service with branches
         $service = Service::with('branches')->findOrFail($serviceId);
-        return [
+
+        // Fetch the potential case associated with the given caseId and serviceId
+        $potentialCase = PotencialCase::whereHas('services', function ($query) use ($serviceId) {
+            $query->where('service_id', $serviceId);
+        })->first();
+
+        // Retrieve the branch data (amounts) associated with the service in this potential case
+        $branchData = [];
+        if ($potentialCase) {
+            $branchData = json_decode($potentialCase->services->where('id', $serviceId)->first()->pivot->branch_data, true);
+        }
+
+        // Map the branch data along with the branches
+        $branchesWithAmounts = $service->branches->map(function ($branch) use ($branchData) {
+            $amount = null;
+            foreach ($branchData as $data) {
+                if ($data['branch_id'] == $branch->id) {
+                    $amount = $data['amount']; // Retrieve the amount for this branch
+                    break;
+                }
+            }
+            return [
+                'branch' => $branch,
+                'amount' => $amount
+            ];
+        });
+
+        // Return the branches with amounts and the service name
+        return response()->json([
             'service_name' => $service->name,
-            'branches' => $service->branches
-        ];
+            'branches' => $branchesWithAmounts
+        ]);
     }
-    
-    public function updateBranchesForService($serviceId, $branchIds, $amounts)
+
+    public function updateBranchesForService($serviceId, $branchIds)
     {
         $service = Service::findOrFail($serviceId);
-    
-        // Update branches and their associated amounts for the service
-        foreach ($branchIds as $key => $branchId) {
+
+        foreach ($branchIds as $branchId) {
             $branch = Branche::find($branchId);
             if ($branch) {
-                // Update amount and branch association
                 $branch->service_id = $serviceId;
-                $branch->amount = $amounts[$key] ?? 0;
                 $branch->save();
             }
         }
@@ -279,11 +298,11 @@ class PotentialCaseService
         $potentialCase = null;
 
         if ($user->user_type == 'Super Responsable') {
-            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->findOrFail($id);
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'branches'])->findOrFail($id);
         }
 
         if ($user->user_type == 'Responsable') {
-            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'branches'])
                 ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
@@ -294,7 +313,7 @@ class PotentialCaseService
         }
 
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
-            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'branches'])
                 ->where('created_by', $user->id)
                 ->findOrFail($id);
         }
@@ -318,11 +337,11 @@ class PotentialCaseService
         $potentialCase = null;
 
         if ($user->user_type == 'Super Responsable') {
-            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches', 'caseHistories.user', 'appointments.creator', 'reports.creator', 'reports.appointment', 'reports.potential_case',])->findOrFail($id);
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'branches', 'caseHistories.user', 'appointments.creator', 'reports.creator', 'reports.appointment', 'reports.potential_case',])->findOrFail($id);
         }
 
         if ($user->user_type == 'Responsable') {
-            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches', 'caseHistories.user', 'appointments.creator', 'reports.creator', 'reports.appointment', 'reports.potential_case',])
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'branches', 'caseHistories.user', 'appointments.creator', 'reports.creator', 'reports.appointment', 'reports.potential_case',])
                 ->whereIn('created_by', function ($query) use ($user) {
                     $query->select('id')
                         ->from('users')
@@ -333,7 +352,7 @@ class PotentialCaseService
         }
 
         if ($user->user_type == 'Admin' || $user->user_type == 'Commercial') {
-            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches', 'caseHistories.user', 'appointments.creator', 'reports.creator', 'reports.appointment', 'reports.potential_case',])
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'branches', 'caseHistories.user', 'appointments.creator', 'reports.creator', 'reports.appointment', 'reports.potential_case',])
                 ->where('created_by', $user->id)
                 ->findOrFail($id);
         }
@@ -344,12 +363,12 @@ class PotentialCaseService
         }
 
 
-        $services = Service::with('branches')->get();
+        $branches = Branche::all();
         $clients = Client::all();
         $cities = City::all();
         return [
             'potentialCase' => $potentialCase,
-            'services' => $services,
+            'branches' => $branches,
             'clients' => $clients,
             'cities' => $cities,
         ];
@@ -362,7 +381,7 @@ class PotentialCaseService
 
         try {
             $user = Auth::user();
-            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->findOrFail($id);
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'branches'])->findOrFail($id);
 
             PotencialCaseHisotry::create([
                 'comment' => $validated['comment'],
@@ -387,7 +406,7 @@ class PotentialCaseService
 
         try {
             $user = Auth::user();
-            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'services.branches'])->findOrFail($id);
+            $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'branches'])->findOrFail($id);
             $statusTranslations = [
                 'pending' => 'En attente',
                 'completed' => 'Terminé',

@@ -75,8 +75,9 @@
                                         <th>Numéro d'Affaire</th>
                                         <th>Client</th>
                                         <th>Statu</th>
-                                        <th>Services</th>
                                         <th>Branches</th>
+                                        <th>CA</th>
+                                        <th>Chargé d'affaire</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -89,40 +90,18 @@
 
                                         <!-- Display Services -->
                                         <td>
-                                            <?php $__currentLoopData = $all_potential_case->services; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <?php echo e($service->name ?? 'N/V'); ?><?php if(!$loop->last): ?>, <?php endif; ?>
+                                            <?php $__currentLoopData = $all_potential_case->branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branche): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php echo e($branche->name ?? 'N/V'); ?><?php if(!$loop->last): ?>, <?php endif; ?>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </td>
 
-                                        <!-- Display Branches and Amounts -->
+                                        <!-- Display CA for Each Branch -->
                                         <td>
-                                            <?php
-                                            // Initialize an array to store branch data (ID -> Amount mapping)
-                                            $branchData = [];
-
-                                            // Loop through each service to gather branch data
-                                            foreach ($all_potential_case->services as $service) {
-                                            $branchDataArray = json_decode($service->pivot->branch_data, true) ?? [];
-
-                                            // Loop through the branch data and map each branch to its amount
-                                            foreach ($branchDataArray as $branch) {
-                                            $branchData[$branch['branch_id']] = $branch['amount'];
-                                            }
-                                            }
-
-                                            // Get distinct branch IDs and retrieve branch names
-                                            $branchIds = array_keys($branchData);
-                                            $branches = \App\Models\Branche::whereIn('id', $branchIds)->get();
-                                            ?>
-
-                                            <?php $__currentLoopData = $branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <?php
-                                            $amount = $branchData[$branch->id] ?? 'N/V';
-                                            ?>
-                                            <div><?php echo e($branch->name ?? 'N/V'); ?> - <?php echo e($amount); ?></div>
+                                            <?php $__currentLoopData = $all_potential_case->branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branche): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php echo e($branche->pivot->branch_ca ?? 'N/V'); ?><?php if(!$loop->last): ?>, <?php endif; ?>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </td>
-
+                                        <td><?php echo e($all_potential_case->creator->first_name ?? 'N/V'); ?> <?php echo e($all_potential_case->creator->last_name ?? 'N/V'); ?></td>
                                         <!-- Actions -->
                                         <td>
                                             <div class="dropdown d-inline-block">

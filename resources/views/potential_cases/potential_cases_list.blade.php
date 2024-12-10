@@ -72,8 +72,9 @@
                                         <th>Numéro d'Affaire</th>
                                         <th>Client</th>
                                         <th>Statu</th>
-                                        <th>Services</th>
                                         <th>Branches</th>
+                                        <th>CA</th>
+                                        <th>Chargé d'affaire</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -86,40 +87,18 @@
 
                                         <!-- Display Services -->
                                         <td>
-                                            @foreach($all_potential_case->services as $service)
-                                            {{ $service->name ?? 'N/V' }}@if (!$loop->last), @endif
+                                            @foreach($all_potential_case->branches as $branche)
+                                            {{ $branche->name ?? 'N/V' }}@if (!$loop->last), @endif
                                             @endforeach
                                         </td>
 
-                                        <!-- Display Branches and Amounts -->
+                                        <!-- Display CA for Each Branch -->
                                         <td>
-                                            @php
-                                            // Initialize an array to store branch data (ID -> Amount mapping)
-                                            $branchData = [];
-
-                                            // Loop through each service to gather branch data
-                                            foreach ($all_potential_case->services as $service) {
-                                            $branchDataArray = json_decode($service->pivot->branch_data, true) ?? [];
-
-                                            // Loop through the branch data and map each branch to its amount
-                                            foreach ($branchDataArray as $branch) {
-                                            $branchData[$branch['branch_id']] = $branch['amount'];
-                                            }
-                                            }
-
-                                            // Get distinct branch IDs and retrieve branch names
-                                            $branchIds = array_keys($branchData);
-                                            $branches = \App\Models\Branche::whereIn('id', $branchIds)->get();
-                                            @endphp
-
-                                            @foreach ($branches as $branch)
-                                            @php
-                                            $amount = $branchData[$branch->id] ?? 'N/V';
-                                            @endphp
-                                            <div>{{ $branch->name ?? 'N/V' }} - {{ $amount }}</div>
+                                            @foreach($all_potential_case->branches as $branche)
+                                            {{ $branche->pivot->branch_ca ?? 'N/V' }}@if (!$loop->last), @endif
                                             @endforeach
                                         </td>
-
+                                        <td>{{ $all_potential_case->creator->first_name ?? 'N/V' }} {{ $all_potential_case->creator->last_name ?? 'N/V' }}</td>
                                         <!-- Actions -->
                                         <td>
                                             <div class="dropdown d-inline-block">

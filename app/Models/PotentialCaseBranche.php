@@ -5,16 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CaseServices extends Model
+class PotentialCaseBranche extends Model
 {
     use HasFactory;
 
+    protected $table = 'potential_case_branches';
     protected $fillable = [
+        'branch_ca',
         'potencial_case_id',
-        'service_id',
-        'branch_ids',
-        // 'branch_amounts',
-        'branch_data',
+        'branch_id',
       
     ];
     protected $casts = [

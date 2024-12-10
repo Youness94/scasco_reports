@@ -11,18 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('potencial_case_service', function (Blueprint $table) {
+        Schema::create('potential_case_branches', function (Blueprint $table) {
             $table->id();
+            $table->decimal('branch_ca', 8, 2); 
             $table->unsignedBigInteger('potencial_case_id');
-            $table->unsignedBigInteger('service_id');
-            $table->json('branch_data')->nullable();
-            // $table->json('branch_ids')->nullable();
-            // $table->json('branch_amounts')->nullable();
+            $table->unsignedBigInteger('branche_id');
             $table->timestamps();
 
             $table->foreign('potencial_case_id')->references('id')->on('potencial_cases')->onDelete('cascade');
-            $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
-
+            $table->foreign('branche_id')->references('id')->on('branches')->onDelete('cascade');
         });
     }
 
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('potencial_case_service');
+        Schema::dropIfExists('potential_case_branches');
     }
 };

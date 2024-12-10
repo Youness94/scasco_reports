@@ -75,10 +75,10 @@ unset($__errorArgs, $__bag); ?>
                                                             </div>
                                                       </div>
 
-                                                      <!-- Select Services -->
+                                                      <!-- Select branches -->
                                                       <div class="col-md-4 mb-3">
-                                                            <label class="form-label" for="services">Sélectionner les Services</label>
-                                                            <select id="services" name="services[]" class="form-control <?php $__errorArgs = ['services'];
+                                                            <label class="form-label" for="branches">Sélectionner les branches</label>
+                                                            <select id="branches" name="branches[]" class="form-control <?php $__errorArgs = ['branches'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -86,15 +86,15 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>" multiple>
-                                                                  <?php $__currentLoopData = $services; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                  <option value="<?php echo e($service->id); ?>"
-                                                                        <?php echo e(in_array($service->id, old('services', $potentialCase->services->pluck('id')->toArray())) ? 'selected' : ''); ?>>
-                                                                        <?php echo e($service->name); ?>
+                                                                  <?php $__currentLoopData = $branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branche): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                  <option value="<?php echo e($branche->id); ?>"
+                                                                        <?php echo e(in_array($branche->id, old('branches', $potentialCase->branches->pluck('id')->toArray())) ? 'selected' : ''); ?>>
+                                                                        <?php echo e($branche->name); ?>
 
                                                                   </option>
                                                                   <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                             </select>
-                                                            <?php $__errorArgs = ['services'];
+                                                            <?php $__errorArgs = ['branches'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -108,39 +108,11 @@ endif;
 unset($__errorArgs, $__bag); ?>
                                                       </div>
 
-                                                      <div id="branches-container" class="col-md-4 mb-3">
-                                                            <?php $__currentLoopData = $services; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $service): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                            <?php if($potentialCase->services->contains('id', $service->id)): ?>
-                                                            <div class="service-branches" data-service-id="<?php echo e($service->id); ?>">
-                                                                  <label class="form-label">Branches pour <?php echo e($service->name); ?></label>
-                                                                  <select name="branches[<?php echo e($service->id); ?>][]" class="form-control branches-select" multiple>
-                                                                        <?php $__currentLoopData = $service->branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                        <option value="<?php echo e($branch->id); ?>"
-                                                                              <?php if(in_array($branch->id, json_decode(optional($potentialCase->services->where('id', $service->id)->first())->pivot->branch_ids, true) ?? [])): ?>
-                                                                              selected
-                                                                              <?php endif; ?>>
-                                                                              <?php echo e($branch->name); ?>
+                                                      <!-- Container for dynamically added branch_ca input fields -->
+                                                      <div id="branch-ca-inputs" class="col-md-4 mb-3"></div>
 
-                                                                        </option>
-                                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                                                  </select>
 
-                                                                  <!-- Amount Input for Each Branch -->
-                                                                  <div class="amounts-container mt-3">
-                                                                        <?php $__currentLoopData = $service->branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                        <div class="form-group branch-amount">
-                                                                              <label for="amount_<?php echo e($branch->id); ?>">Montant pour <?php echo e($branch->name); ?></label>
-                                                                              <input type="number" name="amounts[<?php echo e($service->id); ?>][<?php echo e($branch->id); ?>]"
-                                                                                    class="form-control"
-                                                                                    value="<?php echo e(old('amounts.' . $service->id . '.' . $branch->id, 
-                        json_decode(optional($potentialCase->services->where('id', $service->id)->first())->pivot->branch_data, true)[$branch->id] ?? '')); ?>">
-                                                                        </div>
-                                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                                                  </div>
-                                                            </div>
-                                                            <?php endif; ?>
-                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                                      </div>
+
 
                                                 </div>
                                           </div>
@@ -488,101 +460,72 @@ unset($__errorArgs, $__bag); ?>
 <script src="<?php echo e(URL::asset('build/js/pages/profile-setting.init.js')); ?>"></script>
 <script src="<?php echo e(URL::asset('build/js/app.js')); ?>"></script>
 <script>
-      $(document).ready(function() {
-            var branchesContainer = $('#branches-container');
+    $(document).ready(function() {
 
-            // Handle service selection changes
-            $('#services').on('change', function() {
-                  var selectedServiceIds = $(this).val();
+        $('#branches').select2({
+            placeholder: "Sélectionner les branches",
+            closeOnSelect: false,
+            templateResult: formatState,
+            templateSelection: formatState
+        });
 
-                  // Remove deselected services' branches
-                  branchesContainer.find('.service-branches').each(function() {
-                        var serviceId = $(this).data('service-id').toString();
-                        if (!selectedServiceIds.includes(serviceId)) {
-                              removeBranchesFromService(serviceId);
-                              $(this).remove();
-                        }
-                  });
 
-                  // Add branches for newly selected services
-                  selectedServiceIds.forEach(function(serviceId) {
-                        if (branchesContainer.find(`.service-branches[data-service-id=${serviceId}]`).length === 0) {
-                              addBranchesForService(serviceId);
-                        }
-                  });
-            });
+        function formatState(opt) {
+            if (!opt.id) {
+                return opt.text;
+            }
+            var optimage = $(opt.element).data('image');
+            var $opt = $('<span></span>');
 
-            // Add branches for a selected service
-            function addBranchesForService(serviceId) {
-                  $.ajax({
-                        url: '/edit-branches-by-service',
-                        method: 'GET',
-                        data: {
-                              service_id: serviceId
-                        },
-                        success: function(response) {
-                              var branches = response.branches;
-                              var serviceBranchesHtml = `
-                    <div class="service-branches" data-service-id="${serviceId}">
-                        <label class="form-label">Branches pour ${response.service_name}</label>
-                        <select name="branches[${serviceId}][]" class="form-control" multiple>
-                            ${branches.map(branch => `<option value="${branch.id}">${branch.name}</option>`).join('')}
-                        </select>
-                        <label class="form-label">Montant(s)</label>
-                        <input type="text" name="amounts[${serviceId}][]" class="form-control" placeholder="Montant pour chaque branche">
+            if (optimage) {
+                $opt.append( opt.text);
+            } else {
+                $opt.append( opt.text);
+            }
+            return $opt;
+        }
+
+        function generateBranchCAInputs() {
+            var selectedBranches = $('#branches').val();
+            var container = $('#branch-ca-inputs');
+            container.empty();
+
+            selectedBranches.forEach(function(branchId) {
+
+                var branchName = getBranchName(branchId);
+                var branchCaValue = getBranchCAValue(branchId); 
+
+                var inputHtml = `
+                   <div class="mb-3">
+                       <label for="branch_ca_${branchId}"> CA for ${branchName}</label>
+                        <input type="number" id="branch_ca_${branchId}" name="branch_ca[${branchId}]" class="form-control" placeholder="Enter CA for ${branchName}" min=".01" step=".01" value="${branchCaValue}">
                     </div>
                 `;
-                              branchesContainer.append(serviceBranchesHtml);
-                        }
-                  });
-            }
-
-            // Remove branches for a deselected service
-            function removeBranchesFromService(serviceId) {
-                  $.ajax({
-                        url: '/remove-branches-from-service',
-                        method: 'POST',
-                        data: {
-                              service_id: serviceId,
-                              _token: '<?php echo e(csrf_token()); ?>'
-                        },
-                        success: function(response) {
-                              if (response.success) {
-                                    console.log(`Branches for service ID ${serviceId} removed successfully.`);
-                              }
-                        }
-                  });
-            }
-
-            // Update branches and amounts for a selected service
-            branchesContainer.on('change', 'select, input[name^="amounts"]', function() {
-                  var serviceId = $(this).closest('.service-branches').data('service-id');
-                  var selectedBranchIds = $(this).closest('.service-branches').find('select').val();
-                  var amounts = [];
-
-                  // Collect amounts entered for each branch
-                  $(this).closest('.service-branches').find('input[name^="amounts"]').each(function() {
-                        amounts.push($(this).val());
-                  });
-
-                  $.ajax({
-                        url: '/update-branches-for-service',
-                        method: 'POST',
-                        data: {
-                              service_id: serviceId,
-                              branch_ids: selectedBranchIds,
-                              amounts: amounts,
-                              _token: '<?php echo e(csrf_token()); ?>'
-                        },
-                        success: function(response) {
-                              if (response.success) {
-                                    console.log(`Branches and amounts for service ID ${serviceId} updated successfully.`);
-                              }
-                        }
-                  });
+                container.append(inputHtml);
             });
-      });
+        }
+
+        function getBranchCAValue(branchId) {
+
+            var branchCAData = <?php echo json_encode($potentialCase->branches->pluck('pivot.branch_ca', 'id'), 512) ?>;
+            return branchCAData[branchId] || ''; 
+        }
+
+        function getBranchName(branchId) {
+
+            var branchNames = <?php echo json_encode($potentialCase->branches->pluck('name', 'id'), 512) ?>;
+            return branchNames[branchId] || 'Unknown Branch'; 
+        }
+
+        $('#branches').on('change', function() {
+            generateBranchCAInputs();
+        });
+
+        generateBranchCAInputs();
+    });
 </script>
+
+
 <script>
       $(document).ready(function() {
             // ==========

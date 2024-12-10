@@ -20,6 +20,13 @@ class Branche extends Model
         'created_at' => 'datetime', 
         'updated_at' => 'datetime', 
     ];
+
+    public function potencialCases()
+    {
+        return $this->belongsToMany(PotencialCase::class, 'potential_case_branches')
+        ->withPivot('branch_ca') 
+        ->withTimestamps(); 
+    }
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
