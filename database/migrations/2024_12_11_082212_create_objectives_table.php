@@ -11,20 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('potencial_cases', function (Blueprint $table) {
+        Schema::create('objectives', function (Blueprint $table) {
             $table->id();
-            $table->string('case_number');
-            $table->enum('case_status', ['pending', 'completed', 'processing', 'cancelled'])->default('pending');
-            $table->string('case_name');
-            $table->decimal('case_capital', 8, 2)->nullable();
-            $table->unsignedBigInteger('client_id');
+            $table->decimal('year_objective', 8, 2); //objectif
+            $table->decimal('amount_realized', 8, 2)->default(0); //montant réalisé
+            $table->decimal('remaining_amount', 8, 2)->default(0); //montant restant
+            $table->year('year')->default(date('Y'));
+            $table->enum('objective_status', ['available', 'close'])->default('available');
+           
+            //commercial
+            $table->unsignedBigInteger('commercial_id')->nullable(); //chargé d'affaires
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null'); 
-            $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
-     
+            $table->foreign('commercial_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -33,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('potencial_cases');
+        Schema::dropIfExists('objectives');
     }
 };

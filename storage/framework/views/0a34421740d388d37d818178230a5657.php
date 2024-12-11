@@ -142,23 +142,23 @@
                 </li>
                 <?php endif; ?>
                 <?php if(Auth::check() && (Auth::user()->can('voir les positions') || Auth::user()->can('créer position'))): ?>
-                <li class="menu-title"><span>Positions</span></li>
+                <li class="menu-title"><span>Objectifs</span></li>
                 <?php endif; ?>
                 <?php if(Auth::check() && (Auth::user()->can('voir les positions') || Auth::user()->can('créer position') )): ?>
                 <li class="nav-item">
-                    <a class="nav-link menu-link" aria-expanded="<?php echo e(request()->routeIs('all.positions') || request()->routeIs('add.position')  ? 'true' : 'false'); ?>" href="#Positions" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="Positions">
-                        <i class="ri-layout-3-line"></i> <span>Positions</span>
+                    <a class="nav-link menu-link" aria-expanded="<?php echo e(request()->routeIs('all.objectives') || request()->routeIs('add.objective')  ? 'true' : 'false'); ?>" href="#Objectifs" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="Objectifs">
+                        <i class="ri-layout-3-line"></i> <span>Objectifs</span>
                     </a>
-                    <div class="collapse menu-dropdown <?php echo e(request()->routeIs('all.positions') || request()->routeIs('add.position') ? 'show' : ''); ?>" id="Positions">
+                    <div class="collapse menu-dropdown <?php echo e(request()->routeIs('all.objectives') || request()->routeIs('add.objective') ? 'show' : ''); ?>" id="Objectifs">
                         <ul class="nav nav-sm flex-column">
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('créer position')): ?>
                             <li class="nav-item">
-                                <a href="<?php echo e(route('add.position')); ?>" class="nav-link <?php echo e(Route::is('add.position') ? 'active' : ''); ?>">Ajouter position</a>
+                                <a href="<?php echo e(route('add.objective')); ?>" class="nav-link <?php echo e(Route::is('add.objective') ? 'active' : ''); ?>">Ajouter Objectif</a>
                             </li>
                             <?php endif; ?>
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('voir les positions')): ?>
                             <li class="nav-item">
-                                <a href="<?php echo e(route('all.positions')); ?>" class="nav-link <?php echo e(Route::is('all.positions') ? 'active' : ''); ?>">Les positions</a>
+                                <a href="<?php echo e(route('all.objectives')); ?>" class="nav-link <?php echo e(Route::is('all.objectives') ? 'active' : ''); ?>">Les Objectifs</a>
                             </li>
                             <?php endif; ?>
                           

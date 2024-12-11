@@ -14,20 +14,22 @@ class PotencialCase extends Model
         'client_id',
         'created_by',
         'updated_by',
-      
+        'case_capital',
+        'case_name',
+
     ];
     protected $casts = [
-        'created_at' => 'datetime', 
-        'updated_at' => 'datetime', 
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
     public function branches()
     {
         return $this->belongsToMany(Branche::class, 'potential_case_branches')
-        ->withPivot('branch_ca') 
-        ->withTimestamps(); 
+            ->withPivot('branch_ca')
+            ->withTimestamps();
     }
 
-        public function caseHistories()
+    public function caseHistories()
     {
         return $this->hasMany(PotencialCaseHisotry::class);
     }
@@ -57,7 +59,7 @@ class PotencialCase extends Model
         return $this->belongsTo(Client::class, 'client_id');
     }
 
-  
+
     public function getBranchNamesAttribute()
     {
         $branchNames = [];
@@ -72,6 +74,4 @@ class PotencialCase extends Model
         }
         return implode(', ', $branchNames);
     }
-
-    
 }

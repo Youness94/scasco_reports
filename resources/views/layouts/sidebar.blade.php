@@ -142,23 +142,23 @@
                 </li>
                 @endif
                 @if (Auth::check() && (Auth::user()->can('voir les positions') || Auth::user()->can('créer position')))
-                <li class="menu-title"><span>Positions</span></li>
+                <li class="menu-title"><span>Objectifs</span></li>
                 @endif
                 @if (Auth::check() && (Auth::user()->can('voir les positions') || Auth::user()->can('créer position') ))
                 <li class="nav-item">
-                    <a class="nav-link menu-link" aria-expanded="{{ request()->routeIs('all.positions') || request()->routeIs('add.position')  ? 'true' : 'false' }}" href="#Positions" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="Positions">
-                        <i class="ri-layout-3-line"></i> <span>Positions</span>
+                    <a class="nav-link menu-link" aria-expanded="{{ request()->routeIs('all.objectives') || request()->routeIs('add.objective')  ? 'true' : 'false' }}" href="#Objectifs" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="Objectifs">
+                        <i class="ri-layout-3-line"></i> <span>Objectifs</span>
                     </a>
-                    <div class="collapse menu-dropdown {{ request()->routeIs('all.positions') || request()->routeIs('add.position') ? 'show' : '' }}" id="Positions">
+                    <div class="collapse menu-dropdown {{ request()->routeIs('all.objectives') || request()->routeIs('add.objective') ? 'show' : '' }}" id="Objectifs">
                         <ul class="nav nav-sm flex-column">
                             @can('créer position')
                             <li class="nav-item">
-                                <a href="{{route('add.position')}}" class="nav-link {{ Route::is('add.position') ? 'active' : '' }}">Ajouter position</a>
+                                <a href="{{route('add.objective')}}" class="nav-link {{ Route::is('add.objective') ? 'active' : '' }}">Ajouter Objectif</a>
                             </li>
                             @endcan
                             @can('voir les positions')
                             <li class="nav-item">
-                                <a href="{{route('all.positions')}}" class="nav-link {{ Route::is('all.positions') ? 'active' : '' }}">Les positions</a>
+                                <a href="{{route('all.objectives')}}" class="nav-link {{ Route::is('all.objectives') ? 'active' : '' }}">Les Objectifs</a>
                             </li>
                             @endcan
                           

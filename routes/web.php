@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\BrancheController;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\HomeController;
+use App\Http\Controllers\Admin\ObjectiveController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\PotencialCaseController;
 use App\Http\Controllers\Admin\ReportController;
@@ -88,7 +89,15 @@ Route::group(['middleware' => ['web', 'auth']], function () {
         Route::post('update/position/{id}',  'update_position')->name('update.position');
         Route::get('delete/position/{id}', 'delete_position')->name('delete.position');
     });
+    Route::controller(ObjectiveController::class)->group(function () {
 
+        Route::get('objectifs', 'get_all_objectives')->name('all.objectives');
+        Route::get('ajouter-objectif',  'add_objective')->name('add.objective');
+        Route::post('store/objective',  'store_objective')->name('store.objective');
+        Route::get('modifier-objectif/{id}', 'edit_objective')->name('edit.objective');
+        Route::post('update/objective/{id}',  'update_objective')->name('update.objective');
+        Route::get('delete/objective/{id}', 'delete_objective')->name('delete.objective');
+    });
     Route::controller(ServiceController::class)->group(function () {
 
         Route::get('services', 'get_all_services')->name('all.services');

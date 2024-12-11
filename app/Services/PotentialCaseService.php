@@ -75,32 +75,38 @@ class PotentialCaseService
             );
             $generated_number = 'A-' . str_pad($newPotentialCaseNumber, 6, '0', STR_PAD_LEFT);
 
-            // Create a new PotentialCase
+            $totalCapital = 0;
+
             $potentialCase = PotencialCase::create([
                 'case_name' => $request->input('case_name'),
                 'case_number' => $generated_number,
                 'case_status' => 'pending',
+                'case_capital' => 0,
                 'client_id' => $request->input('client_id'),
                 'created_by' => $user->id,
             ]);
 
-            // Iterate over selected branches and store branch_ca values
             if ($request->has('branches') && $request->has('branch_ca')) {
-                $branches = $request->input('branches'); // Selected branches
-                $branchCaValues = $request->input('branch_ca'); // branch_ca values
+                $branches = $request->input('branches');
+                $branchCaValues = $request->input('branch_ca');
 
                 foreach ($branches as $branchId) {
-                    // Ensure a branch_ca value exists for each selected branch
+
                     $branchCaValue = $branchCaValues[$branchId] ?? null;
 
                     if ($branchCaValue) {
-                        // Store the branch and its associated branch_ca value in the pivot table
+
+                        $totalCapital += $branchCaValue;
+
                         $potentialCase->branches()->attach($branchId, [
-                            'branch_ca' => $branchCaValue, // The 'turnover' value
+                            'branch_ca' => $branchCaValue,
                         ]);
                     }
                 }
             }
+
+            // Update the case capital with the total capital from all branches
+            $potentialCase->update(['case_capital' => $totalCapital]);
 
             // Create a history record
             $this->potencialCaseHisotryService->createHistoryRecord(
@@ -122,6 +128,7 @@ class PotentialCaseService
             return ['status' => 'error', 'message' => $e->getMessage() ?: 'DB Error'];
         }
     }
+
     public function getBranchesByService($serviceIds)
     {
         // Get services with branches for the selected services
@@ -178,6 +185,9 @@ class PotentialCaseService
             $user = Auth::user();
             $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'branches'])->findOrFail($id);
 
+            // Initialize total capital
+            $totalCapital = 0;
+
             // Update the potential case details
             $potentialCase->update([
                 'client_id' => $request->input('client_id'),
@@ -185,23 +195,32 @@ class PotentialCaseService
                 'updated_by' => $user->id,
             ]);
 
+            // Detach all previous branches
             $potentialCase->branches()->detach();
 
+            // Check if new branches and branch_ca values are provided
             if ($request->has('branches') && $request->has('branch_ca')) {
                 $branches = $request->input('branches');
                 $branchCaValues = $request->input('branch_ca');
-
 
                 foreach ($branches as $branchId) {
                     $branchCaValue = $branchCaValues[$branchId] ?? null;
 
                     if ($branchCaValue) {
+                        // Add the branch_ca value to the total capital
+                        $totalCapital += $branchCaValue;
+
+                        // Reattach the branch with the new branch_ca value
                         $potentialCase->branches()->attach($branchId, [
-                            'branch_ca' => $branchCaValue, 
+                            'branch_ca' => $branchCaValue,
                         ]);
                     }
                 }
             }
+
+            // Update the case capital with the total capital from all branches
+            $potentialCase->update(['case_capital' => $totalCapital]);
+
             // Create a history record for the update
             $this->potencialCaseHisotryService->createHistoryRecord('updated', 'L\'affaire a été mise à jour', $potentialCase, null, null, $user->id);
 
