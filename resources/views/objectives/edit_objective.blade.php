@@ -26,37 +26,69 @@
             <!-- <div class="card">
                               <div class="card-body d-flex flex-column">-->
             <!-- <div class="live-preview flex-grow-1"> -->
-            <form method="POST" action="{{ route('update.position', ['id' => $position->id]) }}" class="forms-sample" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('update.objective', ['id' => $objective->id]) }}" class="forms-sample" enctype="multipart/form-data">
                   @csrf
+
                   <div class="row">
                         <div class="col-md-12">
                               <div class="card">
-                                    <div class="card-header">Position</div>
+                                    <div class="card-header">Objectif</div>
 
                                     <div class="card-body d-flex flex-column">
                                           <div class="live-preview flex-grow-1">
                                                 <div class="row">
-
                                                       <div class="col-md-4 mb-3">
-
-                                                            <label class="form-label" for="name">Nom du Poste</label>
-                                                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ $position->name }}">
-                                                            @error('name')
+                                                            <label class="form-label" for="year_objective">Objectif</label>
+                                                            <input type="number" class="form-control @error('year_objective') is-invalid @enderror" name="year_objective" value="{{ old('year_objective', $objective->year_objective) }}">
+                                                            @error('year_objective')
                                                             <span class="invalid-feedback" role="alert">
                                                                   <span class="text-danger"> {{ $message }} </span>
                                                             </span>
                                                             @enderror
                                                       </div>
 
+                                                      <div class="col-md-4 mb-3">
+                                                            <label class="form-label" for="commercial_id">Chargé d'affaire</label>
+                                                            <select name="commercial_id" id="commercial_id" class="form-control">
+                                                                  @foreach($users as $user)
+                                                                  <option value="{{ $user->id }}" {{ old('commercial_id', $objective->commercial_id) == $user->id ? 'selected' : '' }}>
+                                                                        {{ $user->first_name }} {{ $user->last_name }}
+                                                                  </option>
+                                                                  @endforeach
+                                                            </select>
+                                                            @error('commercial_id')
+                                                            <span class="invalid-feedback" role="alert">
+                                                                  <span class="text-danger"> {{ $message }} </span>
+                                                            </span>
+                                                            @enderror
+                                                      </div>
 
+                                                      <div class="col-md-4 mb-3">
+                                                            <label class="form-label" for="objective_status">Status de l'Objectif</label>
+                                                            <select name="objective_status" id="objective_status" class="form-control">
+                                                                  @foreach($objective_status as $status)
+                                                                  <option value="{{ $status }}" {{ old('objective_status', $objective->objective_status) == $status ? 'selected' : '' }}>
+                                                                        {{ ucfirst($status) }} <!-- Capitalize status for better readability -->
+                                                                  </option>
+                                                                  @endforeach
+                                                            </select>
+                                                            @error('objective_status')
+                                                            <span class="invalid-feedback" role="alert">
+                                                                  <span class="text-danger"> {{ $message }} </span>
+                                                            </span>
+                                                            @enderror
+                                                      </div>
 
+                                                      <div class="col-md-4 mb-3">
+                                                            <label class="form-label" for="year">L'année d'objectif</label>
+                                                            <input type="text" name="year" value="{{ date('Y') }}" class="form-control" readonly>
+                                                      </div>
                                                 </div>
                                           </div>
                                     </div>
                               </div>
                         </div>
                   </div>
-
 
                   <div class="row">
                         <div class="col-md-12">

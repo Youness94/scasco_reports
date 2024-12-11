@@ -7,6 +7,7 @@ use App\Http\Requests\ClientRequest;
 use App\Models\Branche;
 use App\Models\City;
 use App\Models\Client;
+use App\Models\Objective;
 use App\Models\PotencialCase;
 use App\Models\PotencialCaseHisotry;
 use App\Models\Service;
@@ -129,11 +130,7 @@ class PotentialCaseService
         }
     }
 
-    public function getBranchesByService($serviceIds)
-    {
-        // Get services with branches for the selected services
-        return Service::with('branches')->whereIn('id', $serviceIds)->get();
-    }
+
     public function editPotentialCase($id)
     {
         $user = auth()->user();
@@ -185,20 +182,44 @@ class PotentialCaseService
             $user = Auth::user();
             $potentialCase = PotencialCase::with(['creator', 'updater', 'client', 'branches'])->findOrFail($id);
 
-            // Initialize total capital
+            if ($potentialCase->case_status == 'completed') {
+                $commercialId = $potentialCase->created_by;
+                $year = date('Y');
+
+                $totalAmountRealized = PotencialCase::where('created_by', $commercialId)
+                    ->whereYear('created_at', $year)
+                    ->with('branches')
+                    ->get()
+                    ->flatMap(function ($case) {
+                        return $case->branches->pluck('pivot.branch_ca');
+                    })
+                    ->sum();
+
+                $objective = Objective::where('commercial_id', $commercialId)
+                    ->where('year', $year)
+                    ->first();
+
+                if ($objective) {
+                    $remainingAmount = $objective->year_objective - $totalAmountRealized;
+
+                    $objective->update([
+                        'amount_realized' => $totalAmountRealized,
+                        'remaining_amount' => $remainingAmount,
+                        'updated_by' => $user->id,
+                    ]);
+                }
+            }
+
             $totalCapital = 0;
 
-            // Update the potential case details
             $potentialCase->update([
-                'client_id' => $request->input('client_id'),
-                'case_name' => $request->input('case_name'),
+                'client_id' => $request->input('client_id') ?? $potentialCase->client_id ,
+                'case_name' => $request->input('case_name') ?? $potentialCase->case_name,
                 'updated_by' => $user->id,
             ]);
 
-            // Detach all previous branches
             $potentialCase->branches()->detach();
 
-            // Check if new branches and branch_ca values are provided
             if ($request->has('branches') && $request->has('branch_ca')) {
                 $branches = $request->input('branches');
                 $branchCaValues = $request->input('branch_ca');
@@ -207,10 +228,9 @@ class PotentialCaseService
                     $branchCaValue = $branchCaValues[$branchId] ?? null;
 
                     if ($branchCaValue) {
-                        // Add the branch_ca value to the total capital
+
                         $totalCapital += $branchCaValue;
 
-                        // Reattach the branch with the new branch_ca value
                         $potentialCase->branches()->attach($branchId, [
                             'branch_ca' => $branchCaValue,
                         ]);
@@ -218,10 +238,8 @@ class PotentialCaseService
                 }
             }
 
-            // Update the case capital with the total capital from all branches
             $potentialCase->update(['case_capital' => $totalCapital]);
 
-            // Create a history record for the update
             $this->potencialCaseHisotryService->createHistoryRecord('updated', 'L\'affaire a été mise à jour', $potentialCase, null, null, $user->id);
 
             DB::commit();
@@ -236,68 +254,6 @@ class PotentialCaseService
     }
 
 
-
-
-
-    public function editBranchesByService($serviceId, $caseId)
-    {
-        // Fetch the service with branches
-        $service = Service::with('branches')->findOrFail($serviceId);
-
-        // Fetch the potential case associated with the given caseId and serviceId
-        $potentialCase = PotencialCase::whereHas('services', function ($query) use ($serviceId) {
-            $query->where('service_id', $serviceId);
-        })->first();
-
-        // Retrieve the branch data (amounts) associated with the service in this potential case
-        $branchData = [];
-        if ($potentialCase) {
-            $branchData = json_decode($potentialCase->services->where('id', $serviceId)->first()->pivot->branch_data, true);
-        }
-
-        // Map the branch data along with the branches
-        $branchesWithAmounts = $service->branches->map(function ($branch) use ($branchData) {
-            $amount = null;
-            foreach ($branchData as $data) {
-                if ($data['branch_id'] == $branch->id) {
-                    $amount = $data['amount']; // Retrieve the amount for this branch
-                    break;
-                }
-            }
-            return [
-                'branch' => $branch,
-                'amount' => $amount
-            ];
-        });
-
-        // Return the branches with amounts and the service name
-        return response()->json([
-            'service_name' => $service->name,
-            'branches' => $branchesWithAmounts
-        ]);
-    }
-
-    public function updateBranchesForService($serviceId, $branchIds)
-    {
-        $service = Service::findOrFail($serviceId);
-
-        foreach ($branchIds as $branchId) {
-            $branch = Branche::find($branchId);
-            if ($branch) {
-                $branch->service_id = $serviceId;
-                $branch->save();
-            }
-        }
-    }
-
-    public function removeBranchesFromService($serviceId)
-    {
-        $service = Service::findOrFail($serviceId);
-
-        Branche::where('service_id', $serviceId)->update(['service_id' => null]);
-
-        Branche::where('service_id', $serviceId)->delete();
-    }
 
     public function deletePotencialCase($id)
     {
@@ -424,11 +380,49 @@ class PotentialCaseService
             $translatedStatus = isset($statusTranslations[$validated['case_status']])
                 ? $statusTranslations[$validated['case_status']]
                 : 'Non défini';
+
+            // If the case status is being changed to 'completed'
+            if ($validated['case_status'] == 'completed') {
+                // Get the commercial_id from the potential case (assuming 'created_by' is the commercial_id)
+                $commercialId = $potentialCase->created_by;
+                $year = date('Y'); // Assuming the year is the current year
+
+                // Calculate the total of 'branch_ca' for this commercial_id in the same year
+                $totalAmountRealized = PotencialCase::where('created_by', $commercialId)  // Same commercial_id
+                    ->whereYear('created_at', $year)  // Same year
+                    ->with('branches')  // Ensure branches relationship is loaded
+                    ->get()
+                    ->flatMap(function ($case) {
+                        // Collect all branch_ca values from the pivot table
+                        return $case->branches->pluck('pivot.branch_ca');
+                    })
+                    ->sum();  // Sum all branch_ca values to get the total realized amount
+
+                // Fetch the objective for the same commercial_id and year
+                $objective = Objective::where('commercial_id', $commercialId)
+                    ->where('year', $year)
+                    ->first();
+
+                // If the objective exists, update its 'amount_realized' and 'remaining_amount'
+                if ($objective) {
+                    $remainingAmount = $objective->year_objective - $totalAmountRealized;
+
+                    // Update the objective with the calculated amounts
+                    $objective->update([
+                        'amount_realized' => $totalAmountRealized,
+                        'remaining_amount' => $remainingAmount,
+                        'updated_by' => $user->id,
+                    ]);
+                }
+            }
+
+            // Update the status of the potential case regardless of the status
             $potentialCase->update([
-                'case_status' =>  $validated['case_status'],
+                'case_status' => $validated['case_status'],
                 'updated_by' => $user->id,
             ]);
 
+            // Log the status change in the history table
             PotencialCaseHisotry::create([
                 'comment' => "Statut modifié à: $translatedStatus",
                 'action_type' => 'status_changed',
@@ -438,7 +432,7 @@ class PotentialCaseService
             ]);
 
             DB::commit();
-            return ['status' => 'success', 'message' => 'statu a été mise à jour avec succès'];
+            return ['status' => 'success', 'message' => 'Statut a été mis à jour avec succès'];
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Potential case update failed: ' . $e->getMessage());
@@ -446,6 +440,8 @@ class PotentialCaseService
             return ['status' => 'error', 'message' => $e->getMessage() ?: 'DB Error'];
         }
     }
+
+
 
 
     // public function storeComment($validatedData, $id)

@@ -39,7 +39,7 @@
                                           <div class="live-preview flex-grow-1">
                                                 <div class="row">
                                                       <!-- Select Client -->
-                                                      <div class="col-md-4 mb-3">
+                                                      <div class="col-md-3 mb-3">
                                                             <label class="form-label" for="client_id">Ville</label>
                                                             <select id="client_id" class="form-control <?php $__errorArgs = ['client_id'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -74,9 +74,31 @@ unset($__errorArgs, $__bag); ?>
                                                                               class="ri-add-line align-bottom me-1"></i> Ajouter Client</button>
                                                             </div>
                                                       </div>
-
+                                                      <div class="col-md-3 mb-3">
+                                                            <label class="form-label" for="year_objective">Nom d'affaire</label>
+                                                            <input type="text" class="form-control <?php $__errorArgs = ['case_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" name="case_name" value="<?php echo e($potentialCase->case_name); ?>">
+                                                            <?php $__errorArgs = ['case_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                            <span class="invalid-feedback" role="alert">
+                                                                  <span class="text-danger"> <?php echo e($message); ?> </span>
+                                                            </span>
+                                                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                                                      </div>
                                                       <!-- Select branches -->
-                                                      <div class="col-md-4 mb-3">
+                                                      <div class="col-md-3 mb-3">
                                                             <label class="form-label" for="branches">Sélectionner les branches</label>
                                                             <select id="branches" name="branches[]" class="form-control <?php $__errorArgs = ['branches'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -109,7 +131,7 @@ unset($__errorArgs, $__bag); ?>
                                                       </div>
 
                                                       <!-- Container for dynamically added branch_ca input fields -->
-                                                      <div id="branch-ca-inputs" class="col-md-4 mb-3"></div>
+                                                      <div id="branch-ca-inputs" class="col-md-3 mb-3"></div>
 
 
 

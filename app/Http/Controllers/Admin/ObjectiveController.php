@@ -32,7 +32,7 @@ class ObjectiveController extends Controller
     public function store_objective(Request $request)
     {
         $request->validate([
-            'year_objective' => 'required|numeric|between:.01,999999999999.99',
+            'year_objective' => 'required|numeric|min:0.01|max:999999999999.99',
             // 'amount_realized' => 'nullable|numeric|between:.01,999999999999.99',
             // 'remaining_amount' => 'nullable|numeric|between:.01,999999999999.99',
             'commercial_id' => 'required|exists:users,id',
@@ -44,7 +44,8 @@ class ObjectiveController extends Controller
             $this->objectiveService->createObjective($request);
             return redirect('/objectifs')->with('success', 'Objective created successfully');
         } catch (\Exception $e) {
-            return redirect('/ajouter-objectif')->with('success', 'Objective not created');
+            Log::error('Objective creation failed: ' . $e->getMessage());  // Log the error
+            return redirect('/ajouter-objectif')->with('error', 'Objective not created');
         }
        
     }
@@ -53,22 +54,22 @@ class ObjectiveController extends Controller
     {
         try {
             $objective = $this->objectiveService->displayObjective($id);
-            return response()->json($objective, 200);
+            return view('objectives.objective_details.', $objective);
         } catch (\Exception $e) {
             Log::error('Objective not found: ' . $e->getMessage());
-            return response()->json(['status' => 'error', 'message' => 'Objective not found'], 404);
+            return redirect('/objectifs')->with('error', 'Objective not ');
         }
     }
     public function edit_objective($id)
-    {
-        try {
-            $objective = $this->objectiveService->editObjective($id);
-            return response()->json($objective, 200);
-        } catch (\Exception $e) {
-            Log::error('Objective not found: ' . $e->getMessage());
-            return response()->json(['status' => 'error', 'message' => 'Objective not found'], 404);
-        }
+{
+    try {
+        $objective = $this->objectiveService->editObjective($id);
+        return view('objectives.edit_objective', $objective);
+    } catch (\Exception $e) {
+        Log::error('Objective not found: ' . $e->getMessage());
+        return redirect('/objectifs')->with('error', 'Objective not found');
     }
+}
     public function update_objective(Request $request, $id)
     {
         $request->validate([
@@ -78,12 +79,14 @@ class ObjectiveController extends Controller
             'commercial_id' => 'sometimes|exists:users,id',
         ]);
 
-        $response = $this->objectiveService->updateObjective($id, $request);
+        // $response = $this->objectiveService->updateObjective($id, $request);
 
-        if ($response['status'] == 'success') {
-            return response()->json($response, 200);
-        } else {
-            return response()->json($response, 400);
+        try {
+            $this->objectiveService->updateObjective($id, $request);
+            return redirect('/objectifs')->with('success', 'Objective created successfully');
+        } catch (\Exception $e) {
+            Log::error('Objective creation failed: ' . $e->getMessage());  // Log the error
+            return redirect('/modifer-objectif')->with('error', 'Objective not created');
         }
     }
 
@@ -91,10 +94,10 @@ class ObjectiveController extends Controller
     {
         try {
             $response = $this->objectiveService->deleteObjective($id);
-            return response()->json($response, 200);
+            return redirect('/objectifs')->with('success', 'Objective deleted successfully');
         } catch (\Exception $e) {
             Log::error('Failed to delete objective: ' . $e->getMessage());
-            return response()->json(['status' => 'error', 'message' => 'Failed to delete objective'], 500);
+            return redirect('/objectifs')->with('error', 'Objective not ');
         }
     }
 }

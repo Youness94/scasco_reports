@@ -9,27 +9,28 @@ class Objective extends Model
 {
     use HasFactory;
 
+    use HasFactory;
+
     protected $fillable = [
-        'year_objective',         
-        'amount_realized',        
-        'remaining_amount',        
-        'year',                   
-        'objective_status',        
-        'commercial_id',           
-        'created_by',              
-        'updated_by',  
+        'year_objective',
+        'amount_realized',
+        'remaining_amount',
+        'year',
+        'objective_status',
+        'commercial_id',
+        'created_by',
+        'updated_by',
     ];
 
     protected $casts = [
-        'created_at' => 'datetime', 
-        'updated_at' => 'datetime', 
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-
 
     public function updater()
     {

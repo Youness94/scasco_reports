@@ -38,7 +38,7 @@
                                           <div class="live-preview flex-grow-1">
                                                 <div class="row">
                                                       <!-- Select Client -->
-                                                      <div class="col-md-4 mb-3">
+                                                      <div class="col-md-3 mb-3">
                                                             <label class="form-label" for="client_id">Ville</label>
                                                             <select id="client_id" class="form-control @error('client_id') is-invalid @enderror" name="client_id">
                                                                   @foreach ($clients as $client)
@@ -58,9 +58,17 @@
                                                                               class="ri-add-line align-bottom me-1"></i> Ajouter Client</button>
                                                             </div>
                                                       </div>
-
+                                                      <div class="col-md-3 mb-3">
+                                                            <label class="form-label" for="year_objective">Nom d'affaire</label>
+                                                            <input type="text" class="form-control @error('case_name') is-invalid @enderror" name="case_name" value="{{ $potentialCase->case_name }}">
+                                                            @error('case_name')
+                                                            <span class="invalid-feedback" role="alert">
+                                                                  <span class="text-danger"> {{ $message }} </span>
+                                                            </span>
+                                                            @enderror
+                                                      </div>
                                                       <!-- Select branches -->
-                                                      <div class="col-md-4 mb-3">
+                                                      <div class="col-md-3 mb-3">
                                                             <label class="form-label" for="branches">Sélectionner les branches</label>
                                                             <select id="branches" name="branches[]" class="form-control @error('branches') is-invalid @enderror" multiple>
                                                                   @foreach ($branches as $branche)
@@ -78,7 +86,7 @@
                                                       </div>
 
                                                       <!-- Container for dynamically added branch_ca input fields -->
-                                                      <div id="branch-ca-inputs" class="col-md-4 mb-3"></div>
+                                                      <div id="branch-ca-inputs" class="col-md-3 mb-3"></div>
 
 
 

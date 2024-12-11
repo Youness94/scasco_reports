@@ -132,75 +132,7 @@ class PotencialCaseController extends Controller
             ], 400);
         }
     }
-    public function getBranchesByService(Request $request)
-    {
-        $serviceIds = $request->input('service_ids');
-        $services = $this->potentialCaseService->getBranchesByService($serviceIds);
-
-        return response()->json($services);
-    }
-
-
-    public function editBranchesByService(Request $request)
-    {
-        // Ensure both service_id and case_id are present in the request
-        $request->validate([
-            'service_id' => 'required|integer|exists:services,id',
-            'case_id' => 'required|integer|exists:potencial_cases,id',
-        ]);
-
-        $serviceId = $request->service_id;
-        $caseId = $request->case_id;
-
-        try {
-            // Call the service method, passing both serviceId and caseId
-            $result = $this->potentialCaseService->editBranchesByService($serviceId, $caseId);
-
-            // Return the service name and branches with amounts
-            return response()->json([
-                'service_name' => $result['service_name'],
-                'branches' => $result['branches']
-            ]);
-        } catch (\Exception $e) {
-            // Log the error with additional details
-            Log::error('Error in editBranchesByService: ' . $e->getMessage(), [
-                'service_id' => $serviceId,
-                'case_id' => $caseId
-            ]);
-
-            // Return a generic error response
-            return response()->json(['error' => 'Something went wrong'], 500);
-        }
-    }
-
-    public function updateBranchesForService(Request $request)
-    {
-        $serviceId = $request->service_id;
-        $branchIds = $request->branch_ids; // array of branch IDs to associate with the service
-
-        try {
-            // Calling the service layer method to update the branches
-            $this->potentialCaseService->updateBranchesForService($serviceId, $branchIds);
-            return response()->json(['success' => true]);
-        } catch (\Exception $e) {
-            Log::error('Error in updateBranchesForService: ' . $e->getMessage());
-            return response()->json(['error' => 'Something went wrong'], 500);
-        }
-    }
-
-    public function removeBranchesFromService(Request $request)
-    {
-        $serviceId = $request->service_id;
-
-        try {
-
-            $this->potentialCaseService->removeBranchesFromService($serviceId);
-            return response()->json(['success' => true]);
-        } catch (\Exception $e) {
-            Log::error('Error in removeBranchesFromService: ' . $e->getMessage());
-            return response()->json(['error' => 'Something went wrong'], 500);
-        }
-    }
+  
 
 
 

@@ -56,10 +56,10 @@
                         <div class="card-header d-flex flex-column">
                             <div class="row align-items-center">
                                 <div class="col-md-10">
-                                    <h5 class="card-title mb-0">Les Positions</h5>
+                                    <h5 class="card-title mb-0">Les objectifs</h5>
                                 </div>
                                 <div class="col-md-2 d-flex justify-content-end"> 
-                                    <a href="{{ route('add.position') }}" class="btn btn-success add-btn"><i class="ri-add-line align-bottom me-1"></i> Ajouter</a> <!-- Remove padding from button -->
+                                    <a href="{{ route('add.objective') }}" class="btn btn-success add-btn"><i class="ri-add-line align-bottom me-1"></i> Ajouter</a> <!-- Remove padding from button -->
                                 </div>
                             </div>
                         </div>
@@ -69,15 +69,35 @@
                             <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>Positions</th>
-
+                                        <th>L'année d'objectif</th>
+                                        <th>L'objectif</th>
+                                        <th>Le montant réalisé</th>
+                                        <th>Le montant restant</th>
+                                        <th>Chargé(e) d'affaire</th>
+                                        <th>Statut d'objectif</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($positions as $position)
+                                    @foreach ($objectives as $objective)
                                     <tr>
-                                        <td>{{ $position->name }}</td>
+                                        <td>{{ $objective->year }}</td>
+                                        <td>{{ $objective->year_objective }} DH </td>
+                                        <td>{{ $objective->amount_realized }} DH</td>
+                                        <td>{{ $objective->remaining_amount }} DH</td>
+                                        <td>{{ $objective->commercial->first_name }} {{ $objective->commercial->last_name }}</td>
+                                        <td>
+                                            @switch($objective->objective_status)
+                                            @case('available')
+                                            <a class="text-warning">En coure</a>
+                                            @break
+                                            @case('close')
+                                            <a class="text-danger">Fermer</a>
+                                            @break
+                                            @default
+                                            <a class="text-muted">Pas de statut</a>
+                                            @endswitch
+                                        </td>
 
                                         <td>
                                             <div class="dropdown d-inline-block">
@@ -85,8 +105,8 @@
                                                     <i class="ri-more-fill align-middle"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
-                                                    <li><a href="{{route('edit.position',$position->id)}}" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Modifier</a></li>
-                                                    <li><a href="{{route('delete.position',$position->id)}}" class="dropdown-item edit-item-btn"><i class="ri-delete-bin-2-fill align-bottom me-2 text-muted"></i> Supprimer</a></li>
+                                                    <li><a href="{{route('edit.objective',$objective->id)}}" class="dropdown-item edit-item-btn"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Modifier</a></li>
+                                                    <li><a href="{{route('delete.objective',$objective->id)}}" class="dropdown-item edit-item-btn"><i class="ri-delete-bin-2-fill align-bottom me-2 text-muted"></i> Supprimer</a></li>
                                                 </ul>
                                             </div>
                                         </td>

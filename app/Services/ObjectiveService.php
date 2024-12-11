@@ -25,61 +25,69 @@ class ObjectiveService
         ];
     }
     public function createObjective($request)
-{
-    DB::beginTransaction();
-    try {
-        $user = Auth::user();
+    {
+        DB::beginTransaction();
 
-        $existingObjective = Objective::where('commercial_id', $request->input('commercial_id'))
-            ->where('year', date('Y'))
-            ->where('objective_status', 'available')
-            ->first();
+        try {
+            $user = Auth::user();
 
-        if ($existingObjective) {
-            $existingObjective->update([
-                'objective_status' => 'close',
-                'updated_by' => $user->id
+            // Check for an existing objective for this commercial and the current year
+            $existingObjective = Objective::where('commercial_id', $request->input('commercial_id'))
+                ->where('year', date('Y'))
+                ->where('objective_status', 'available')
+                ->first();
+
+            if ($existingObjective) {
+                $existingObjective->update([
+                    'objective_status' => 'close',
+                    'updated_by' => $user->id
+                ]);
+            }
+
+            // Calculate the total amount realized
+            $totalAmountRealized = PotencialCase::where('created_by', $request->input('commercial_id'))
+                ->whereYear('created_at', date('Y'))
+                ->where('case_status', 'completed')
+                ->with('branches')
+                ->get()
+                ->flatMap(function ($case) {
+                    // For each PotencialCase, collect all branch_ca values
+                    return $case->branches->pluck('pivot.branch_ca');
+                })
+                ->sum();
+
+            // Calculate the remaining amount
+            $yearObjective = $request->input('year_objective');
+            $remainingAmount = $yearObjective - $totalAmountRealized;
+
+            // Create a new objective
+            $objective = Objective::create([
+                'year_objective' => $yearObjective,
+                'amount_realized' => $totalAmountRealized,
+                'remaining_amount' => $remainingAmount,
+                'objective_status' => $request->input('objective_status') ?? 'available',
+                'year' => date('Y'),
+                'commercial_id' => $request->input('commercial_id'),
+                'created_by' => $user->id,
             ]);
+
+            DB::commit();
+            return ['status' => 'success', 'message' => 'Objective created successfully'];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Objective creation failed: ' . $e->getMessage());
+            return ['status' => 'error', 'message' => 'Objective not created'];
         }
-
-        $totalAmountRealized = PotencialCase::where('created_by', $request->input('commercial_id'))
-            ->whereYear('created_at', date('Y'))  
-            ->where('case_status', 'completed')  
-            ->with('branches') 
-            ->get()
-            ->flatMap(function ($case) {
-                // For each PotencialCase, collect all branch_ca values
-                return $case->branches->pluck('pivot.branch_ca');  
-            })
-            ->sum(); 
-
-     
-        $yearObjective = $request->input('year_objective');
-        $remainingAmount = $yearObjective - $totalAmountRealized;
-
-        $objective = Objective::create([
-            'year_objective' => $yearObjective,
-            'amount_realized' => $totalAmountRealized,  
-            'remaining_amount' => $remainingAmount,  
-            'objective_status' => $request->input('objective_status') ?? 'available',
-            'year' => date('Y'), 
-            'commercial_id' => $request->input('commercial_id'),
-            'created_by' => $user->id,
-        ]);
-
-        DB::commit();
-        return ['status' => 'success', 'message' => 'Objective created successfully'];
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Objective creation failed: ' . $e->getMessage());
-        return ['status' => 'error', 'message' => 'Objective not created'];
     }
-}
-
 
     public function editObjective($id)
     {
-        return Objective::with('creator', 'updater', 'commercial')->findOrFail($id);
+        return [
+            'objective' => Objective::with('creator', 'updater', 'commercial')->findOrFail($id),
+            'users' => User::all(),
+            'objective_status' => ['available', 'close'] 
+            
+        ];
     }
 
     public function updateObjective($id, $request)
@@ -88,31 +96,31 @@ class ObjectiveService
         try {
             $user = Auth::user();
             $objective = Objective::with('creator', 'updater', 'commercial')->findOrFail($id);
-    
+
 
             $newCommercialId = $request->input('commercial_id', $objective->commercial_id);
-    
 
-            $totalAmountRealized = PotencialCase::where('created_by', $newCommercialId)  
-                ->whereYear('created_at', $objective->year) 
-                ->where('case_status', 'completed')  
-                ->with('branches')  
+
+            $totalAmountRealized = PotencialCase::where('created_by', $newCommercialId)
+                ->whereYear('created_at', $objective->year)
+                ->where('case_status', 'completed')
+                ->with('branches')
                 ->get()
                 ->flatMap(function ($case) {
-                    return $case->branches->pluck('pivot.branch_ca'); 
+                    return $case->branches->pluck('pivot.branch_ca');
                 })
-                ->sum();  
-    
+                ->sum();
+
             // Calculate remaining_amount as year_objective - amount_realized
             $yearObjective = $request->input('year_objective', $objective->year_objective);
             $remainingAmount = $yearObjective - $totalAmountRealized;
-    
+
             if ($objective->commercial_id != $newCommercialId) {
                 $previousObjective = Objective::where('commercial_id', $objective->commercial_id)
-                                              ->where('year', $objective->year)
-                                              ->where('objective_status', 'available')
-                                              ->first();
-    
+                    ->where('year', $objective->year)
+                    ->where('objective_status', 'available')
+                    ->first();
+
                 if ($previousObjective) {
                     $previousObjective->update([
                         'objective_status' => 'close',
@@ -121,10 +129,10 @@ class ObjectiveService
                 }
 
                 $newObjective = Objective::where('commercial_id', $newCommercialId)
-                                         ->where('year', $objective->year)
-                                         ->where('objective_status', 'available')
-                                         ->first();
-    
+                    ->where('year', $objective->year)
+                    ->where('objective_status', 'available')
+                    ->first();
+
                 if ($newObjective) {
                     $newObjective->update([
                         'objective_status' => 'close',
@@ -132,15 +140,16 @@ class ObjectiveService
                     ]);
                 }
             }
-    
+
             $objective->update([
-                'year_objective' => $yearObjective, 
+                'year_objective' => $yearObjective,
                 'amount_realized' => $totalAmountRealized,
-                'remaining_amount' => $remainingAmount, 
-                'commercial_id' => $newCommercialId, 
-                'updated_by' => $user->id, 
+                'remaining_amount' => $remainingAmount,
+                'commercial_id' => $newCommercialId,
+                'objective_status' => $request->input('objective_status') ?? $objective->objective_status, 
+                'updated_by' => $user->id,
             ]);
-    
+
             DB::commit();
             return ['status' => 'success', 'message' => 'Objective updated successfully'];
         } catch (\Exception $e) {
@@ -149,7 +158,7 @@ class ObjectiveService
             return ['status' => 'error', 'message' => $e->getMessage() ?: 'DB Error'];
         }
     }
-    
+
 
     public function displayObjective($id)
     {

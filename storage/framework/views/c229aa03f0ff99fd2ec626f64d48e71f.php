@@ -73,6 +73,7 @@
                                 <thead>
                                     <tr>
                                         <th>Numéro d'Affaire</th>
+                                        <th>Nom d'Affaire</th>
                                         <th>Client</th>
                                         <th>Statu</th>
                                         <th>Branches</th>
@@ -85,7 +86,8 @@
                                     <?php $__currentLoopData = $all_potential_cases; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $all_potential_case): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr>
                                         <td><?php echo e($all_potential_case->case_number ?? 'N/V'); ?></td>
-                                        <td><?php echo e($all_potential_case->client->client_first_name ?? 'N/V'); ?></td>
+                                        <td><?php echo e($all_potential_case->case_name ?? 'N/V'); ?></td>
+                                        <td><?php echo e($all_potential_case->client->client_first_name ?? 'N/V'); ?> <?php echo e($all_potential_case->client->client_last_name ?? 'N/V'); ?></td>
                                         <td><?php echo e($all_potential_case->case_status ?? 'N/V'); ?></td>
 
                                         <!-- Display Services -->
@@ -98,7 +100,8 @@
                                         <!-- Display CA for Each Branch -->
                                         <td>
                                             <?php $__currentLoopData = $all_potential_case->branches; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branche): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <?php echo e($branche->pivot->branch_ca ?? 'N/V'); ?><?php if(!$loop->last): ?>, <?php endif; ?>
+                                            <?php echo e($branche->pivot->branch_ca ?? 'N/V'); ?> DH
+                                            <?php if(!$loop->last): ?>, <?php endif; ?>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </td>
                                         <td><?php echo e($all_potential_case->creator->first_name ?? 'N/V'); ?> <?php echo e($all_potential_case->creator->last_name ?? 'N/V'); ?></td>

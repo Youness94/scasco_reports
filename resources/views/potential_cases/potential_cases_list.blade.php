@@ -70,6 +70,7 @@
                                 <thead>
                                     <tr>
                                         <th>Numéro d'Affaire</th>
+                                        <th>Nom d'Affaire</th>
                                         <th>Client</th>
                                         <th>Statu</th>
                                         <th>Branches</th>
@@ -82,7 +83,8 @@
                                     @foreach ($all_potential_cases as $all_potential_case)
                                     <tr>
                                         <td>{{ $all_potential_case->case_number ?? 'N/V' }}</td>
-                                        <td>{{ $all_potential_case->client->client_first_name ?? 'N/V' }}</td>
+                                        <td>{{ $all_potential_case->case_name ?? 'N/V' }}</td>
+                                        <td>{{ $all_potential_case->client->client_first_name ?? 'N/V' }} {{ $all_potential_case->client->client_last_name ?? 'N/V' }}</td>
                                         <td>{{ $all_potential_case->case_status ?? 'N/V' }}</td>
 
                                         <!-- Display Services -->
@@ -95,7 +97,8 @@
                                         <!-- Display CA for Each Branch -->
                                         <td>
                                             @foreach($all_potential_case->branches as $branche)
-                                            {{ $branche->pivot->branch_ca ?? 'N/V' }}@if (!$loop->last), @endif
+                                            {{ $branche->pivot->branch_ca ?? 'N/V' }} DH
+                                            @if (!$loop->last), @endif
                                             @endforeach
                                         </td>
                                         <td>{{ $all_potential_case->creator->first_name ?? 'N/V' }} {{ $all_potential_case->creator->last_name ?? 'N/V' }}</td>

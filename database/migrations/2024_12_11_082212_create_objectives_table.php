@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('objectives', function (Blueprint $table) {
             $table->id();
-            $table->decimal('year_objective', 8, 2); //objectif
-            $table->decimal('amount_realized', 8, 2)->default(0); //montant réalisé
-            $table->decimal('remaining_amount', 8, 2)->default(0); //montant restant
-            $table->year('year')->default(date('Y'));
+            $table->decimal('year_objective', 12, 2); //objectif
+            $table->decimal('amount_realized', 12, 2)->default(0); //montant réalisé
+            $table->decimal('remaining_amount', 12, 2)->default(0); //montant restant
+            $table->year('year')->default(now()->year); 
             $table->enum('objective_status', ['available', 'close'])->default('available');
            
             //commercial

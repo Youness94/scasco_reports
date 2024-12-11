@@ -40,7 +40,7 @@
 
 
                                     <!-- Client -->
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-md-3 mb-3">
                                         <label class="form-label" for="client_id">Client</label>
                                         <select id="client_id" class="js-example-basic-single form-control @error('client_id') is-invalid @enderror" name="client_id">
                                             <option selected disabled value="">Choisissez une ville</option>
@@ -62,8 +62,16 @@
                                         </div>
 
                                     </div>
-
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-md-3 mb-3">
+                                        <label class="form-label" for="year_objective">Nom d'affaire</label>
+                                        <input type="text" class="form-control @error('case_name') is-invalid @enderror" name="case_name" value="{{ old('case_name') }}">
+                                        @error('case_name')
+                                        <span class="invalid-feedback" role="alert">
+                                            <span class="text-danger"> {{ $message }} </span>
+                                        </span>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-3 mb-3">
                                         <label class="form-label" for="branches">Branches</label>
                                         <select id="branches" name="branches[]" class="form-control" multiple>
                                             @foreach($branches as $branch)
@@ -73,7 +81,7 @@
                                     </div>
 
                                     <!-- Dynamic Branch CA Inputs -->
-                                    <div id="branch-ca-inputs" class="col-md-4 mb-3">
+                                    <div id="branch-ca-inputs" class="col-md-3 mb-3">
                                         <!-- Dynamically generated branch_ca inputs will go here -->
                                     </div>
                                 </div>
