@@ -111,7 +111,7 @@ unset($__errorArgs, $__bag); ?>
 
                                                       <div class="col-md-4 mb-3">
                                                             <label class="form-label" for="year">L'année d'objectif</label>
-                                                            <input type="text" name="year" value="<?php echo e(date('Y')); ?>" class="form-control" >
+                                                            <input type="text" name="year" value="<?php echo e(date('Y')); ?>" class="form-control" readonly>
                                                       </div>
                                                 </div>
                                           </div>

@@ -36,6 +36,13 @@ class ObjectiveController extends Controller
             // 'amount_realized' => 'nullable|numeric|between:.01,999999999999.99',
             // 'remaining_amount' => 'nullable|numeric|between:.01,999999999999.99',
             'commercial_id' => 'required|exists:users,id',
+        ], [
+            'year_objective.required' => 'L\'objectif annuel est obligatoire.',
+            'year_objective.numeric' => 'L\'objectif annuel doit être un nombre.',
+            'year_objective.min' => 'L\'objectif annuel doit être au moins 0.01.',
+            'year_objective.max' => 'L\'objectif annuel ne peut pas dépasser 999999999999.99.',
+            'commercial_id.required' => 'L\'identifiant commercial est obligatoire.',
+            'commercial_id.exists' => 'L\'identifiant commercial sélectionné n\'existe pas.',
         ]);
 
         // $response = $this->objectiveService->createObjective($request);
@@ -77,6 +84,18 @@ class ObjectiveController extends Controller
             // 'amount_realized' => 'sometimes|numeric|between:.01,999999999999.99',
             // 'remaining_amount' => 'sometimes|numeric|between:.01,999999999999.99',
             'commercial_id' => 'sometimes|exists:users,id',
+        ], [
+            'year_objective.sometimes' => 'L\'objectif annuel est obligatoire si présent.',
+            'year_objective.numeric' => 'L\'objectif annuel doit être un nombre.',
+            'year_objective.between' => 'L\'objectif annuel doit être entre 0.01 et 999999999999.99.',
+            // 'amount_realized.sometimes' => 'Le montant réalisé est obligatoire si présent.',
+            // 'amount_realized.numeric' => 'Le montant réalisé doit être un nombre.',
+            // 'amount_realized.between' => 'Le montant réalisé doit être entre 0.01 et 999999999999.99.',
+            // 'remaining_amount.sometimes' => 'Le montant restant est obligatoire si présent.',
+            // 'remaining_amount.numeric' => 'Le montant restant doit être un nombre.',
+            // 'remaining_amount.between' => 'Le montant restant doit être entre 0.01 et 999999999999.99.',
+            'commercial_id.sometimes' => 'L\'identifiant commercial est obligatoire si présent.',
+            'commercial_id.exists' => 'L\'identifiant commercial sélectionné n\'existe pas.',
         ]);
 
         // $response = $this->objectiveService->updateObjective($id, $request);

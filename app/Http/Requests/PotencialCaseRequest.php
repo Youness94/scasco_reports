@@ -24,11 +24,12 @@ class PotencialCaseRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'case_name' => 'required',
             'client_id' => 'required|exists:clients,id',
-            'services' => 'required|array',
-            'services.*' => 'exists:services,id',
-            'branches' => 'nullable|array',
+            'branches' => 'required|array',
             'branches.*' => 'exists:branches,id',
+            'branch_ca' => 'nullable|array',
+            'branch_ca.*' => 'numeric|between:.01,999999999999.99',
         ];
     }
     /**
@@ -39,13 +40,15 @@ class PotencialCaseRequest extends FormRequest
     public function messages()
     {
         return [
+            'case_name.required' => 'Le nom du cas est obligatoire.',
             'client_id.required' => 'Le client est obligatoire.',
-            'client_id.exists' => 'Le client spécifié n\'existe pas.',
-            'services.required' => 'Les services sont obligatoires.',
-            'services.array' => 'Les services doivent être fournis sous forme de tableau.',
-            'services.*.exists' => 'Un ou plusieurs services spécifiés n\'existent pas.',
-            'branches.array' => 'Les branches doivent être fournies sous forme de tableau.',
-            'branches.*.exists' => 'Une ou plusieurs branches spécifiées n\'existent pas.',
+            'client_id.exists' => 'Le client sélectionné n\'existe pas.',
+            'branches.required' => 'Les branches sont obligatoires.',
+            'branches.array' => 'Les branches doivent être un tableau.',
+            'branches.*.exists' => 'La branche sélectionnée n\'existe pas.',
+            'branch_ca.array' => 'Les montants des branches doivent être un tableau.',
+            'branch_ca.*.numeric' => 'Les montants des branches doivent être numériques.',
+            'branch_ca.*.between' => 'Les montants des branches doivent être entre 0.01 et 999999999999.99.',
         ];
     }
     public function failedValidation(Validator $validator)

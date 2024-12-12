@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\BrancheApiController;
 use App\Http\Controllers\Api\ClientApiController;
 use App\Http\Controllers\Api\LoginApiController;
 use App\Http\Controllers\Api\HomeApiController;
+use App\Http\Controllers\Api\ObjectiveApiController;
 use App\Http\Controllers\Api\PositionApiController;
 use App\Http\Controllers\Api\PotencialCaseApiController;
 use App\Http\Controllers\Api\ReportApiController;
@@ -131,6 +132,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/update-branches-for-service', 'updateBranchesForService')->name('updateBranchesForService');
         Route::post('/remove-branches-from-service', 'removeBranchesFromService')->name('removeBranchesFromService');
         Route::get('/edit-branches-by-service', 'editBranchesByService')->name('editBranchesByService');
+
+
+        Route::post('update/status_potential_case/{id}',  'updateStatusPotentialCase')->name('update.status.potential.case');
+        Route::post('store/commnet_potential_case/{id}',  'createCommentPotentialCase')->name('store.comment.potential.case');
+        Route::post('store/client_potential_case',  'store_client_potential_case')->name('store.client.potential.case');
     });
 
     Route::controller(ReportApiController::class)->group(function () {
@@ -160,6 +166,15 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
 
+    Route::controller(ObjectiveApiController::class)->group(function () {
+
+        Route::get('objectifs', 'get_all_objectives')->name('all.objectives');
+        Route::get('ajouter-objectif',  'add_objective')->name('add.objective');
+        Route::post('store/objective',  'store_objective')->name('store.objective');
+        Route::get('modifier-objectif/{id}', 'edit_objective')->name('edit.objective');
+        Route::post('update/objective/{id}',  'update_objective')->name('update.objective');
+        Route::get('delete/objective/{id}', 'delete_objective')->name('delete.objective');
+    });
 
     // Route::controller(AdminPermissionController::class)->group(function () {
 

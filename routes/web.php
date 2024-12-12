@@ -139,11 +139,11 @@ Route::group(['middleware' => ['web', 'auth']], function () {
         Route::get('delete/affaire/{id}', 'delete_potential_case')->name('delete.potential_case');
         Route::get('détail-de-affaire/{id}', 'display_potential_case')->name('display.potential_case');
 
-        Route::get('get-branches-by-service', 'getBranchesByService')->name('getBranchesByService');
+        // Route::get('get-branches-by-service', 'getBranchesByService')->name('getBranchesByService');
 
-        Route::get('/edit-branches-by-service',  'editBranchesByService')->name('edit.branches.by.service');
-        Route::post('/update-branches-for-service', 'updateBranchesForService')->name('update.branches.for.service');
-        Route::post('/remove-branches-from-service',  'removeBranchesFromService')->name('remove.branches.from.service');
+        // Route::get('/edit-branches-by-service',  'editBranchesByService')->name('edit.branches.by.service');
+        // Route::post('/update-branches-for-service', 'updateBranchesForService')->name('update.branches.for.service');
+        // Route::post('/remove-branches-from-service',  'removeBranchesFromService')->name('remove.branches.from.service');
         
         
         Route::post('update/status_potential_case/{id}',  'updateStatusPotentialCase')->name('update.status.potential.case');

@@ -16,10 +16,10 @@ class BrancheSeeder extends Seeder
     {
         $branches = [
             // Sinistres Risques Divers Et Prévoyance
-            "Sinistres Maladie",
-            "Sinistres AT",
-            "Sinistres Risques Divers Et Techniques",
-            "Sinistres Manitines",
+            "Maladie",
+            "AT",
+            "Risques Divers Et Techniques",
+            "Manitines",
             
             // Recouvrement
             "Recouvrement à L'amiable",
@@ -69,10 +69,10 @@ class BrancheSeeder extends Seeder
         $serviceBranches = [
             // Sinistres Risques Divers Et Prévoyance
             "Sinistres Risques Divers Et Prévoyance" => [
-                "Sinistres Maladie",
-                "Sinistres AT",
-                "Sinistres Risques Divers Et Techniques",
-                "Sinistres Manitines",
+                "Maladie",
+                "AT",
+                "Risques Divers Et Techniques",
+                "Manitines",
             ],
             
             // Recouvrement

@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdatePotencialCaseRequest extends FormRequest
+class ObjectiveRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,12 +24,10 @@ class UpdatePotencialCaseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'case_name' => 'sometimes',
-            'client_id' => 'sometimes|exists:clients,id',
-            'branches' => 'nullable|array',
-            'branches.*' => 'exists:branches,id',
-            'branch_ca' => 'nullable|array',
-            'branch_ca.*' => 'numeric|between:.01,999999999999.99',
+            'year_objective' => 'required|numeric|min:0.01|max:999999999999.99',
+            // 'amount_realized' => 'nullable|numeric|between:.01,999999999999.99',
+            // 'remaining_amount' => 'nullable|numeric|between:.01,999999999999.99',
+            'commercial_id' => 'required|exists:users,id',
         ];
     }
     /**
@@ -40,14 +38,12 @@ class UpdatePotencialCaseRequest extends FormRequest
     public function messages()
     {
         return [
-            'case_name.sometimes' => 'Le nom du cas peut être renseigné.',
-            'client_id.sometimes' => 'Le client peut être renseigné.',
-            'client_id.exists' => 'Le client sélectionné n\'existe pas.',
-            'branches.array' => 'Les branches doivent être un tableau.',
-            'branches.*.exists' => 'La branche sélectionnée n\'existe pas.',
-            'branch_ca.array' => 'Les montants des branches doivent être un tableau.',
-            'branch_ca.*.numeric' => 'Les montants des branches doivent être numériques.',
-            'branch_ca.*.between' => 'Les montants des branches doivent être entre 0.01 et 999999999999.99.',
+            'year_objective.required' => 'L\'objectif annuel est obligatoire.',
+            'year_objective.numeric' => 'L\'objectif annuel doit être un nombre.',
+            'year_objective.min' => 'L\'objectif annuel doit être au moins 0.01.',
+            'year_objective.max' => 'L\'objectif annuel ne peut pas dépasser 999999999999.99.',
+            'commercial_id.required' => 'L\'identifiant commercial est obligatoire.',
+            'commercial_id.exists' => 'L\'identifiant commercial sélectionné n\'existe pas.',
         ];
     }
     public function failedValidation(Validator $validator)
